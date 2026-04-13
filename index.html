@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pantry - Live Firestore Pantry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f3ec;
+    --warm-white: #fdfaf5;
+    --ink: #1c1810;
+    --ink-light: #4a4438;
+    --ink-muted: #8c8070;
+    --terracotta: #c4623a;
+    --terracotta-light: #e8956d;
+    --sage: #6b8c6b;
+    --gold: #d4a844;
+    --border: rgba(28, 24, 16, 0.12);
+    --shadow: 0 4px 24px rgba(28, 24, 16, 0.08);
+    --shadow-lg: 0 12px 48px rgba(28, 24, 16, 0.14);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "DM Sans", sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231C1810' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  header {
+    padding: 48px 0 36px;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .logo-eyebrow,
+  .stat-label,
+  .tab,
+  label,
+  .badge,
+  .status-pill,
+  .mono {
+    font-family: "DM Mono", monospace;
+  }
+
+  .logo-eyebrow,
+  .stat-label,
+  .tab,
+  label,
+  .badge,
+  .status-pill {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .logo-eyebrow {
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+
+  .logo-title {
+    font-family: "Playfair Display", serif;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-title em {
+    color: var(--terracotta);
+    font-style: italic;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: "Playfair Display", serif;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--terracotta);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .section-sub {
+    color: var(--ink-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 24px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"],
+  input[type="url"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--cream);
+    color: var(--ink);
+    font: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 3px rgba(196, 98, 58, 0.12);
+  }
+
+  textarea {
+    min-height: 170px;
+    resize: vertical;
+    font-family: "DM Mono", monospace;
+    line-height: 1.5;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 22px;
+    cursor: pointer;
+    font: 500 12px "DM Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--terracotta);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 8px 20px rgba(196, 98, 58, 0.24);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-muted);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: #b93a2d;
+    border: 1.5px solid rgba(185, 58, 45, 0.18);
+    padding: 7px 12px;
+    font-size: 10px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .status-pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-live {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .status-offline {
+    background: #fff4ee;
+    color: var(--terracotta);
+  }
+
+  .status-note,
+  .tip {
+    margin-top: 16px;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .status-note {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--ink-light);
+  }
+
+  .tip {
+    background: #f0f7f0;
+    border: 1px solid #c8dfc8;
+    color: var(--sage);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    padding: 14px 22px;
+    position: relative;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1.5px;
+    height: 2px;
+    background: var(--terracotta);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .tab.active {
+    color: var(--ink);
+  }
+
+  .tab.active::after {
+    transform: scaleX(1);
+  }
+
+  .panel {
+    display: none;
+  }
+
+  .panel.active {
+    display: block;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .pantry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .pantry-item,
+  .url-item {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .item-name {
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .item-meta,
+  .recipe-url-line {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .badge-produce { background: #e8f5e9; color: #2e7d32; }
+  .badge-dairy { background: #fff8e1; color: #f57f17; }
+  .badge-meat { background: #fce4ec; color: #c62828; }
+  .badge-pantry { background: #ede7f6; color: #4527a0; }
+  .badge-spice { background: #fff3e0; color: #e65100; }
+  .badge-frozen { background: #e3f2fd; color: #1565c0; }
+  .badge-bakery { background: #f3e5f5; color: #6a1b9a; }
+  .badge-other { background: #eceff1; color: #37474f; }
+
+  .item-qty,
+  .recipe-url-line {
+    color: var(--ink-muted);
+    font-size: 12px;
+  }
+
+  .empty,
+  .coming-soon {
+    text-align: center;
+    padding: 56px 20px;
+    color: var(--ink-muted);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    background: rgba(253, 250, 245, 0.5);
+  }
+
+  .empty strong,
+  .coming-soon strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .toast {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: transform 0.24s, opacity 0.24s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .notice-list {
+    margin-top: 18px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .notice {
+    border-left: 4px solid var(--gold);
+    background: #fff8e8;
+    padding: 16px 18px;
+    border-radius: 12px;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  a.link {
+    color: var(--terracotta);
+    text-decoration: none;
+  }
+
+  a.link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 820px) {
+    header,
+    .section-header,
+    .two-col {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+
+    header {
+      align-items: start;
+    }
+
+    .header-stats,
+    .filter-bar,
+    .input-row {
+      width: 100%;
+    }
+
+    .stat {
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-eyebrow">Kitchen Intelligence</div>
+      <h1 class="logo-title">The <em>Pantry</em></h1>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-items">0</div>
+        <div class="stat-label">Pantry Items</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-recipes">0</div>
+        <div class="stat-label">Recipes Queued</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Live Firestore Sync</h2>
+        <p class="section-sub">This GitHub Pages version is fully static. Pantry items and recipe links can sync live with Firestore directly from the browser.</p>
+      </div>
+      <span class="status-pill status-offline" id="sync-status">Not Connected</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <label for="firebase-config">Firebase Web Config JSON</label>
+        <textarea id="firebase-config" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea>
+      </div>
+      <div>
+        <label for="space-id">Pantry Space</label>
+        <input type="text" id="space-id" placeholder="family-kitchen" onkeydown="if(event.key==='Enter') connectFirestore()">
+        <div class="tip">Use the same pantry space on multiple devices if you want everyone looking at the same live pantry.</div>
+        <div class="input-row" style="margin-top:16px;">
+          <button class="btn btn-primary" onclick="connectFirestore()">Save and Connect</button>
+          <button class="btn btn-ghost" onclick="disconnectFirestore()">Disconnect</button>
+        </div>
+      </div>
+    </div>
+    <div class="status-note" id="sync-note">Paste your Firebase web config JSON, choose a pantry space, and click Save and Connect.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('pantry')">Pantry</button>
+    <button class="tab" onclick="switchTab('recipes')">Recipes</button>
+    <button class="tab" onclick="switchTab('analyze')">Analyze</button>
+    <button class="tab" onclick="switchTab('suggest')">Suggest</button>
+  </div>
+
+  <div id="tab-pantry" class="panel active">
+    <div class="card">
+      <h2 class="section-title">Add To Your Pantry</h2>
+      <p class="section-sub">These pantry items sync through Firestore in real time once you connect.</p>
+      <div class="input-row" style="margin-top:18px;">
+        <input type="text" id="ing-name" placeholder="Ingredient name, or comma-separated list" onkeydown="if(event.key==='Enter') addIngredient()">
+        <input type="text" id="ing-qty" placeholder="Quantity" style="max-width:160px;">
+        <select id="ing-cat" style="max-width:170px;">
+          <option value="produce">Produce</option>
+          <option value="dairy">Dairy</option>
+          <option value="meat">Meat</option>
+          <option value="pantry" selected>Pantry</option>
+          <option value="spice">Spice</option>
+          <option value="frozen">Frozen</option>
+          <option value="bakery">Bakery</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="addIngredient()">Add Item</button>
+      </div>
+      <div class="tip">Bulk add works too. Example: olive oil, salt, black pepper, garlic</div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="search-pantry" placeholder="Search pantry..." oninput="renderPantry()">
+      <select id="filter-cat" onchange="renderPantry()" style="max-width:170px;">
+        <option value="">All Categories</option>
+        <option value="produce">Produce</option>
+        <option value="dairy">Dairy</option>
+        <option value="meat">Meat</option>
+        <option value="pantry">Pantry</option>
+        <option value="spice">Spice</option>
+        <option value="frozen">Frozen</option>
+        <option value="bakery">Bakery</option>
+        <option value="other">Other</option>
+      </select>
+      <button class="btn btn-ghost" onclick="clearPantry()">Clear All</button>
+    </div>
+
+    <div id="pantry-grid" class="pantry-grid"></div>
+  </div>
+
+  <div id="tab-recipes" class="panel">
+    <div class="card">
+      <h2 class="section-title">Queue Recipe URLs</h2>
+      <p class="section-sub">This queue also syncs live through Firestore and stays GitHub Pages compatible.</p>
+      <div class="input-row" style="margin-top:18px;">
+        <input type="url" id="recipe-url" placeholder="https://example.com/recipe" onkeydown="if(event.key==='Enter') addRecipeUrl()">
+        <button class="btn btn-primary" onclick="addRecipeUrl()">Add URL</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2 class="section-title" style="margin-bottom:0;">Queued Recipes <span id="recipe-count-badge" class="mono" style="font-size:14px;color:var(--ink-muted);"></span></h2>
+      <button class="btn btn-ghost" onclick="clearUrls()">Clear All</button>
+    </div>
+
+    <div id="url-list"></div>
+  </div>
+
+  <div id="tab-analyze" class="panel">
+    <div class="card coming-soon">
+      <strong>Analysis Needs A Secure Backend</strong>
+      <p>This site is hosted on GitHub Pages, so it cannot safely store a private AI API key in the browser.</p>
+      <div class="notice-list">
+        <div class="notice">The Firestore database pieces are safe to run directly from a static site.</div>
+        <div class="notice">Recipe analysis should move to a serverless function later, such as Firebase Functions, Netlify Functions, or Cloudflare Workers.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-suggest" class="panel">
+    <div class="card coming-soon">
+      <strong>Recipe Suggestions Need A Proxy Too</strong>
+      <p>The suggestion workflow has the same constraint as analysis: a static GitHub Pages app should not expose private API credentials.</p>
+      <div class="notice-list">
+        <div class="notice">Your live Firestore pantry is ready now.</div>
+        <div class="notice">When you want, we can add a small serverless endpoint and wire these two tabs back in safely.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toast-icon">OK</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
+<script>
+const LEGACY_PANTRY_KEY = "pantry_app_v1";
+const LEGACY_RECIPE_KEY = "recipe_urls_v1";
+const FIREBASE_CONFIG_KEY = "firebase_config_v1";
+const FIREBASE_SPACE_KEY = "pantry_space_id_v1";
+const ALL_TABS = ["pantry", "recipes", "analyze", "suggest"];
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBO8gvxEWSfUDZE07cSwSt2nFbg4NeveWo",
+  authDomain: "pantry-app-2bb89.firebaseapp.com",
+  projectId: "pantry-app-2bb89",
+  storageBucket: "pantry-app-2bb89.firebasestorage.app",
+  messagingSenderId: "313951589579",
+  appId: "1:313951589579:web:f2e9132722f526b2ecf74e"
+};
+
+const legacyPantry = JSON.parse(localStorage.getItem(LEGACY_PANTRY_KEY) || "[]");
+const legacyRecipeUrls = JSON.parse(localStorage.getItem(LEGACY_RECIPE_KEY) || "[]");
+
+let pantry = [...legacyPantry];
+let recipeUrls = legacyRecipeUrls.map((url, index) => ({ id: `legacy-${index}`, url }));
+let db = null;
+let pantryUnsubscribe = null;
+let recipeUnsubscribe = null;
+let pantryImported = false;
+let recipesImported = false;
+let currentSpaceId = sanitizeSpaceId(localStorage.getItem(FIREBASE_SPACE_KEY) || "default-pantry");
+let toastTimeout = null;
+
+function sanitizeSpaceId(value) {
+  const cleaned = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return cleaned || "default-pantry";
+}
+
+function esc(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function updateStats() {
+  document.getElementById("stat-items").textContent = pantry.length;
+  document.getElementById("stat-recipes").textContent = recipeUrls.length;
+  document.getElementById("recipe-count-badge").textContent = recipeUrls.length ? `(${recipeUrls.length})` : "";
+}
+
+function toast(message, icon = "OK") {
+  const el = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = message;
+  document.getElementById("toast-icon").textContent = icon;
+  el.classList.add("show");
+  window.clearTimeout(toastTimeout);
+  toastTimeout = window.setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+function setSyncStatus(text, isLive) {
+  const el = document.getElementById("sync-status");
+  el.textContent = text;
+  el.className = `status-pill ${isLive ? "status-live" : "status-offline"}`;
+}
+
+function setSyncNote(text) {
+  document.getElementById("sync-note").textContent = text;
+}
+
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach((tab, index) => {
+    tab.classList.toggle("active", ALL_TABS[index] === name);
+  });
+  document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+  document.getElementById(`tab-${name}`).classList.add("active");
+}
+
+function updateSetupInputs() {
+  document.getElementById("space-id").value = currentSpaceId;
+  const storedConfig = localStorage.getItem(FIREBASE_CONFIG_KEY) || JSON.stringify(DEFAULT_FIREBASE_CONFIG);
+  if (!storedConfig) return;
+  try {
+    document.getElementById("firebase-config").value = JSON.stringify(JSON.parse(storedConfig), null, 2);
+  } catch (err) {
+    document.getElementById("firebase-config").value = storedConfig;
+  }
+}
+
+function ensureFirestoreReady(action) {
+  if (db) return true;
+  toast(`Connect Firestore before ${action}.`, "DB");
+  switchTab("pantry");
+  document.getElementById("firebase-config").focus();
+  return false;
+}
+
+function pantryCollection() {
+  return db.collection("pantries").doc(currentSpaceId).collection("items");
+}
+
+function recipeCollection() {
+  return db.collection("pantries").doc(currentSpaceId).collection("recipes");
+}
+
+function teardownSubscriptions() {
+  if (pantryUnsubscribe) pantryUnsubscribe();
+  if (recipeUnsubscribe) recipeUnsubscribe();
+  pantryUnsubscribe = null;
+  recipeUnsubscribe = null;
+}
+
+function mapSnapshot(snapshot) {
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+async function importLegacyPantryIfNeeded(snapshot) {
+  if (pantryImported || !snapshot.empty || !legacyPantry.length) return;
+  pantryImported = true;
+  const batch = db.batch();
+  legacyPantry.forEach(item => {
+    const ref = pantryCollection().doc();
+    batch.set(ref, {
+      name: item.name || "",
+      qty: item.qty || "",
+      cat: item.cat || "other",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+  await batch.commit();
+  toast("Imported local pantry data into Firestore.", "DB");
+}
+
+async function importLegacyRecipesIfNeeded(snapshot) {
+  if (recipesImported || !snapshot.empty || !legacyRecipeUrls.length) return;
+  recipesImported = true;
+  const batch = db.batch();
+  legacyRecipeUrls.forEach(url => {
+    const ref = recipeCollection().doc();
+    batch.set(ref, {
+      url,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+  await batch.commit();
+  toast("Imported local recipe URLs into Firestore.", "DB");
+}
+
+function handleSyncError(err) {
+  setSyncStatus("Sync Error", false);
+  setSyncNote(`Firestore sync failed: ${err.message}`);
+  toast("Firestore sync failed.", "ERR");
+}
+
+function renderPantry() {
+  const grid = document.getElementById("pantry-grid");
+  const search = document.getElementById("search-pantry").value.trim().toLowerCase();
+  const category = document.getElementById("filter-cat").value;
+  const filtered = pantry.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(search);
+    const matchesCategory = !category || item.cat === category;
+    return matchesSearch && matchesCategory;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <strong>${pantry.length ? "No matching items" : "Your pantry is empty"}</strong>
+        <p>${pantry.length ? "Try a different filter or search term." : "Add an ingredient above or import your old local data by connecting Firestore."}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <div class="pantry-item">
+      <div>
+        <div class="item-name">${esc(item.name)}</div>
+        <div class="item-meta">
+          <span class="badge badge-${esc(item.cat)}">${esc(item.cat)}</span>
+          ${item.qty ? `<span class="item-qty">${esc(item.qty)}</span>` : ""}
+        </div>
+      </div>
+      <button class="btn btn-danger" onclick='removeItem(${JSON.stringify(item.id)})'>Remove</button>
+    </div>`).join("");
+}
+
+function renderUrls() {
+  const list = document.getElementById("url-list");
+  if (!recipeUrls.length) {
+    list.innerHTML = `
+      <div class="empty">
+        <strong>No recipes queued yet</strong>
+        <p>Add recipe links above once Firestore is connected.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = recipeUrls.map(recipe => `
+    <div class="url-item" style="margin-bottom:12px;">
+      <div style="min-width:0;">
+        <div class="recipe-url-line mono">${esc(recipe.url)}</div>
+      </div>
+      <button class="btn btn-danger" onclick='removeUrl(${JSON.stringify(recipe.id)})'>Remove</button>
+    </div>`).join("");
+}
+
+function subscribeToFirestore() {
+  teardownSubscriptions();
+
+  pantryUnsubscribe = pantryCollection().orderBy("createdAt", "desc").onSnapshot(async snapshot => {
+    pantry = mapSnapshot(snapshot);
+    renderPantry();
+    updateStats();
+    try {
+      await importLegacyPantryIfNeeded(snapshot);
+    } catch (err) {
+      handleSyncError(err);
+    }
+  }, handleSyncError);
+
+  recipeUnsubscribe = recipeCollection().orderBy("createdAt", "desc").onSnapshot(async snapshot => {
+    recipeUrls = mapSnapshot(snapshot);
+    renderUrls();
+    updateStats();
+    try {
+      await importLegacyRecipesIfNeeded(snapshot);
+    } catch (err) {
+      handleSyncError(err);
+    }
+  }, handleSyncError);
+}
+
+async function connectFirestore() {
+  if (typeof firebase === "undefined") {
+    setSyncStatus("SDK Missing", false);
+    setSyncNote("Firebase scripts did not load. Refresh the page and try again.");
+    return;
+  }
+
+  const rawConfig = document.getElementById("firebase-config").value.trim();
+  const nextSpace = sanitizeSpaceId(document.getElementById("space-id").value);
+
+  if (!rawConfig) {
+    toast("Paste your Firebase config first.", "DB");
+    return;
+  }
+
+  let parsedConfig;
+  try {
+    parsedConfig = JSON.parse(rawConfig);
+  } catch (err) {
+    toast("Firebase config is not valid JSON.", "ERR");
+    return;
+  }
+
+  const required = ["apiKey", "authDomain", "projectId", "appId"];
+  const missing = required.filter(key => !parsedConfig[key]);
+  if (missing.length) {
+    setSyncNote(`Missing required Firebase config fields: ${missing.join(", ")}`);
+    toast("Firebase config is incomplete.", "ERR");
+    return;
+  }
+
+  setSyncStatus("Connecting", false);
+  setSyncNote(`Connecting to Firestore project "${parsedConfig.projectId}" using pantry space "${nextSpace}".`);
+
+  try {
+    teardownSubscriptions();
+    if (firebase.apps.length) {
+      await Promise.all(firebase.apps.map(app => app.delete().catch(() => undefined)));
+    }
+
+    firebase.initializeApp(parsedConfig);
+    db = firebase.firestore();
+    currentSpaceId = nextSpace;
+    pantryImported = false;
+    recipesImported = false;
+
+    localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(parsedConfig));
+    localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
+
+    subscribeToFirestore();
+    setSyncStatus("Live On Firestore", true);
+    setSyncNote(`Connected to project "${parsedConfig.projectId}". This pantry space is "${currentSpaceId}".`);
+    toast("Firestore connected.", "DB");
+  } catch (err) {
+    db = null;
+    setSyncStatus("Connection Failed", false);
+    setSyncNote(`Could not connect to Firestore: ${err.message}`);
+    toast("Could not connect to Firestore.", "ERR");
+  }
+}
+
+function disconnectFirestore() {
+  teardownSubscriptions();
+  db = null;
+  setSyncStatus("Disconnected", false);
+  setSyncNote("Disconnected from Firestore. Your saved config is still stored in this browser.");
+  toast("Firestore disconnected.", "DB");
+}
+
+async function deleteAllDocs(collectionRef) {
+  const snapshot = await collectionRef.get();
+  if (snapshot.empty) return;
+  const batch = db.batch();
+  snapshot.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+}
+
+async function addIngredient() {
+  if (!ensureFirestoreReady("adding pantry items")) return;
+
+  const nameEl = document.getElementById("ing-name");
+  const qtyEl = document.getElementById("ing-qty");
+  const catEl = document.getElementById("ing-cat");
+  const raw = nameEl.value.trim();
+  if (!raw) {
+    nameEl.focus();
+    return;
+  }
+
+  const names = raw.split(",").map(value => value.trim()).filter(Boolean);
+  try {
+    await Promise.all(names.map(name => pantryCollection().add({
+      name,
+      qty: qtyEl.value.trim(),
+      cat: catEl.value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })));
+    nameEl.value = "";
+    qtyEl.value = "";
+    nameEl.focus();
+    toast(names.length > 1 ? `Added ${names.length} pantry items.` : `Added ${names[0]}.`, "OK");
+  } catch (err) {
+    toast("Could not add pantry item.", "ERR");
+  }
+}
+
+async function removeItem(id) {
+  if (!ensureFirestoreReady("removing pantry items")) return;
+  try {
+    await pantryCollection().doc(id).delete();
+    toast("Pantry item removed.", "OK");
+  } catch (err) {
+    toast("Could not remove pantry item.", "ERR");
+  }
+}
+
+async function clearPantry() {
+  if (!ensureFirestoreReady("clearing the pantry")) return;
+  if (!window.confirm("Clear all pantry items?")) return;
+  try {
+    await deleteAllDocs(pantryCollection());
+    toast("Pantry cleared.", "OK");
+  } catch (err) {
+    toast("Could not clear pantry.", "ERR");
+  }
+}
+
+async function addRecipeUrl() {
+  if (!ensureFirestoreReady("adding recipe URLs")) return;
+
+  const el = document.getElementById("recipe-url");
+  const url = el.value.trim();
+  if (!url) return;
+
+  try {
+    new URL(url);
+  } catch (err) {
+    toast("Enter a valid recipe URL.", "ERR");
+    return;
+  }
+
+  if (recipeUrls.some(recipe => recipe.url === url)) {
+    toast("That recipe URL is already queued.", "OK");
+    return;
+  }
+
+  try {
+    await recipeCollection().add({
+      url,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    el.value = "";
+    el.focus();
+    toast("Recipe URL added.", "OK");
+  } catch (err) {
+    toast("Could not add recipe URL.", "ERR");
+  }
+}
+
+async function removeUrl(id) {
+  if (!ensureFirestoreReady("removing recipe URLs")) return;
+  try {
+    await recipeCollection().doc(id).delete();
+    toast("Recipe URL removed.", "OK");
+  } catch (err) {
+    toast("Could not remove recipe URL.", "ERR");
+  }
+}
+
+async function clearUrls() {
+  if (!ensureFirestoreReady("clearing recipe URLs")) return;
+  if (!window.confirm("Remove all recipe URLs?")) return;
+  try {
+    await deleteAllDocs(recipeCollection());
+    toast("Recipe queue cleared.", "OK");
+  } catch (err) {
+    toast("Could not clear recipe queue.", "ERR");
+  }
+}
+
+updateSetupInputs();
+renderPantry();
+renderUrls();
+updateStats();
+
+if (legacyPantry.length || legacyRecipeUrls.length) {
+  setSyncNote("Local browser data is loaded right now. Connect Firestore to import it and make this pantry live across devices.");
+}
+
+if (!localStorage.getItem(FIREBASE_CONFIG_KEY)) {
+  localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(DEFAULT_FIREBASE_CONFIG));
+}
+
+connectFirestore();
+</script>
+</body>
+</html>
