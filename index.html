@@ -424,11 +424,18 @@ function checkPrereqs() {
 }
 
 async function runAnalysis() {
-  const btn = document.getElementById('analyze-btn');
   const container = document.getElementById('results-container');
-  btn.disabled = true; btn.textContent = '⏳ Analyzing…'; container.innerHTML = '';
-  const pantryStr = pantry.length ? pantry.map(i => `- ${i.name}${i.qty?' ('+i.qty+')':''} [${i.cat}]`).join('\n') : '(pantry is empty)';
-  let allMissing = new Set();
+  container.innerHTML = `
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+      <h3 style="font-family:'Playfair Display',serif;margin-bottom:8px">
+        Analysis Disabled
+      </h3>
+      <p style="color:var(--ink-muted)">
+        This feature requires a backend API and is disabled on this version.
+      </p>
+    </div>`;
+}
 
   for (let i = 0; i < recipeUrls.length; i++) {
     const url = recipeUrls[i];
@@ -499,13 +506,18 @@ function renderRecipeResult(container, result) {
 
 // ── SUGGEST ──
 async function runSuggest() {
-  if (!pantry.length) { toast('Add pantry items first!', '⚠️'); return; }
-  const btn = document.getElementById('suggest-btn');
   const container = document.getElementById('suggest-results');
-  const cuisine = document.getElementById('suggest-cuisine').value;
-  const meal = document.getElementById('suggest-meal').value;
-  const time = document.getElementById('suggest-time').value;
-  btn.disabled = true; btn.textContent = '⏳ Finding recipes…'; container.innerHTML = '';
+  container.innerHTML = `
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+      <h3 style="font-family:'Playfair Display',serif;margin-bottom:8px">
+        Suggestions Disabled
+      </h3>
+      <p style="color:var(--ink-muted)">
+        Recipe suggestions require an external API and are turned off here.
+      </p>
+    </div>`;
+}
 
   const loadingDiv = document.createElement('div'); loadingDiv.className = 'loading'; loadingDiv.id = 'suggest-loading';
   loadingDiv.innerHTML = `<div class="spinner"></div>Claude is searching for the best recipes for your pantry…`;
