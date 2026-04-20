@@ -1349,7 +1349,7 @@ async function unlockPantry() {
     subscribeToFirestore();
     toast("Pantry opened.", "OK");
   } catch (err) {
-    setGateError("Could not open that pantry right now.");
+    setGateError(`Could not open that pantry right now. ${err.message || ""}`.trim());
   }
 }
 
@@ -1396,7 +1396,7 @@ async function createPantryAccess() {
     subscribeToFirestore();
     toast("New pantry created.", "OK");
   } catch (err) {
-    setGateError("Could not create that pantry right now.");
+    setGateError(`Could not create that pantry right now. ${err.message || ""}`.trim());
   }
 }
 
