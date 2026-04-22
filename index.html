@@ -1658,6 +1658,8 @@ auth.onAuthStateChanged(user => {
     document.getElementById("shared-pantry-banner").classList.toggle("hidden", !isShared);
     document.getElementById("password-gate").classList.add("hidden");
     document.getElementById("app-shell").classList.remove("locked");
+    setSyncStatus("Live On Firestore", true);
+    setSyncNote(`Connected. Pantry space: ${currentSpaceId}`);
     subscribeToFirestore();
   } else {
     pantryUnlocked = false;
