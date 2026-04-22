@@ -127,6 +127,41 @@
     min-height: 20px;
   }
 
+  .shared-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  .shared-banner.hidden {
+    display: none;
+  }
+
+  .shared-banner-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .shared-badge {
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--gold);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+
   header {
     padding: 48px 0 36px;
     border-bottom: 1.5px solid var(--border);
@@ -713,10 +748,21 @@
       </div>
       <div class="stat" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
         <span id="auth-user-display" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
-        <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="shareMyPantry()" style="font-size:12px;padding:4px 12px;">Share Pantry</button>
+          <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
+        </div>
       </div>
     </div>
   </header>
+
+  <div id="shared-pantry-banner" class="shared-banner hidden">
+    <div class="shared-banner-text">
+      <span class="shared-badge">Shared</span>
+      <span>You're viewing someone else's pantry.</span>
+    </div>
+    <button class="btn btn-ghost" onclick="leaveSharedPantry()" style="font-size:12px;padding:4px 12px;white-space:nowrap;">Leave &amp; use my own</button>
+  </div>
 
   <div class="card">
     <div class="section-header">
@@ -860,6 +906,7 @@ const LEGACY_RECIPE_KEY = "recipe_urls_v1";
 const FIREBASE_CONFIG_KEY = "firebase_config_v1";
 const FIREBASE_SPACE_KEY = "pantry_space_id_v1";
 const PANTRY_PASSWORD_KEY = "pantry_password_v1";
+const LINKED_PANTRY_KEY = "linked_pantry_v1";
 const ALL_TABS = ["pantry", "recipes", "analyze", "suggest"];
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBO8gvxEWSfUDZE07cSwSt2nFbg4NeveWo",
@@ -884,6 +931,33 @@ let currentSpaceId = sanitizeSpaceId(localStorage.getItem(FIREBASE_SPACE_KEY) ||
 let toastTimeout = null;
 let pantryUnlocked = false;
 let gateMode = "open";
+
+function shareMyPantry() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const url = `${location.origin}${location.pathname}?pantry=${user.uid}`;
+  navigator.clipboard.writeText(url).then(() => {
+    toast("Share link copied to clipboard!", "OK");
+  }).catch(() => {
+    prompt("Copy this link to share your pantry:", url);
+  });
+}
+
+function leaveSharedPantry() {
+  localStorage.removeItem(LINKED_PANTRY_KEY);
+  history.replaceState(null, "", location.pathname);
+  const user = auth.currentUser;
+  if (!user) return;
+  teardownSubscriptions();
+  currentSpaceId = user.uid;
+  pantryImported = false;
+  recipesImported = false;
+  localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
+  document.getElementById("space-id").value = currentSpaceId;
+  document.getElementById("shared-pantry-banner").classList.add("hidden");
+  subscribeToFirestore();
+  toast("Switched back to your own pantry.", "OK");
+}
 
 function initFirebase() {
   if (!firebase.apps.length) {
@@ -1513,12 +1587,29 @@ initFirebase();
 
 auth.onAuthStateChanged(user => {
   if (user) {
-    currentSpaceId = user.uid;
+    const urlParams = new URLSearchParams(location.search);
+    const sharedParam = urlParams.get("pantry");
+    const savedLinked = localStorage.getItem(LINKED_PANTRY_KEY);
+
+    let isShared = false;
+    if (sharedParam && sharedParam !== user.uid) {
+      currentSpaceId = sharedParam;
+      localStorage.setItem(LINKED_PANTRY_KEY, sharedParam);
+      history.replaceState(null, "", location.pathname);
+      isShared = true;
+    } else if (savedLinked && savedLinked !== user.uid) {
+      currentSpaceId = savedLinked;
+      isShared = true;
+    } else {
+      currentSpaceId = user.uid;
+    }
+
     pantryUnlocked = true;
     localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
     document.getElementById("space-id").value = currentSpaceId;
     const display = document.getElementById("auth-user-display");
     if (display) display.textContent = user.email;
+    document.getElementById("shared-pantry-banner").classList.toggle("hidden", !isShared);
     document.getElementById("password-gate").classList.add("hidden");
     document.getElementById("app-shell").classList.remove("locked");
     subscribeToFirestore();
