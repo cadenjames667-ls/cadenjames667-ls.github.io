@@ -748,10 +748,7 @@
       </div>
       <div class="stat" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
         <span id="auth-user-display" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-ghost" onclick="shareMyPantry()" style="font-size:12px;padding:4px 12px;">Share Pantry</button>
-          <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
-        </div>
+        <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
       </div>
     </div>
   </header>
@@ -845,6 +842,7 @@
         <option value="other">Other</option>
       </select>
       <button class="btn btn-ghost" onclick="clearPantry()">Clear All</button>
+      <button class="btn btn-primary" onclick="shareMyPantry()" style="margin-left:auto;">Share Pantry</button>
     </div>
 
     <div id="pantry-grid" class="pantry-grid"></div>
