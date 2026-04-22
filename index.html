@@ -127,6 +127,53 @@
     min-height: 20px;
   }
 
+  .sync-bar {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .sync-bar summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .sync-bar summary::-webkit-details-marker { display: none; }
+
+  .sync-bar-label {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    flex: 1;
+  }
+
+  .sync-bar-caret {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-family: "DM Mono", monospace;
+  }
+
+  .sync-bar[open] .sync-bar-caret { opacity: 0.5; }
+
+  .sync-bar-body {
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .sync-bar-body .section-sub {
+    margin: 14px 0 16px;
+    font-size: 13px;
+  }
+
   .shared-banner {
     display: flex;
     align-items: center;
@@ -761,31 +808,32 @@
     <button class="btn btn-ghost" onclick="leaveSharedPantry()" style="font-size:12px;padding:4px 12px;white-space:nowrap;">Leave &amp; use my own</button>
   </div>
 
-  <div class="card">
-    <div class="section-header">
-      <div>
-        <h2 class="section-title">Live Firestore Sync</h2>
-        <p class="section-sub">This GitHub Pages version is fully static. Pantry items and recipe links can sync live with Firestore directly from the browser.</p>
-      </div>
+  <details class="sync-bar" id="sync-settings">
+    <summary>
+      <span class="sync-bar-label">Sync</span>
       <span class="status-pill status-offline" id="sync-status">Not Connected</span>
-    </div>
-    <div class="two-col">
-      <div>
-        <label for="firebase-config">Firebase Web Config JSON</label>
-        <textarea id="firebase-config" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea>
-      </div>
-      <div>
-        <label for="space-id">Pantry Space</label>
-        <input type="text" id="space-id" placeholder="family-kitchen" onkeydown="if(event.key==='Enter') connectFirestore()">
-        <div class="tip">This is auto-filled from the pantry password. Matching passwords open the same shared pantry.</div>
-        <div class="input-row" style="margin-top:16px;">
-          <button class="btn btn-primary" onclick="connectFirestore()">Save and Connect</button>
-          <button class="btn btn-ghost" onclick="disconnectFirestore()">Disconnect</button>
+      <span class="sync-bar-caret">⚙ Settings</span>
+    </summary>
+    <div class="sync-bar-body">
+      <p class="section-sub">Advanced: reconnect or manually set the active pantry space.</p>
+      <div class="two-col">
+        <div>
+          <label for="firebase-config">Firebase Web Config JSON</label>
+          <textarea id="firebase-config" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea>
+        </div>
+        <div>
+          <label for="space-id">Pantry Space</label>
+          <input type="text" id="space-id" placeholder="auto-filled on sign-in" onkeydown="if(event.key==='Enter') connectFirestore()">
+          <div class="tip">Auto-filled from your account. Only change this if you know what you're doing.</div>
+          <div class="input-row" style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="connectFirestore()">Reconnect</button>
+            <button class="btn btn-ghost" onclick="disconnectFirestore()">Disconnect</button>
+          </div>
         </div>
       </div>
+      <div class="status-note" id="sync-note"></div>
     </div>
-    <div class="status-note" id="sync-note">Paste your Firebase web config JSON, choose a pantry space, and click Save and Connect.</div>
-  </div>
+  </details>
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('pantry')">Pantry</button>
