@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Furnder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f0eb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #c0392b;
+      letter-spacing: -0.5px;
+    }
+
+    header h1 span { color: #333; }
+
+    nav button {
+      background: none;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-left: 8px;
+      transition: all 0.15s;
+      color: #555;
+      font-weight: 500;
+    }
+
+    nav button:hover, nav button.active {
+      border-color: #c0392b;
+      color: #c0392b;
+      background: #fff5f5;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; width: 100%; max-width: 480px; padding: 24px 16px; }
+    .view.active { display: flex; flex-direction: column; align-items: center; }
+
+    /* ── SWIPE VIEW ── */
+    #card-stack {
+      width: 100%;
+      position: relative;
+      height: 420px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .card:active { cursor: grabbing; }
+
+    .card img {
+      width: 100%;
+      flex: 1;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .card .card-info {
+      padding: 14px 18px;
+      background: #fff;
+    }
+
+    .card .card-info h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 4px;
+    }
+
+    .card .card-info p {
+      font-size: 0.82rem;
+      color: #888;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stamp {
+      position: absolute;
+      top: 28px;
+      font-size: 2.4rem;
+      font-weight: 900;
+      border: 5px solid;
+      border-radius: 10px;
+      padding: 4px 14px;
+      opacity: 0;
+      transform: rotate(-20deg);
+      pointer-events: none;
+      transition: opacity 0.1s;
+      z-index: 10;
+    }
+
+    .stamp.like { left: 20px; color: #27ae60; border-color: #27ae60; transform: rotate(-15deg); }
+    .stamp.dislike { right: 20px; color: #e74c3c; border-color: #e74c3c; transform: rotate(15deg); }
+
+    .card.going-right .stamp.like,
+    .card.going-left .stamp.dislike { opacity: 1; }
+
+    .empty-state {
+      width: 100%;
+      height: 420px;
+      border-radius: 20px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 1rem;
+      gap: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .empty-state .big { font-size: 3rem; }
+
+    .action-btns {
+      display: flex;
+      gap: 32px;
+      margin-top: 8px;
+    }
+
+    .action-btns button {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .action-btns button:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+    .action-btns button:active { transform: scale(0.96); }
+
+    #btn-dislike { background: #fff; color: #e74c3c; }
+    #btn-like    { background: #fff; color: #27ae60; }
+
+    /* ── ADD VIEW ── */
+    #view-add { gap: 16px; }
+
+    .form-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus, .form-group textarea:focus { border-color: #c0392b; }
+
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    #preview-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: none;
+      border: 2px solid #eee;
+    }
+
+    #btn-add-item {
+      width: 100%;
+      padding: 14px;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    #btn-add-item:hover { background: #a93226; }
+    #btn-add-item:active { transform: scale(0.98); }
+    #btn-add-item:disabled { background: #ccc; cursor: not-allowed; }
+
+    .msg { font-size: 0.85rem; color: #27ae60; text-align: center; min-height: 20px; }
+    .msg.error { color: #e74c3c; }
+
+    /* ── LIKED VIEW ── */
+    #view-liked { gap: 16px; }
+
+    #liked-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .liked-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.09);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .liked-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .liked-card .liked-info {
+      padding: 10px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .liked-card .liked-info h3 { font-size: 0.9rem; font-weight: 700; color: #222; }
+    .liked-card .liked-info p  { font-size: 0.75rem; color: #888; }
+
+    .liked-card .liked-info a {
+      font-size: 0.75rem;
+      color: #c0392b;
+      text-decoration: none;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .liked-card .liked-info a:hover { text-decoration: underline; }
+
+    .no-liked {
+      width: 100%;
+      padding: 48px 0;
+      text-align: center;
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    /* ── CONFIG WARNING ── */
+    #config-banner {
+      width: 100%;
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.85rem;
+      color: #664d03;
+      display: none;
+      margin: 16px 0 0;
+      text-align: center;
+      max-width: 480px;
+    }
+
+    #config-banner code {
+      background: rgba(0,0,0,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    /* ── LOADING ── */
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid #eee;
+      border-top-color: #c0392b;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<script type="module">
+  import { initializeApp }                        from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getAnalytics }                         from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+  import { getFirestore, collection, addDoc,
+           getDocs, doc, updateDoc, query,
+           where, orderBy }                       from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyDI6IKYN4UxzSnWRsyPWc3micI67xI9r2c",
+    authDomain:        "furnder-3442a.firebaseapp.com",
+    projectId:         "furnder-3442a",
+    storageBucket:     "furnder-3442a.firebasestorage.app",
+    messagingSenderId: "66710627264",
+    appId:             "1:66710627264:web:22aa22c6d85bc39dd11e25",
+    measurementId:     "G-4KMKLD0VKL"
+  };
+
+  // ── Init ──
+  const app       = initializeApp(FIREBASE_CONFIG);
+  const analytics = getAnalytics(app);
+  const db        = getFirestore(app);
+  const isConfigured = true;
+
+  // ── State ──
+  let deck    = [];   // unswiped items
+  let topCard = null;
+  let startX  = 0;
+  let currentX = 0;
+  let dragging = false;
+
+  // ── Elements ──
+  const stack      = document.getElementById("card-stack");
+  const btnLike    = document.getElementById("btn-like");
+  const btnDislike = document.getElementById("btn-dislike");
+  const addMsg     = document.getElementById("add-msg");
+  const likedGrid  = document.getElementById("liked-grid");
+
+  // ── Navigation ──
+  document.querySelectorAll("[data-view]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.view;
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById("view-" + id).classList.add("active");
+      document.querySelectorAll("[data-view]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      if (id === "liked") loadLiked();
+    });
+  });
+
+  // ── Load swipe deck ──
+  async function loadDeck() {
+    if (!isConfigured) return;
+    stack.innerHTML = `<div class="empty-state"><div class="spinner"></div></div>`;
+
+    const snap = await getDocs(
+      query(collection(db, "furniture"), orderBy("addedAt", "desc"))
+    );
+
+    deck = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if (!data.swiped) deck.push({ id: d.id, ...data });
+    });
+
+    renderDeck();
+  }
+
+  function renderDeck() {
+    stack.innerHTML = "";
+
+    if (deck.length === 0) {
+      stack.innerHTML = `<div class="empty-state">
+        <div class="big">🛋️</div>
+        <div>No more furniture to swipe!</div>
+        <div style="font-size:0.8rem">Add some items in the Add tab</div>
+      </div>`;
+      return;
+    }
+
+    // Render bottom two cards as visual stack (non-interactive)
+    for (let i = Math.min(deck.length - 1, 2); i >= 1; i--) {
+      const ghost = makeCardEl(deck[i]);
+      ghost.style.transform = `scale(${0.94 + i * 0.02}) translateY(${(2 - i) * 10}px)`;
+      ghost.style.zIndex = i;
+      ghost.style.pointerEvents = "none";
+      ghost.style.filter = "brightness(0.97)";
+      stack.appendChild(ghost);
+    }
+
+    // Top card — interactive
+    topCard = makeCardEl(deck[0]);
+    topCard.style.zIndex = 10;
+    stack.appendChild(topCard);
+    addDragListeners(topCard);
+  }
+
+  function makeCardEl(item) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="stamp like">LIKE</div>
+      <div class="stamp dislike">NOPE</div>
+      <img src="${escHtml(item.url)}" alt="${escHtml(item.name)}"
+           onerror="this.src='https://placehold.co/480x320/eee/aaa?text=Image+Error'" />
+      <div class="card-info">
+        <h2>${escHtml(item.name)}</h2>
+        <p>${escHtml(item.description || item.url)}</p>
+      </div>`;
+    return card;
+  }
+
+  // ── Drag / swipe ──
+  function addDragListeners(card) {
+    card.addEventListener("mousedown",  e => onStart(e.clientX));
+    card.addEventListener("touchstart", e => onStart(e.touches[0].clientX), { passive: true });
+    window.addEventListener("mousemove",  e => onMove(e.clientX));
+    window.addEventListener("touchmove",  e => onMove(e.touches[0].clientX), { passive: true });
+    window.addEventListener("mouseup",  onEnd);
+    window.addEventListener("touchend", onEnd);
+  }
+
+  function onStart(x) { dragging = true; startX = x; currentX = x; }
+
+  function onMove(x) {
+    if (!dragging || !topCard) return;
+    currentX = x;
+    const dx = currentX - startX;
+    const rotate = dx * 0.08;
+    topCard.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
+    topCard.classList.toggle("going-right", dx > 40);
+    topCard.classList.toggle("going-left",  dx < -40);
+  }
+
+  function onEnd() {
+    if (!dragging || !topCard) return;
+    dragging = false;
+    const dx = currentX - startX;
+    if (dx > 100)       animateSwipe("right");
+    else if (dx < -100) animateSwipe("left");
+    else {
+      topCard.style.transform = "";
+      topCard.classList.remove("going-right", "going-left");
+    }
+  }
+
+  function animateSwipe(dir) {
+    if (!topCard) return;
+    const card = topCard;
+    topCard = null;
+    const tx = dir === "right" ? 600 : -600;
+    card.style.transition = "transform 0.35s ease, opacity 0.35s ease";
+    card.style.transform  = `translateX(${tx}px) rotate(${dir === "right" ? 20 : -20}deg)`;
+    card.style.opacity    = "0";
+    const item = deck.shift();
+    recordSwipe(item.id, dir === "right");
+    setTimeout(() => { card.remove(); renderDeck(); }, 360);
+  }
+
+  // ── Button swipe ──
+  btnLike.addEventListener("click", () => { if (deck.length) animateSwipe("right"); });
+  btnDislike.addEventListener("click", () => { if (deck.length) animateSwipe("left"); });
+
+  // ── Keyboard ──
+  document.addEventListener("keydown", e => {
+    if (document.getElementById("view-swipe").classList.contains("active")) {
+      if (e.key === "ArrowRight") btnLike.click();
+      if (e.key === "ArrowLeft")  btnDislike.click();
+    }
+  });
+
+  // ── Record swipe to Firestore ──
+  async function recordSwipe(id, liked) {
+    if (!isConfigured) return;
+    await updateDoc(doc(db, "furniture", id), { swiped: true, liked });
+  }
+
+  // ── Add furniture ──
+  const urlInput  = document.getElementById("input-url");
+  const nameInput = document.getElementById("input-name");
+  const descInput = document.getElementById("input-desc");
+  const previewImg = document.getElementById("preview-img");
+
+  urlInput.addEventListener("input", () => {
+    const val = urlInput.value.trim();
+    if (val) { previewImg.src = val; previewImg.style.display = "block"; }
+    else previewImg.style.display = "none";
+  });
+
+  document.getElementById("btn-add-item").addEventListener("click", async () => {
+    const url  = urlInput.value.trim();
+    const name = nameInput.value.trim() || "Untitled";
+    const desc = descInput.value.trim();
+
+    if (!url) { showMsg("Please enter an image URL.", true); return; }
+    if (!isConfigured) { showMsg("Firebase not configured yet.", true); return; }
+
+    const btn = document.getElementById("btn-add-item");
+    btn.disabled = true;
+    btn.textContent = "Adding…";
+
+    try {
+      await addDoc(collection(db, "furniture"), {
+        url, name, description: desc,
+        swiped: false, liked: false,
+        addedAt: Date.now()
+      });
+      showMsg("Added! ✓");
+      urlInput.value = nameInput.value = descInput.value = "";
+      previewImg.style.display = "none";
+    } catch (e) {
+      showMsg("Error: " + e.message, true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Add Furniture";
+    }
+  });
+
+  function showMsg(text, isError = false) {
+    addMsg.textContent = text;
+    addMsg.className   = "msg" + (isError ? " error" : "");
+    setTimeout(() => { addMsg.textContent = ""; }, 3000);
+  }
+
+  // ── Load liked items ──
+  async function loadLiked() {
+    if (!isConfigured) { likedGrid.innerHTML = `<div class="no-liked">Firebase not configured.</div>`; return; }
+    likedGrid.innerHTML = `<div class="spinner" style="margin:32px auto;grid-column:1/-1"></div>`;
+
+    const snap = await getDocs(
+      query(collection(db, "furniture"), where("liked", "==", true))
+    );
+
+    if (snap.empty) {
+      likedGrid.innerHTML = `<div class="no-liked">No liked items yet — start swiping!</div>`;
+      return;
+    }
+
+    likedGrid.innerHTML = "";
+    snap.forEach(d => {
+      const item = d.data();
+      const el = document.createElement("div");
+      el.className = "liked-card";
+      el.innerHTML = `
+        <img src="${escHtml(item.url)}" alt="${escHtml(item.name)}"
+             onerror="this.src='https://placehold.co/240x140/eee/aaa?text=Error'" />
+        <div class="liked-info">
+          <h3>${escHtml(item.name)}</h3>
+          ${item.description ? `<p>${escHtml(item.description)}</p>` : ""}
+          <a href="${escHtml(item.url)}" target="_blank" rel="noopener">View image ↗</a>
+        </div>`;
+      likedGrid.appendChild(el);
+    });
+  }
+
+  // ── Helpers ──
+  function escHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // ── Boot ──
+  loadDeck();
+</script>
+
+<header>
+  <h1>Furn<span>der</span></h1>
+  <nav>
+    <button data-view="swipe" class="active">Swipe</button>
+    <button data-view="add">+ Add</button>
+    <button data-view="liked">❤️ Liked</button>
+  </nav>
+</header>
+
+<div id="config-banner">
+  ⚠️ Firebase not configured. Open <code>index.html</code> and replace <code>FIREBASE_CONFIG</code> with your project credentials.
+</div>
+
+<!-- SWIPE VIEW -->
+<div id="view-swipe" class="view active">
+  <div id="card-stack"></div>
+  <div class="action-btns">
+    <button id="btn-dislike" title="Dislike (←)">✕</button>
+    <button id="btn-like"    title="Like (→)">♥</button>
+  </div>
+</div>
+
+<!-- ADD VIEW -->
+<div id="view-add" class="view">
+  <div class="form-group">
+    <label for="input-url">Image URL *</label>
+    <input id="input-url" type="url" placeholder="https://example.com/chair.jpg" />
+  </div>
+  <img id="preview-img" alt="Preview" />
+  <div class="form-group">
+    <label for="input-name">Name</label>
+    <input id="input-name" type="text" placeholder="Mid-century sofa" />
+  </div>
+  <div class="form-group">
+    <label for="input-desc">Description / Notes</label>
+    <textarea id="input-desc" placeholder="$299 at IKEA, comes in blue and grey…"></textarea>
+  </div>
+  <button id="btn-add-item">Add Furniture</button>
+  <div id="add-msg" class="msg"></div>
+</div>
+
+<!-- LIKED VIEW -->
+<div id="view-liked" class="view">
+  <div id="liked-grid"></div>
+</div>
+
+</body>
+</html>
