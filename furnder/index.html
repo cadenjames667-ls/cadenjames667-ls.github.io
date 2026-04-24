@@ -26,13 +26,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #c0392b;
-      letter-spacing: -0.5px;
-    }
-
+    header h1 { font-size: 1.6rem; font-weight: 800; color: #c0392b; letter-spacing: -0.5px; }
     header h1 span { color: #333; }
 
     nav button {
@@ -90,24 +84,20 @@
       pointer-events: none;
     }
 
-    .card .card-info {
-      padding: 14px 18px;
-      background: #fff;
-    }
+    .card .card-info { padding: 14px 18px; background: #fff; }
+    .card .card-info h2 { font-size: 1.05rem; font-weight: 700; color: #222; margin-bottom: 4px; }
+    .card .card-info p  { font-size: 0.8rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .card .card-info h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #222;
-      margin-bottom: 4px;
-    }
-
-    .card .card-info p {
-      font-size: 0.82rem;
-      color: #888;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .card .card-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      color: #c0392b;
+      font-weight: 600;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .stamp {
@@ -125,52 +115,35 @@
       z-index: 10;
     }
 
-    .stamp.like { left: 20px; color: #27ae60; border-color: #27ae60; transform: rotate(-15deg); }
-    .stamp.dislike { right: 20px; color: #e74c3c; border-color: #e74c3c; transform: rotate(15deg); }
+    .stamp.like    { left: 20px;  color: #27ae60; border-color: #27ae60; transform: rotate(-15deg); }
+    .stamp.dislike { right: 20px; color: #e74c3c; border-color: #e74c3c; transform: rotate(15deg);  }
 
     .card.going-right .stamp.like,
-    .card.going-left .stamp.dislike { opacity: 1; }
+    .card.going-left  .stamp.dislike { opacity: 1; }
 
     .empty-state {
-      width: 100%;
-      height: 420px;
-      border-radius: 20px;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      font-size: 1rem;
-      gap: 12px;
+      width: 100%; height: 420px;
+      border-radius: 20px; background: #fff;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #aaa; font-size: 1rem; gap: 12px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
-
     .empty-state .big { font-size: 3rem; }
 
-    .action-btns {
-      display: flex;
-      gap: 32px;
-      margin-top: 8px;
-    }
+    .action-btns { display: flex; gap: 32px; margin-top: 8px; }
 
     .action-btns button {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      border: none;
-      font-size: 1.8rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 68px; height: 68px;
+      border-radius: 50%; border: none;
+      font-size: 1.8rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
       transition: transform 0.1s, box-shadow 0.1s;
     }
 
-    .action-btns button:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+    .action-btns button:hover  { transform: scale(1.08); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
     .action-btns button:active { transform: scale(0.96); }
-
     #btn-dislike { background: #fff; color: #e74c3c; }
     #btn-like    { background: #fff; color: #27ae60; }
 
@@ -178,7 +151,6 @@
     #view-add { gap: 16px; }
 
     .form-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-
     .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
 
     .form-group input, .form-group textarea {
@@ -193,16 +165,58 @@
     }
 
     .form-group input:focus, .form-group textarea:focus { border-color: #c0392b; }
-
     .form-group textarea { resize: vertical; min-height: 80px; }
 
-    #preview-img {
+    .url-hint {
+      font-size: 0.76rem;
+      color: #aaa;
+      margin-top: -4px;
+    }
+
+    /* URL fetch state row */
+    .fetch-status {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #888;
+      min-height: 20px;
       width: 100%;
-      max-height: 260px;
-      object-fit: cover;
+    }
+    .fetch-status.visible { display: flex; }
+    .fetch-status.ok   { color: #27ae60; }
+    .fetch-status.fail { color: #e67e22; }
+
+    /* Preview box */
+    .preview-box {
+      width: 100%;
       border-radius: 12px;
+      overflow: hidden;
       display: none;
       border: 2px solid #eee;
+      background: #fafafa;
+      flex-direction: column;
+    }
+    .preview-box.visible { display: flex; }
+
+    .preview-box img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+    }
+
+    .preview-box .preview-meta {
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #555;
+      border-top: 1px solid #eee;
+    }
+
+    .preview-box .preview-meta strong {
+      display: block;
+      color: #222;
+      font-size: 0.88rem;
+      margin-bottom: 2px;
     }
 
     #btn-add-item {
@@ -245,21 +259,14 @@
       flex-direction: column;
     }
 
-    .liked-card img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-    }
+    .liked-card img { width: 100%; height: 140px; object-fit: cover; }
 
     .liked-card .liked-info {
-      padding: 10px 12px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      padding: 10px 12px; flex: 1;
+      display: flex; flex-direction: column; gap: 4px;
     }
 
-    .liked-card .liked-info h3 { font-size: 0.9rem; font-weight: 700; color: #222; }
+    .liked-card .liked-info h3 { font-size: 0.9rem;  font-weight: 700; color: #222; }
     .liked-card .liked-info p  { font-size: 0.75rem; color: #888; }
 
     .liked-card .liked-info a {
@@ -268,48 +275,25 @@
       text-decoration: none;
       margin-top: auto;
       padding-top: 4px;
+      font-weight: 600;
     }
 
     .liked-card .liked-info a:hover { text-decoration: underline; }
 
-    .no-liked {
-      width: 100%;
-      padding: 48px 0;
-      text-align: center;
-      color: #aaa;
-      font-size: 0.95rem;
-    }
-
-    /* ── CONFIG WARNING ── */
-    #config-banner {
-      width: 100%;
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 0.85rem;
-      color: #664d03;
-      display: none;
-      margin: 16px 0 0;
-      text-align: center;
-      max-width: 480px;
-    }
-
-    #config-banner code {
-      background: rgba(0,0,0,0.08);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
+    .no-liked { width: 100%; padding: 48px 0; text-align: center; color: #aaa; font-size: 0.95rem; }
 
     /* ── LOADING ── */
     .spinner {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       border: 4px solid #eee;
       border-top-color: #c0392b;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
+    }
+
+    .spinner.sm {
+      width: 16px; height: 16px;
+      border-width: 2px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -318,11 +302,11 @@
 <body>
 
 <script type="module">
-  import { initializeApp }                        from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getAnalytics }                         from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-  import { getFirestore, collection, addDoc,
-           getDocs, doc, updateDoc, query,
-           where, orderBy }                       from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  import { initializeApp }           from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, collection,
+           addDoc, getDocs, doc,
+           updateDoc, query, where,
+           orderBy }                 from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
   const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyDI6IKYN4UxzSnWRsyPWc3micI67xI9r2c",
@@ -334,25 +318,29 @@
     measurementId:     "G-4KMKLD0VKL"
   };
 
-  // ── Init ──
-  const app       = initializeApp(FIREBASE_CONFIG);
-  const analytics = getAnalytics(app);
-  const db        = getFirestore(app);
-  const isConfigured = true;
+  const app = initializeApp(FIREBASE_CONFIG);
+  const db  = getFirestore(app);
 
   // ── State ──
-  let deck    = [];   // unswiped items
-  let topCard = null;
-  let startX  = 0;
-  let currentX = 0;
-  let dragging = false;
+  let deck     = [];
+  let topCard  = null;
+  let startX   = 0, currentX = 0, dragging = false;
+  let fetchedImageUrl = "";   // OG image pulled from product page
+  let fetchTimer = null;
 
   // ── Elements ──
-  const stack      = document.getElementById("card-stack");
-  const btnLike    = document.getElementById("btn-like");
-  const btnDislike = document.getElementById("btn-dislike");
-  const addMsg     = document.getElementById("add-msg");
-  const likedGrid  = document.getElementById("liked-grid");
+  const stack       = document.getElementById("card-stack");
+  const btnLike     = document.getElementById("btn-like");
+  const btnDislike  = document.getElementById("btn-dislike");
+  const addMsg      = document.getElementById("add-msg");
+  const likedGrid   = document.getElementById("liked-grid");
+  const urlInput    = document.getElementById("input-url");
+  const nameInput   = document.getElementById("input-name");
+  const descInput   = document.getElementById("input-desc");
+  const fetchStatus = document.getElementById("fetch-status");
+  const previewBox  = document.getElementById("preview-box");
+  const previewImg  = document.getElementById("preview-img");
+  const previewMeta = document.getElementById("preview-meta");
 
   // ── Navigation ──
   document.querySelectorAll("[data-view]").forEach(btn => {
@@ -366,47 +354,134 @@
     });
   });
 
+  // ── URL input → fetch OG metadata ──
+  urlInput.addEventListener("input", () => {
+    clearTimeout(fetchTimer);
+    const val = urlInput.value.trim();
+    if (!val) { resetPreview(); return; }
+    fetchTimer = setTimeout(() => fetchProductMeta(val), 600);
+  });
+
+  async function fetchProductMeta(url) {
+    fetchedImageUrl = "";
+    previewBox.classList.remove("visible");
+    fetchStatus.className = "fetch-status visible";
+    fetchStatus.innerHTML = `<div class="spinner sm"></div> Fetching product info…`;
+
+    try {
+      const res  = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+      const json = await res.json();
+
+      if (json.status !== "success") throw new Error("No data");
+
+      const { title, description, image } = json.data ?? {};
+
+      fetchedImageUrl = image?.url ?? "";
+
+      // Auto-fill name from OG title (strip trailing site name after | or —)
+      if (title && !nameInput.value.trim()) {
+        const clean = title.replace(/\s*[\|—–-]\s*(wayfair|ikea|amazon|target|pottery barn|crate.?&.?barrel|west elm|cb2|article|joss.?&.?main|allmodern|birch lane|perigold|overstock|houzz|room.?&.?board|restoration hardware|rh|home depot|lowe'?s)[^]*$/i, "").trim();
+        nameInput.value = clean || title;
+      }
+
+      if (fetchedImageUrl) {
+        previewImg.src = fetchedImageUrl;
+        previewMeta.innerHTML = `<strong>${escHtml(nameInput.value || title || "")}</strong>${description ? escHtml(description.slice(0, 80)) + "…" : ""}`;
+        previewBox.classList.add("visible");
+        fetchStatus.className = "fetch-status ok";
+        fetchStatus.textContent = "✓ Product info loaded";
+      } else {
+        fetchStatus.className = "fetch-status fail";
+        fetchStatus.textContent = "⚠ No image found — you can still add it";
+      }
+    } catch {
+      fetchStatus.className = "fetch-status fail";
+      fetchStatus.textContent = "⚠ Couldn't load preview — you can still add it";
+    }
+  }
+
+  function resetPreview() {
+    fetchedImageUrl = "";
+    fetchStatus.className = "fetch-status";
+    previewBox.classList.remove("visible");
+  }
+
+  // ── Add item ──
+  document.getElementById("btn-add-item").addEventListener("click", async () => {
+    const productUrl = urlInput.value.trim();
+    const name       = nameInput.value.trim() || "Untitled";
+    const desc       = descInput.value.trim();
+
+    if (!productUrl) { showMsg("Paste a product page URL first.", true); return; }
+
+    const btn = document.getElementById("btn-add-item");
+    btn.disabled = true;
+    btn.textContent = "Adding…";
+
+    try {
+      // If we haven't fetched yet (user clicked fast), try now
+      let imgUrl = fetchedImageUrl;
+      if (!imgUrl && productUrl) {
+        try {
+          const r = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(productUrl)}`);
+          const j = await r.json();
+          imgUrl = j.data?.image?.url ?? "";
+        } catch { /* silent */ }
+      }
+
+      await addDoc(collection(db, "furniture"), {
+        productUrl,
+        imageUrl:    imgUrl,
+        name,
+        description: desc,
+        swiped:      false,
+        liked:       false,
+        addedAt:     Date.now()
+      });
+
+      showMsg("Added! ✓");
+      urlInput.value = nameInput.value = descInput.value = "";
+      resetPreview();
+    } catch (e) {
+      showMsg("Error: " + e.message, true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Add Furniture";
+    }
+  });
+
+  function showMsg(text, isError = false) {
+    addMsg.textContent = text;
+    addMsg.className   = "msg" + (isError ? " error" : "");
+    setTimeout(() => { addMsg.textContent = ""; }, 3500);
+  }
+
   // ── Load swipe deck ──
   async function loadDeck() {
-    if (!isConfigured) return;
     stack.innerHTML = `<div class="empty-state"><div class="spinner"></div></div>`;
-
-    const snap = await getDocs(
-      query(collection(db, "furniture"), orderBy("addedAt", "desc"))
-    );
-
+    const snap = await getDocs(query(collection(db, "furniture"), orderBy("addedAt", "desc")));
     deck = [];
     snap.forEach(d => {
       const data = d.data();
       if (!data.swiped) deck.push({ id: d.id, ...data });
     });
-
     renderDeck();
   }
 
   function renderDeck() {
     stack.innerHTML = "";
-
     if (deck.length === 0) {
-      stack.innerHTML = `<div class="empty-state">
-        <div class="big">🛋️</div>
-        <div>No more furniture to swipe!</div>
-        <div style="font-size:0.8rem">Add some items in the Add tab</div>
-      </div>`;
+      stack.innerHTML = `<div class="empty-state"><div class="big">🛋️</div><div>No more furniture!</div><div style="font-size:0.8rem">Add items in the Add tab</div></div>`;
       return;
     }
-
-    // Render bottom two cards as visual stack (non-interactive)
     for (let i = Math.min(deck.length - 1, 2); i >= 1; i--) {
       const ghost = makeCardEl(deck[i]);
-      ghost.style.transform = `scale(${0.94 + i * 0.02}) translateY(${(2 - i) * 10}px)`;
-      ghost.style.zIndex = i;
+      ghost.style.transform    = `scale(${0.94 + i * 0.02}) translateY(${(2 - i) * 10}px)`;
+      ghost.style.zIndex       = i;
       ghost.style.pointerEvents = "none";
-      ghost.style.filter = "brightness(0.97)";
+      ghost.style.filter       = "brightness(0.97)";
       stack.appendChild(ghost);
     }
-
-    // Top card — interactive
     topCard = makeCardEl(deck[0]);
     topCard.style.zIndex = 10;
     stack.appendChild(topCard);
@@ -414,21 +489,29 @@
   }
 
   function makeCardEl(item) {
+    // Support old records that stored url directly as the image
+    const imgSrc     = item.imageUrl || item.url || "";
+    const productUrl = item.productUrl || item.url || "";
+    const domain     = productUrl ? (() => { try { return new URL(productUrl).hostname.replace(/^www\./, ""); } catch { return ""; } })() : "";
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       <div class="stamp like">LIKE</div>
       <div class="stamp dislike">NOPE</div>
-      <img src="${escHtml(item.url)}" alt="${escHtml(item.name)}"
-           onerror="this.src='https://placehold.co/480x320/eee/aaa?text=Image+Error'" />
+      ${imgSrc
+        ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'">`
+        : `<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:3rem;background:#f5f0eb;">🛋️</div>`
+      }
       <div class="card-info">
+        ${domain ? `<div class="card-source">🔗 ${escHtml(domain)}</div>` : ""}
         <h2>${escHtml(item.name)}</h2>
-        <p>${escHtml(item.description || item.url)}</p>
+        <p>${escHtml(item.description || domain || "")}</p>
       </div>`;
     return card;
   }
 
-  // ── Drag / swipe ──
+  // ── Drag ──
   function addDragListeners(card) {
     card.addEventListener("mousedown",  e => onStart(e.clientX));
     card.addEventListener("touchstart", e => onStart(e.touches[0].clientX), { passive: true });
@@ -444,8 +527,7 @@
     if (!dragging || !topCard) return;
     currentX = x;
     const dx = currentX - startX;
-    const rotate = dx * 0.08;
-    topCard.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
+    topCard.style.transform = `translateX(${dx}px) rotate(${dx * 0.08}deg)`;
     topCard.classList.toggle("going-right", dx > 40);
     topCard.classList.toggle("going-left",  dx < -40);
   }
@@ -454,7 +536,7 @@
     if (!dragging || !topCard) return;
     dragging = false;
     const dx = currentX - startX;
-    if (dx > 100)       animateSwipe("right");
+    if      (dx >  100) animateSwipe("right");
     else if (dx < -100) animateSwipe("left");
     else {
       topCard.style.transform = "";
@@ -464,22 +546,18 @@
 
   function animateSwipe(dir) {
     if (!topCard) return;
-    const card = topCard;
-    topCard = null;
-    const tx = dir === "right" ? 600 : -600;
+    const card = topCard; topCard = null;
     card.style.transition = "transform 0.35s ease, opacity 0.35s ease";
-    card.style.transform  = `translateX(${tx}px) rotate(${dir === "right" ? 20 : -20}deg)`;
+    card.style.transform  = `translateX(${dir === "right" ? 600 : -600}px) rotate(${dir === "right" ? 20 : -20}deg)`;
     card.style.opacity    = "0";
     const item = deck.shift();
     recordSwipe(item.id, dir === "right");
     setTimeout(() => { card.remove(); renderDeck(); }, 360);
   }
 
-  // ── Button swipe ──
-  btnLike.addEventListener("click", () => { if (deck.length) animateSwipe("right"); });
-  btnDislike.addEventListener("click", () => { if (deck.length) animateSwipe("left"); });
+  btnLike.addEventListener("click",    () => { if (deck.length) animateSwipe("right"); });
+  btnDislike.addEventListener("click", () => { if (deck.length) animateSwipe("left");  });
 
-  // ── Keyboard ──
   document.addEventListener("keydown", e => {
     if (document.getElementById("view-swipe").classList.contains("active")) {
       if (e.key === "ArrowRight") btnLike.click();
@@ -487,67 +565,14 @@
     }
   });
 
-  // ── Record swipe to Firestore ──
   async function recordSwipe(id, liked) {
-    if (!isConfigured) return;
     await updateDoc(doc(db, "furniture", id), { swiped: true, liked });
   }
 
-  // ── Add furniture ──
-  const urlInput  = document.getElementById("input-url");
-  const nameInput = document.getElementById("input-name");
-  const descInput = document.getElementById("input-desc");
-  const previewImg = document.getElementById("preview-img");
-
-  urlInput.addEventListener("input", () => {
-    const val = urlInput.value.trim();
-    if (val) { previewImg.src = val; previewImg.style.display = "block"; }
-    else previewImg.style.display = "none";
-  });
-
-  document.getElementById("btn-add-item").addEventListener("click", async () => {
-    const url  = urlInput.value.trim();
-    const name = nameInput.value.trim() || "Untitled";
-    const desc = descInput.value.trim();
-
-    if (!url) { showMsg("Please enter an image URL.", true); return; }
-    if (!isConfigured) { showMsg("Firebase not configured yet.", true); return; }
-
-    const btn = document.getElementById("btn-add-item");
-    btn.disabled = true;
-    btn.textContent = "Adding…";
-
-    try {
-      await addDoc(collection(db, "furniture"), {
-        url, name, description: desc,
-        swiped: false, liked: false,
-        addedAt: Date.now()
-      });
-      showMsg("Added! ✓");
-      urlInput.value = nameInput.value = descInput.value = "";
-      previewImg.style.display = "none";
-    } catch (e) {
-      showMsg("Error: " + e.message, true);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Add Furniture";
-    }
-  });
-
-  function showMsg(text, isError = false) {
-    addMsg.textContent = text;
-    addMsg.className   = "msg" + (isError ? " error" : "");
-    setTimeout(() => { addMsg.textContent = ""; }, 3000);
-  }
-
-  // ── Load liked items ──
+  // ── Liked items ──
   async function loadLiked() {
-    if (!isConfigured) { likedGrid.innerHTML = `<div class="no-liked">Firebase not configured.</div>`; return; }
     likedGrid.innerHTML = `<div class="spinner" style="margin:32px auto;grid-column:1/-1"></div>`;
-
-    const snap = await getDocs(
-      query(collection(db, "furniture"), where("liked", "==", true))
-    );
+    const snap = await getDocs(query(collection(db, "furniture"), where("liked", "==", true)));
 
     if (snap.empty) {
       likedGrid.innerHTML = `<div class="no-liked">No liked items yet — start swiping!</div>`;
@@ -556,29 +581,31 @@
 
     likedGrid.innerHTML = "";
     snap.forEach(d => {
-      const item = d.data();
+      const item       = d.data();
+      const imgSrc     = item.imageUrl || item.url || "";
+      const productUrl = item.productUrl || item.url || "";
+      const domain     = productUrl ? (() => { try { return new URL(productUrl).hostname.replace(/^www\./, ""); } catch { return ""; } })() : "";
+
       const el = document.createElement("div");
       el.className = "liked-card";
       el.innerHTML = `
-        <img src="${escHtml(item.url)}" alt="${escHtml(item.name)}"
-             onerror="this.src='https://placehold.co/240x140/eee/aaa?text=Error'" />
+        ${imgSrc
+          ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'">`
+          : `<div style="height:140px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:#f5f0eb;">🛋️</div>`
+        }
         <div class="liked-info">
           <h3>${escHtml(item.name)}</h3>
           ${item.description ? `<p>${escHtml(item.description)}</p>` : ""}
-          <a href="${escHtml(item.url)}" target="_blank" rel="noopener">View image ↗</a>
+          ${productUrl ? `<a href="${escHtml(productUrl)}" target="_blank" rel="noopener">View on ${escHtml(domain || "site")} ↗</a>` : ""}
         </div>`;
       likedGrid.appendChild(el);
     });
   }
 
-  // ── Helpers ──
   function escHtml(str) {
-    return String(str ?? "")
-      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
-  // ── Boot ──
   loadDeck();
 </script>
 
@@ -590,10 +617,6 @@
     <button data-view="liked">❤️ Liked</button>
   </nav>
 </header>
-
-<div id="config-banner">
-  ⚠️ Firebase not configured. Open <code>index.html</code> and replace <code>FIREBASE_CONFIG</code> with your project credentials.
-</div>
 
 <!-- SWIPE VIEW -->
 <div id="view-swipe" class="view active">
@@ -607,17 +630,25 @@
 <!-- ADD VIEW -->
 <div id="view-add" class="view">
   <div class="form-group">
-    <label for="input-url">Image URL *</label>
-    <input id="input-url" type="url" placeholder="https://example.com/chair.jpg" />
+    <label for="input-url">Product Page URL *</label>
+    <input id="input-url" type="url" placeholder="https://www.wayfair.com/furniture/…" />
+    <span class="url-hint">Paste any link from Wayfair, IKEA, Amazon, Target, and more — the image and name will load automatically.</span>
   </div>
-  <img id="preview-img" alt="Preview" />
+
+  <div id="fetch-status" class="fetch-status"></div>
+
+  <div id="preview-box" class="preview-box">
+    <img id="preview-img" alt="Product preview" />
+    <div class="preview-meta" id="preview-meta"></div>
+  </div>
+
   <div class="form-group">
-    <label for="input-name">Name</label>
+    <label for="input-name">Name <span style="font-weight:400;color:#aaa">(auto-filled)</span></label>
     <input id="input-name" type="text" placeholder="Mid-century sofa" />
   </div>
   <div class="form-group">
-    <label for="input-desc">Description / Notes</label>
-    <textarea id="input-desc" placeholder="$299 at IKEA, comes in blue and grey…"></textarea>
+    <label for="input-desc">Notes</label>
+    <textarea id="input-desc" placeholder="Color, size, why you love it…"></textarea>
   </div>
   <button id="btn-add-item">Add Furniture</button>
   <div id="add-msg" class="msg"></div>
