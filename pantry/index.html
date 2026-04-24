@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pantry - Live Firestore Pantry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f3ec;
+    --warm-white: #fdfaf5;
+    --ink: #1c1810;
+    --ink-light: #4a4438;
+    --ink-muted: #8c8070;
+    --terracotta: #c4623a;
+    --terracotta-light: #e8956d;
+    --sage: #6b8c6b;
+    --gold: #d4a844;
+    --border: rgba(28, 24, 16, 0.12);
+    --shadow: 0 4px 24px rgba(28, 24, 16, 0.08);
+    --shadow-lg: 0 12px 48px rgba(28, 24, 16, 0.14);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "DM Sans", sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231C1810' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .app.locked {
+    display: none;
+  }
+
+  .gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gate.hidden {
+    display: none;
+  }
+
+  .gate-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow-lg);
+    padding: 36px 34px;
+  }
+
+  .gate-title {
+    font-family: "Playfair Display", serif;
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .gate-copy {
+    color: var(--ink-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+  }
+
+  .gate-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .gate-mode-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .gate-mode-btn {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .gate-mode-btn.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  .gate-panel.hidden {
+    display: none;
+  }
+
+  .gate-error {
+    margin-top: 14px;
+    color: #b93a2d;
+    font-size: 13px;
+    min-height: 20px;
+  }
+
+  .sync-bar {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .sync-bar summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .sync-bar summary::-webkit-details-marker { display: none; }
+
+  .sync-bar-label {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    flex: 1;
+  }
+
+  .sync-bar-caret {
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-family: "DM Mono", monospace;
+  }
+
+  .sync-bar[open] .sync-bar-caret { opacity: 0.5; }
+
+  .sync-bar-body {
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .sync-bar-body .section-sub {
+    margin: 14px 0 16px;
+    font-size: 13px;
+  }
+
+  .shared-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  .shared-banner.hidden {
+    display: none;
+  }
+
+  .shared-banner-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .shared-badge {
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--gold);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+
+  header {
+    padding: 48px 0 36px;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .logo-eyebrow,
+  .stat-label,
+  .tab,
+  label,
+  .badge,
+  .status-pill,
+  .mono {
+    font-family: "DM Mono", monospace;
+  }
+
+  .logo-eyebrow,
+  .stat-label,
+  .tab,
+  label,
+  .badge,
+  .status-pill {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .logo-eyebrow {
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+
+  .logo-title {
+    font-family: "Playfair Display", serif;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-title em {
+    color: var(--terracotta);
+    font-style: italic;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: "Playfair Display", serif;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--terracotta);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .section-sub {
+    color: var(--ink-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 24px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"],
+  input[type="url"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--cream);
+    color: var(--ink);
+    font: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 3px rgba(196, 98, 58, 0.12);
+  }
+
+  textarea {
+    min-height: 170px;
+    resize: vertical;
+    font-family: "DM Mono", monospace;
+    line-height: 1.5;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 22px;
+    cursor: pointer;
+    font: 500 12px "DM Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--terracotta);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 8px 20px rgba(196, 98, 58, 0.24);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-muted);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: #b93a2d;
+    border: 1.5px solid rgba(185, 58, 45, 0.18);
+    padding: 7px 12px;
+    font-size: 10px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .status-pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-live {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .status-offline {
+    background: #fff4ee;
+    color: var(--terracotta);
+  }
+
+  .status-note,
+  .tip {
+    margin-top: 16px;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .status-note {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--ink-light);
+  }
+
+  .tip {
+    background: #f0f7f0;
+    border: 1px solid #c8dfc8;
+    color: var(--sage);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    padding: 14px 22px;
+    position: relative;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1.5px;
+    height: 2px;
+    background: var(--terracotta);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .tab.active {
+    color: var(--ink);
+  }
+
+  .tab.active::after {
+    transform: scaleX(1);
+  }
+
+  .panel {
+    display: none;
+  }
+
+  .panel.active {
+    display: block;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .pantry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .pantry-item,
+  .url-item {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .receipt-status {
+    margin-top: 14px;
+    color: var(--ink-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .receipt-list {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .receipt-pill {
+    background: #f4eee3;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  .item-name {
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .item-meta,
+  .recipe-url-line {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .badge-produce { background: #e8f5e9; color: #2e7d32; }
+  .badge-dairy { background: #fff8e1; color: #f57f17; }
+  .badge-meat { background: #fce4ec; color: #c62828; }
+  .badge-pantry { background: #ede7f6; color: #4527a0; }
+  .badge-spice { background: #fff3e0; color: #e65100; }
+  .badge-frozen { background: #e3f2fd; color: #1565c0; }
+  .badge-bakery { background: #f3e5f5; color: #6a1b9a; }
+  .badge-other { background: #eceff1; color: #37474f; }
+
+  .item-qty,
+  .recipe-url-line {
+    color: var(--ink-muted);
+    font-size: 12px;
+  }
+
+  .empty,
+  .coming-soon {
+    text-align: center;
+    padding: 56px 20px;
+    color: var(--ink-muted);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    background: rgba(253, 250, 245, 0.5);
+  }
+
+  .empty strong,
+  .coming-soon strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .toast {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: transform 0.24s, opacity 0.24s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .notice-list {
+    margin-top: 18px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .notice {
+    border-left: 4px solid var(--gold);
+    background: #fff8e8;
+    padding: 16px 18px;
+    border-radius: 12px;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 0;
+    color: var(--ink-muted);
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--terracotta);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .two-stack {
+    display: grid;
+    gap: 20px;
+  }
+
+  .missing-grid,
+  .shopping-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .missing-pill,
+  .have-pill,
+  .shopping-chip {
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .missing-pill {
+    background: #fff5f2;
+    border: 1px solid #ffcfc0;
+    color: var(--terracotta);
+  }
+
+  .have-pill {
+    background: #f1f8f1;
+    border: 1px solid #c3dec3;
+    color: var(--sage);
+  }
+
+  .shopping-chip {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .shopping-list-export {
+    background: linear-gradient(135deg, var(--ink) 0%, #2c2416 100%);
+    color: #fff;
+  }
+
+  .suggest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .recipe-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .recipe-card h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .recipe-meta {
+    color: var(--ink-muted);
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  a.link {
+    color: var(--terracotta);
+    text-decoration: none;
+  }
+
+  a.link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 820px) {
+    header,
+    .section-header,
+    .two-col {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+
+    header {
+      align-items: start;
+    }
+
+    .header-stats,
+    .filter-bar,
+    .input-row {
+      width: 100%;
+    }
+
+    .stat {
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="gate" id="password-gate">
+  <div class="gate-card">
+    <div class="logo-eyebrow">Pantry Access</div>
+    <h1 class="gate-title" id="gate-title">Sign In</h1>
+    <p class="gate-copy" id="gate-copy">Sign in to access your pantry. Your data stays private to your account.</p>
+    <div class="gate-mode-row">
+      <button class="btn btn-ghost gate-mode-btn active" id="mode-open-btn" onclick="setGateMode('open')">Sign In</button>
+      <button class="btn btn-ghost gate-mode-btn" id="mode-create-btn" onclick="setGateMode('create')">Create Account</button>
+    </div>
+
+    <div id="gate-open-panel" class="gate-panel">
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('auth-password').focus()">
+      <label for="auth-password" style="margin-top:16px;">Password</label>
+      <input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter') signInWithEmail()">
+      <div class="gate-actions">
+        <button class="btn btn-primary" onclick="signInWithEmail()">Sign In</button>
+      </div>
+    </div>
+
+    <div id="gate-create-panel" class="gate-panel hidden">
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('signup-password').focus()">
+      <label for="signup-password" style="margin-top:16px;">Password</label>
+      <input type="password" id="signup-password" placeholder="Choose a password (6+ characters)" autocomplete="new-password" onkeydown="if(event.key==='Enter') signUpWithEmail()">
+      <div class="gate-actions">
+        <button class="btn btn-primary" onclick="signUpWithEmail()">Create Account</button>
+      </div>
+    </div>
+
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<div class="app locked" id="app-shell">
+  <header>
+    <div class="logo">
+      <div class="logo-eyebrow">Kitchen Intelligence</div>
+      <h1 class="logo-title">The <em>Pantry</em></h1>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-items">0</div>
+        <div class="stat-label">Pantry Items</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-recipes">0</div>
+        <div class="stat-label">Recipes Queued</div>
+      </div>
+      <div class="stat" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <span id="auth-user-display" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
+        <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="shared-pantry-banner" class="shared-banner hidden">
+    <div class="shared-banner-text">
+      <span class="shared-badge">Shared</span>
+      <span>You're viewing someone else's pantry.</span>
+    </div>
+    <button class="btn btn-ghost" onclick="leaveSharedPantry()" style="font-size:12px;padding:4px 12px;white-space:nowrap;">Leave &amp; use my own</button>
+  </div>
+
+  <details class="sync-bar" id="sync-settings">
+    <summary>
+      <span class="sync-bar-label">Sync</span>
+      <span class="status-pill status-offline" id="sync-status">Not Connected</span>
+      <span class="sync-bar-caret">⚙ Settings</span>
+    </summary>
+    <div class="sync-bar-body">
+      <p class="section-sub">Advanced: reconnect or manually set the active pantry space.</p>
+      <div class="two-col">
+        <div>
+          <label for="firebase-config">Firebase Web Config JSON</label>
+          <textarea id="firebase-config" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'></textarea>
+        </div>
+        <div>
+          <label for="space-id">Pantry Space</label>
+          <input type="text" id="space-id" placeholder="auto-filled on sign-in" onkeydown="if(event.key==='Enter') connectFirestore()">
+          <div class="tip">Auto-filled from your account. Only change this if you know what you're doing.</div>
+          <div class="input-row" style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="connectFirestore()">Reconnect</button>
+            <button class="btn btn-ghost" onclick="disconnectFirestore()">Disconnect</button>
+          </div>
+        </div>
+      </div>
+      <div class="status-note" id="sync-note"></div>
+    </div>
+  </details>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('pantry')">Pantry</button>
+    <button class="tab" onclick="switchTab('recipes')">Recipes</button>
+    <button class="tab" onclick="switchTab('analyze')">Analyze</button>
+    <button class="tab" onclick="switchTab('suggest')">Suggest</button>
+  </div>
+
+  <div id="tab-pantry" class="panel active">
+    <div class="card">
+      <h2 class="section-title">Add To Your Pantry</h2>
+      <p class="section-sub">These pantry items sync through Firestore in real time once you connect.</p>
+      <div class="input-row" style="margin-top:18px;">
+        <input type="text" id="ing-name" placeholder="Ingredient name, or comma-separated list" onkeydown="if(event.key==='Enter') addIngredient()">
+        <input type="text" id="ing-qty" placeholder="Quantity" style="max-width:160px;">
+        <select id="ing-cat" style="max-width:170px;">
+          <option value="produce">Produce</option>
+          <option value="dairy">Dairy</option>
+          <option value="meat">Meat</option>
+          <option value="pantry" selected>Pantry</option>
+          <option value="spice">Spice</option>
+          <option value="frozen">Frozen</option>
+          <option value="bakery">Bakery</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="addIngredient()">Add Item</button>
+      </div>
+      <div class="tip">Bulk add works too. Example: olive oil, salt, black pepper, garlic</div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Import H-E-B Receipt</h2>
+      <p class="section-sub">Upload a receipt photo or text receipt and the app will try to pull grocery items into your pantry automatically.</p>
+      <div class="input-row" style="margin-top:18px;">
+        <input type="file" id="receipt-file" accept="image/*,.pdf,.txt" style="max-width:420px;">
+        <button class="btn btn-primary" id="receipt-btn" onclick="processHebReceipt()">Import Receipt</button>
+      </div>
+      <div class="tip">Upload your H-E-B online order PDF (print the order page as PDF) or a receipt photo. Items will be imported with their category automatically.</div>
+      <div id="receipt-status" class="receipt-status"></div>
+      <div id="receipt-results" class="receipt-list"></div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="search-pantry" placeholder="Search pantry..." oninput="renderPantry()">
+      <select id="filter-cat" onchange="renderPantry()" style="max-width:170px;">
+        <option value="">All Categories</option>
+        <option value="produce">Produce</option>
+        <option value="dairy">Dairy</option>
+        <option value="meat">Meat</option>
+        <option value="pantry">Pantry</option>
+        <option value="spice">Spice</option>
+        <option value="frozen">Frozen</option>
+        <option value="bakery">Bakery</option>
+        <option value="other">Other</option>
+      </select>
+      <button class="btn btn-ghost" onclick="clearPantry()">Clear All</button>
+      <button class="btn btn-primary" onclick="shareMyPantry()" style="margin-left:auto;">Share Pantry</button>
+    </div>
+
+    <div id="pantry-grid" class="pantry-grid"></div>
+  </div>
+
+  <div id="tab-recipes" class="panel">
+    <div class="card">
+      <h2 class="section-title">Queue Recipe URLs</h2>
+      <p class="section-sub">This queue also syncs live through Firestore and stays GitHub Pages compatible.</p>
+      <div class="input-row" style="margin-top:18px;">
+        <input type="url" id="recipe-url" placeholder="https://example.com/recipe" onkeydown="if(event.key==='Enter') addRecipeUrl()">
+        <button class="btn btn-primary" onclick="addRecipeUrl()">Add URL</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2 class="section-title" style="margin-bottom:0;">Queued Recipes <span id="recipe-count-badge" class="mono" style="font-size:14px;color:var(--ink-muted);"></span></h2>
+      <button class="btn btn-ghost" onclick="clearUrls()">Clear All</button>
+    </div>
+
+    <div id="url-list"></div>
+  </div>
+
+  <div id="tab-analyze" class="panel">
+    <div class="card coming-soon">
+      <strong>Analysis Needs A Secure Backend</strong>
+      <p>This site is hosted on GitHub Pages, so it cannot safely store a private AI API key in the browser.</p>
+      <div class="notice-list">
+        <div class="notice">The Firestore database pieces are safe to run directly from a static site.</div>
+        <div class="notice">Recipe analysis should move to a serverless function later, such as Cloudflare Workers or another backend.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-suggest" class="panel">
+    <div class="card coming-soon">
+      <strong>Recipe Suggestions Need A Proxy Too</strong>
+      <p>The suggestion workflow has the same constraint as analysis: a static GitHub Pages app should not expose private API credentials.</p>
+      <div class="notice-list">
+        <div class="notice">Your live Firestore pantry is ready now.</div>
+        <div class="notice">If you ever want, we can wire these two tabs back in with a backend later.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toast-icon">OK</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/6.0.1/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const LEGACY_PANTRY_KEY = "pantry_app_v1";
+const LEGACY_RECIPE_KEY = "recipe_urls_v1";
+const FIREBASE_CONFIG_KEY = "firebase_config_v1";
+const FIREBASE_SPACE_KEY = "pantry_space_id_v1";
+const PANTRY_PASSWORD_KEY = "pantry_password_v1";
+const LINKED_PANTRY_KEY = "linked_pantry_v1";
+const ALL_TABS = ["pantry", "recipes", "analyze", "suggest"];
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBO8gvxEWSfUDZE07cSwSt2nFbg4NeveWo",
+  authDomain: "pantry-app-2bb89.firebaseapp.com",
+  projectId: "pantry-app-2bb89",
+  storageBucket: "pantry-app-2bb89.firebasestorage.app",
+  messagingSenderId: "313951589579",
+  appId: "1:313951589579:web:f2e9132722f526b2ecf74e"
+};
+const legacyPantry = JSON.parse(localStorage.getItem(LEGACY_PANTRY_KEY) || "[]");
+const legacyRecipeUrls = JSON.parse(localStorage.getItem(LEGACY_RECIPE_KEY) || "[]");
+
+let pantry = [...legacyPantry];
+let recipeUrls = legacyRecipeUrls.map((url, index) => ({ id: `legacy-${index}`, url }));
+let db = null;
+let auth = null;
+let pantryUnsubscribe = null;
+let recipeUnsubscribe = null;
+let pantryImported = false;
+let recipesImported = false;
+let currentSpaceId = sanitizeSpaceId(localStorage.getItem(FIREBASE_SPACE_KEY) || "default-pantry");
+let toastTimeout = null;
+let pantryUnlocked = false;
+let gateMode = "open";
+
+function shareMyPantry() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const url = `${location.origin}${location.pathname}?pantry=${user.uid}`;
+  navigator.clipboard.writeText(url).then(() => {
+    toast("Share link copied to clipboard!", "OK");
+  }).catch(() => {
+    prompt("Copy this link to share your pantry:", url);
+  });
+}
+
+function leaveSharedPantry() {
+  localStorage.removeItem(LINKED_PANTRY_KEY);
+  history.replaceState(null, "", location.pathname);
+  const user = auth.currentUser;
+  if (!user) return;
+  teardownSubscriptions();
+  currentSpaceId = user.uid;
+  pantryImported = false;
+  recipesImported = false;
+  localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
+  document.getElementById("space-id").value = currentSpaceId;
+  document.getElementById("shared-pantry-banner").classList.add("hidden");
+  subscribeToFirestore();
+  toast("Switched back to your own pantry.", "OK");
+}
+
+function initFirebase() {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(DEFAULT_FIREBASE_CONFIG);
+  }
+  auth = firebase.auth();
+  db = firebase.firestore();
+}
+
+function friendlyAuthError(err) {
+  switch (err.code) {
+    case "auth/user-not-found":
+    case "auth/invalid-credential": return "No account found with that email and password.";
+    case "auth/wrong-password": return "Incorrect password.";
+    case "auth/invalid-email": return "Enter a valid email address.";
+    case "auth/email-already-in-use": return "An account with that email already exists. Sign in instead.";
+    case "auth/weak-password": return "Password must be at least 6 characters.";
+    case "auth/too-many-requests": return "Too many attempts. Please try again later.";
+    case "auth/network-request-failed": return "Network error. Check your connection and try again.";
+    default: return err.message || "Authentication failed.";
+  }
+}
+
+function sanitizeSpaceId(value) {
+  const cleaned = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return cleaned || "default-pantry";
+}
+
+function esc(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function updateStats() {
+  document.getElementById("stat-items").textContent = pantry.length;
+  document.getElementById("stat-recipes").textContent = recipeUrls.length;
+  document.getElementById("recipe-count-badge").textContent = recipeUrls.length ? `(${recipeUrls.length})` : "";
+}
+
+function toast(message, icon = "OK") {
+  const el = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = message;
+  document.getElementById("toast-icon").textContent = icon;
+  el.classList.add("show");
+  window.clearTimeout(toastTimeout);
+  toastTimeout = window.setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+function setSyncStatus(text, isLive) {
+  const el = document.getElementById("sync-status");
+  el.textContent = text;
+  el.className = `status-pill ${isLive ? "status-live" : "status-offline"}`;
+}
+
+function setSyncNote(text) {
+  document.getElementById("sync-note").textContent = text;
+}
+
+function setGateError(text) {
+  document.getElementById("gate-error").textContent = text;
+}
+
+function accessCollection() {
+  return db.collection("pantryAccess");
+}
+
+function normalizePasswordKey(password) {
+  return sanitizeSpaceId(String(password || "").trim());
+}
+
+function setGateMode(mode) {
+  gateMode = mode;
+  document.getElementById("mode-open-btn").classList.toggle("active", mode === "open");
+  document.getElementById("mode-create-btn").classList.toggle("active", mode === "create");
+  document.getElementById("gate-open-panel").classList.toggle("hidden", mode !== "open");
+  document.getElementById("gate-create-panel").classList.toggle("hidden", mode !== "create");
+  setGateError("");
+  const focusId = mode === "open" ? "auth-email" : "signup-email";
+  document.getElementById(focusId).focus();
+}
+
+function showApp() {
+  document.getElementById("password-gate").classList.add("hidden");
+  document.getElementById("app-shell").classList.remove("locked");
+}
+
+function showGate() {
+  document.getElementById("password-gate").classList.remove("hidden");
+  document.getElementById("app-shell").classList.add("locked");
+  setTimeout(() => document.getElementById("auth-email").focus(), 50);
+}
+
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach((tab, index) => {
+    tab.classList.toggle("active", ALL_TABS[index] === name);
+  });
+  document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+  document.getElementById(`tab-${name}`).classList.add("active");
+}
+
+function updateSetupInputs() {
+  document.getElementById("space-id").value = currentSpaceId;
+  const storedConfig = localStorage.getItem(FIREBASE_CONFIG_KEY) || JSON.stringify(DEFAULT_FIREBASE_CONFIG);
+  if (!storedConfig) return;
+  try {
+    document.getElementById("firebase-config").value = JSON.stringify(JSON.parse(storedConfig), null, 2);
+  } catch (err) {
+    document.getElementById("firebase-config").value = storedConfig;
+  }
+}
+
+function ensureFirestoreReady(action) {
+  if (db && pantryUnlocked) return true;
+  toast(`Connect Firestore before ${action}.`, "DB");
+  if (!pantryUnlocked) {
+    showGate();
+    return false;
+  }
+  switchTab("pantry");
+  document.getElementById("firebase-config").focus();
+  return false;
+}
+
+function pantryCollection() {
+  return db.collection("pantries").doc(currentSpaceId).collection("items");
+}
+
+function recipeCollection() {
+  return db.collection("pantries").doc(currentSpaceId).collection("recipes");
+}
+
+function teardownSubscriptions() {
+  if (pantryUnsubscribe) pantryUnsubscribe();
+  if (recipeUnsubscribe) recipeUnsubscribe();
+  pantryUnsubscribe = null;
+  recipeUnsubscribe = null;
+}
+
+function mapSnapshot(snapshot) {
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+async function importLegacyPantryIfNeeded(snapshot) {
+  if (pantryImported || !snapshot.empty || !legacyPantry.length) return;
+  pantryImported = true;
+  const batch = db.batch();
+  legacyPantry.forEach(item => {
+    const ref = pantryCollection().doc();
+    batch.set(ref, {
+      name: item.name || "",
+      qty: item.qty || "",
+      cat: item.cat || "other",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+  await batch.commit();
+  toast("Imported local pantry data into Firestore.", "DB");
+}
+
+async function importLegacyRecipesIfNeeded(snapshot) {
+  if (recipesImported || !snapshot.empty || !legacyRecipeUrls.length) return;
+  recipesImported = true;
+  const batch = db.batch();
+  legacyRecipeUrls.forEach(url => {
+    const ref = recipeCollection().doc();
+    batch.set(ref, {
+      url,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  });
+  await batch.commit();
+  toast("Imported local recipe URLs into Firestore.", "DB");
+}
+
+function handleSyncError(err) {
+  setSyncStatus("Sync Error", false);
+  setSyncNote(`Firestore sync failed: ${err.message}`);
+  toast("Firestore sync failed.", "ERR");
+}
+
+function renderPantry() {
+  const grid = document.getElementById("pantry-grid");
+  const search = document.getElementById("search-pantry").value.trim().toLowerCase();
+  const category = document.getElementById("filter-cat").value;
+  const filtered = pantry.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(search);
+    const matchesCategory = !category || item.cat === category;
+    return matchesSearch && matchesCategory;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        <strong>${pantry.length ? "No matching items" : "Your pantry is empty"}</strong>
+        <p>${pantry.length ? "Try a different filter or search term." : "Add an ingredient above or import your old local data by connecting Firestore."}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <div class="pantry-item">
+      <div>
+        <div class="item-name">${esc(item.name)}</div>
+        <div class="item-meta">
+          <span class="badge badge-${esc(item.cat)}">${esc(item.cat)}</span>
+          ${item.qty ? `<span class="item-qty">${esc(item.qty)}</span>` : ""}
+        </div>
+      </div>
+      <button class="btn btn-danger" onclick='removeItem(${JSON.stringify(item.id)})'>Remove</button>
+    </div>`).join("");
+}
+
+function renderUrls() {
+  const list = document.getElementById("url-list");
+  if (!recipeUrls.length) {
+    list.innerHTML = `
+      <div class="empty">
+        <strong>No recipes queued yet</strong>
+        <p>Add recipe links above once Firestore is connected.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = recipeUrls.map(recipe => `
+    <div class="url-item" style="margin-bottom:12px;">
+      <div style="min-width:0;">
+        <div class="recipe-url-line mono">${esc(recipe.url)}</div>
+      </div>
+      <button class="btn btn-danger" onclick='removeUrl(${JSON.stringify(recipe.id)})'>Remove</button>
+    </div>`).join("");
+}
+
+function setReceiptStatus(text) {
+  document.getElementById("receipt-status").textContent = text;
+}
+
+function renderReceiptItems(items) {
+  const el = document.getElementById("receipt-results");
+  if (!items.length) {
+    el.innerHTML = "";
+    return;
+  }
+
+  el.innerHTML = items.map(item => {
+    const qty = item.qty ? ` (${esc(item.qty)})` : "";
+    return `<span class="receipt-pill">${esc(item.name)}${qty}</span>`;
+  }).join("");
+}
+
+// Maps HEB.com online order category headings to pantry categories
+const HEB_ONLINE_CATEGORIES = {
+  "beverages": "pantry",
+  "dairy & eggs": "dairy",
+  "dairy": "dairy",
+  "frozen food": "frozen",
+  "frozen": "frozen",
+  "fruit & vegetables": "produce",
+  "produce": "produce",
+  "health & beauty": "other",
+  "pantry": "pantry",
+  "meat": "meat",
+  "seafood": "meat",
+  "bakery": "bakery",
+  "deli": "meat",
+  "snacks & candy": "pantry",
+  "snacks": "pantry",
+  "breakfast": "pantry",
+  "condiments & sauces": "pantry",
+  "baby": "pantry",
+  "floral": "other",
+  "pet": "pantry",
+};
+
+function inferReceiptCategory(name) {
+  const n = name.toLowerCase();
+  if (/(banana|apple|avocado|lettuce|tomato|onion|lime|lemon|cilantro|spinach|grape|berry|pepper|potato|garlic|orange|broccoli|carrot|corn|cucumber|zucchini|celery|kale|arugula|radish|beet|squash|mushroom|herb|mint|basil|parsley|mango|pineapple|watermelon|cantaloupe|peach|plum|strawberr|blueberr|raspberry|cherry|pear|fig|date|coconut|ginger|turmeric)/.test(n)) return "produce";
+  if (/(milk|egg|cheese|yogurt|butter|cream|sour cream|half.and.half|cottage|ricotta|mozzarella|cheddar|gouda|brie|feta|parmesan|monterey|colby|queso|kefir|whey)/.test(n)) return "dairy";
+  if (/(chicken|beef|steak|ground beef|pork|bacon|ham|turkey|sausage|salmon|shrimp|fish|tilapia|tuna|crab|lobster|brisket|rib|roast|tenderloin|filet|wing|thigh|drum|chorizo|pepperoni|salami|prosciutto|venison|lamb|veal|bison)/.test(n)) return "meat";
+  if (/(bread|bagel|bun|roll|tortilla|croissant|muffin|toast|pita|naan|baguette|sourdough|rye|wheat|brioche|waffle|pancake|cake|cookie|brownie|pastry|pie|donut|pretzel)/.test(n)) return "bakery";
+  if (/(frozen|ice cream|gelato|sorbet|popsicle|pizza rolls|frozen pizza|tater tot|fries|edamame|pot pie)/.test(n)) return "frozen";
+  if (/(salt|pepper|paprika|cumin|oregano|cinnamon|seasoning|powder|spice|chili powder|garlic powder|onion powder|turmeric|curry|cayenne|thyme|rosemary|sage|bay leaf|cardamom|clove|nutmeg|allspice|fennel|anise|dill|tarragon|marjoram|coriander)/.test(n)) return "spice";
+  return "pantry";
+}
+
+// Parses an HEB.com online order page (PDF or text)
+function parseHebOnlineOrder(text) {
+  const SKIP = [
+    /^don'?t substitute$/i,
+    /^ready later$/i,
+    /^add items$/i,
+    /^quick actions$/i,
+    /^forgot something\??$/i,
+    /^you can add items/i,
+    /^pickup details$/i,
+    /^curbside$/i,
+    /^order #/i,
+    /^we'?ll see you$/i,
+    /^view store details$/i,
+    /^order details \|/i,
+    /^https?:\/\//i,
+    /^\d+ of \d+$/,
+    /^\d{1,2}\/\d{1,2}\/\d{4}/,
+    /^\(\d{3}\)/,
+    /^at \d{1,2}:\d{2}/i,
+    /^today,/i,
+    /^order placed on/i,
+    /^accept by/i,
+    /^\*online prices/i,
+    /^your (estimated|curbside)/i,
+    /^h-e-b (plano|san antonio|austin|houston|dallas|corpus|laredo|mcallen|waco|college station|killeen|round rock|pflugerville|cedar park|georgetown|kyle|buda|new braunfels|san marcos|victoria|beaumont|lufkin|nacogdoches|texarkana|longview|tyler|temple|harlingen|edinburg|mission|pharr|brownsville)/i,
+    /^\d{4,}\s+[a-z]/i,
+    /^(plano|san antonio|houston|austin|dallas),?\s+tx/i,
+    /^visa \d+/i,
+    /^(company|our services|customer service|more from h-e-b)$/i,
+    /^(find a store|about us|careers|community|newsroom|sustainability|our brands|store openings|suppliers)$/i,
+    /^(h-e-b credit card|pharmacy|restaurants|h-e-b services|gift cards|nutrition services|custom cakes|accessibility|help & faqs|review our website|coupon policy|refund policy|product recalls|all recipes|meal simple|sushiya)$/i,
+    /^(partners|copyright|privacy|terms|site map|h-e-b, lp|central market|mi tienda|joe v|favor delivery)$/i,
+    /^h-e-b corporate/i,
+    /earn \$\d+ bonus/i,
+  ];
+
+  const isEndMarker = l => /^(payment summary|estimated subtotal|payment method|earn \$)/.test(l.toLowerCase());
+  const isPriceLine = l => /^\$[\d,]+\.\d{2}\s*\/\s*(ea|lb|oz|ct)/i.test(l);
+  const isTotalLine = l => /^\$[\d,]+\.\d{2}$/.test(l.trim());
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const items = [];
+  let currentCat = "pantry";
+  let nameParts = [];
+  let qty = 1;
+  let inItems = false;
+
+  const flush = () => {
+    if (!nameParts.length) return;
+    const name = nameParts.join(" ").replace(/\s+/g, " ").trim();
+    if (name.length >= 3 && /[a-z]/i.test(name)) {
+      items.push({ name, qty: qty > 1 ? `${qty}x` : "1x", cat: currentCat });
+    }
+    nameParts = [];
+    qty = 1;
+  };
+
+  for (const line of lines) {
+    if (isEndMarker(line)) { flush(); break; }
+
+    const lower = line.toLowerCase();
+    if (HEB_ONLINE_CATEGORIES.hasOwnProperty(lower)) {
+      flush();
+      currentCat = HEB_ONLINE_CATEGORIES[lower];
+      inItems = true;
+      continue;
+    }
+
+    if (!inItems) continue;
+    if (SKIP.some(p => p.test(line))) continue;
+
+    if (isPriceLine(line)) {
+      const m = line.match(/qty[:\s]*(\d+)/i);
+      if (m) qty = parseInt(m[1]);
+      continue;
+    }
+
+    if (isTotalLine(line)) { flush(); continue; }
+
+    nameParts.push(line);
+  }
+
+  flush();
+  return items;
+}
+
+// Parses a physical HEB store receipt (image OCR / text file)
+function parseHebPhysicalReceipt(text) {
+  const skipLine = line => {
+    if (!/[a-z]/i.test(line) || line.length < 3) return true;
+    return /(heb|coupon|total|subtotal|tax|change|visa|mastercard|debit|credit|cash|savings|balance|thank you|store|cashier|register|lane|date|time|payment|tender|approval|auth|ref#|trace|fuel|points)/.test(line.toLowerCase());
+  };
+
+  const lines = text
+    .split(/\r?\n/)
+    .map(l => l.replace(/\s+/g, " ").replace(/^\d{3,}\s+/, "").replace(/\s+\d+\.\d{2}\s*$/, "").replace(/\s+[A-Z]$/, "").trim())
+    .filter(Boolean)
+    .filter(l => !skipLine(l));
+
+  const merged = new Map();
+  lines.forEach(line => {
+    const candidate = line.replace(/\s{2,}/g, " ").replace(/[^a-z0-9\s&'\-]/gi, " ").replace(/\b(lt|ea|oz|lb|pk|ct)\b/gi, " ").replace(/\s+/g, " ").trim();
+    if (!candidate || candidate.length < 3 || !/[a-z]/i.test(candidate)) return;
+    const name = candidate.toLowerCase().split(/\s+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const key = name.toLowerCase();
+    if (merged.has(key)) { const e = merged.get(key); e.count++; e.qty = `${e.count}x`; return; }
+    merged.set(key, { name, qty: "1x", cat: inferReceiptCategory(name), count: 1 });
+  });
+
+  return [...merged.values()].map(({ count, ...item }) => item).slice(0, 40);
+}
+
+function parseHebReceiptText(text) {
+  // Auto-detect: online order has HEB category headings
+  const lower = text.toLowerCase();
+  const isOnlineOrder = ["dairy & eggs", "frozen food", "fruit & vegetables", "health & beauty"].some(h => lower.includes(h));
+  return isOnlineOrder ? parseHebOnlineOrder(text) : parseHebPhysicalReceipt(text);
+}
+
+async function extractPdfText(file) {
+  if (typeof pdfjsLib === "undefined") throw new Error("PDF library did not load. Refresh and try again.");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const pageTexts = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    let lastY = null;
+    let line = "";
+    const lines = [];
+    for (const item of content.items) {
+      const y = item.transform[5];
+      if (lastY !== null && Math.abs(y - lastY) > 2) {
+        if (line.trim()) lines.push(line.trim());
+        line = item.str;
+      } else {
+        line += (line && item.str && !line.endsWith(" ") ? " " : "") + item.str;
+      }
+      lastY = y;
+    }
+    if (line.trim()) lines.push(line.trim());
+    pageTexts.push(lines.join("\n"));
+  }
+  return pageTexts.join("\n");
+}
+
+async function extractReceiptText(file) {
+  if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+    return extractPdfText(file);
+  }
+  if (file.type.startsWith("text/") || file.name.toLowerCase().endsWith(".txt")) {
+    return file.text();
+  }
+  if (file.type.startsWith("image/")) {
+    if (typeof Tesseract === "undefined") throw new Error("OCR library did not load.");
+    const { data } = await Tesseract.recognize(file, "eng");
+    return data?.text || "";
+  }
+  throw new Error("Upload a PDF, image, or .txt file.");
+}
+
+
+function subscribeToFirestore() {
+  teardownSubscriptions();
+
+  pantryUnsubscribe = pantryCollection().orderBy("createdAt", "desc").onSnapshot(async snapshot => {
+    pantry = mapSnapshot(snapshot);
+    renderPantry();
+    updateStats();
+    try {
+      await importLegacyPantryIfNeeded(snapshot);
+    } catch (err) {
+      handleSyncError(err);
+    }
+  }, handleSyncError);
+
+  recipeUnsubscribe = recipeCollection().orderBy("createdAt", "desc").onSnapshot(async snapshot => {
+    recipeUrls = mapSnapshot(snapshot);
+    renderUrls();
+    updateStats();
+    try {
+      await importLegacyRecipesIfNeeded(snapshot);
+    } catch (err) {
+      handleSyncError(err);
+    }
+  }, handleSyncError);
+}
+
+async function connectFirestore() {
+  if (!db) {
+    setSyncStatus("Not Connected", false);
+    setSyncNote("Sign in to connect to Firestore.");
+    return;
+  }
+
+  const nextSpace = sanitizeSpaceId(document.getElementById("space-id").value) || currentSpaceId;
+
+  setSyncStatus("Connecting", false);
+  setSyncNote(`Reconnecting using pantry space "${nextSpace}".`);
+
+  try {
+    teardownSubscriptions();
+    currentSpaceId = nextSpace;
+    pantryImported = false;
+    recipesImported = false;
+    localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
+
+    setSyncStatus("Live On Firestore", true);
+    setSyncNote(`Connected. This pantry space is "${currentSpaceId}".`);
+    toast("Firestore reconnected.", "DB");
+    subscribeToFirestore();
+  } catch (err) {
+    setSyncStatus("Connection Failed", false);
+    setSyncNote(`Could not connect to Firestore: ${err.message}`);
+    toast("Could not connect to Firestore.", "ERR");
+  }
+}
+
+function disconnectFirestore() {
+  teardownSubscriptions();
+  db = null;
+  setSyncStatus("Disconnected", false);
+  setSyncNote("Disconnected from Firestore. Your saved config is still stored in this browser.");
+  toast("Firestore disconnected.", "DB");
+}
+
+async function signInWithEmail() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email) { setGateError("Enter your email address."); return; }
+  if (!password) { setGateError("Enter your password."); return; }
+  setGateError("");
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles showApp + subscribeToFirestore
+  } catch (err) {
+    setGateError(friendlyAuthError(err));
+  }
+}
+
+async function signUpWithEmail() {
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  if (!email) { setGateError("Enter your email address."); return; }
+  if (!password) { setGateError("Enter a password."); return; }
+  setGateError("");
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles showApp + subscribeToFirestore
+  } catch (err) {
+    setGateError(friendlyAuthError(err));
+  }
+}
+
+async function signOut() {
+  teardownSubscriptions();
+  db = null;
+  pantryUnlocked = false;
+  currentSpaceId = "default-pantry";
+  localStorage.removeItem(FIREBASE_SPACE_KEY);
+  setGateError("");
+  setGateMode("open");
+  await auth.signOut();
+  // onAuthStateChanged will call showGate()
+}
+
+async function deleteAllDocs(collectionRef) {
+  const snapshot = await collectionRef.get();
+  if (snapshot.empty) return;
+  const batch = db.batch();
+  snapshot.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+}
+
+async function addIngredient() {
+  if (!ensureFirestoreReady("adding pantry items")) return;
+
+  const nameEl = document.getElementById("ing-name");
+  const qtyEl = document.getElementById("ing-qty");
+  const catEl = document.getElementById("ing-cat");
+  const raw = nameEl.value.trim();
+  if (!raw) {
+    nameEl.focus();
+    return;
+  }
+
+  const names = raw.split(",").map(value => value.trim()).filter(Boolean);
+  try {
+    await Promise.all(names.map(name => pantryCollection().add({
+      name,
+      qty: qtyEl.value.trim(),
+      cat: catEl.value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })));
+    nameEl.value = "";
+    qtyEl.value = "";
+    nameEl.focus();
+    toast(names.length > 1 ? `Added ${names.length} pantry items.` : `Added ${names[0]}.`, "OK");
+  } catch (err) {
+    toast("Could not add pantry item.", "ERR");
+  }
+}
+
+async function removeItem(id) {
+  if (!ensureFirestoreReady("removing pantry items")) return;
+  try {
+    await pantryCollection().doc(id).delete();
+    toast("Pantry item removed.", "OK");
+  } catch (err) {
+    toast("Could not remove pantry item.", "ERR");
+  }
+}
+
+async function clearPantry() {
+  if (!ensureFirestoreReady("clearing the pantry")) return;
+  if (!window.confirm("Clear all pantry items?")) return;
+  try {
+    await deleteAllDocs(pantryCollection());
+    toast("Pantry cleared.", "OK");
+  } catch (err) {
+    toast("Could not clear pantry.", "ERR");
+  }
+}
+
+async function addRecipeUrl() {
+  if (!ensureFirestoreReady("adding recipe URLs")) return;
+
+  const el = document.getElementById("recipe-url");
+  const url = el.value.trim();
+  if (!url) return;
+
+  try {
+    new URL(url);
+  } catch (err) {
+    toast("Enter a valid recipe URL.", "ERR");
+    return;
+  }
+
+  if (recipeUrls.some(recipe => recipe.url === url)) {
+    toast("That recipe URL is already queued.", "OK");
+    return;
+  }
+
+  try {
+    await recipeCollection().add({
+      url,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    el.value = "";
+    el.focus();
+    toast("Recipe URL added.", "OK");
+  } catch (err) {
+    toast("Could not add recipe URL.", "ERR");
+  }
+}
+
+async function removeUrl(id) {
+  if (!ensureFirestoreReady("removing recipe URLs")) return;
+  try {
+    await recipeCollection().doc(id).delete();
+    toast("Recipe URL removed.", "OK");
+  } catch (err) {
+    toast("Could not remove recipe URL.", "ERR");
+  }
+}
+
+async function clearUrls() {
+  if (!ensureFirestoreReady("clearing recipe URLs")) return;
+  if (!window.confirm("Remove all recipe URLs?")) return;
+  try {
+    await deleteAllDocs(recipeCollection());
+    toast("Recipe queue cleared.", "OK");
+  } catch (err) {
+    toast("Could not clear recipe queue.", "ERR");
+  }
+}
+
+async function processHebReceipt() {
+  if (!ensureFirestoreReady("importing a receipt")) return;
+
+  const input = document.getElementById("receipt-file");
+  const btn = document.getElementById("receipt-btn");
+  const file = input.files?.[0];
+  if (!file) {
+    setReceiptStatus("Choose a receipt image or text file first.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Importing...";
+  setReceiptStatus(file.type.startsWith("image/") ? "Reading receipt image with OCR..." : "Reading receipt text...");
+  renderReceiptItems([]);
+
+  try {
+    const rawText = await extractReceiptText(file);
+    const items = parseHebReceiptText(rawText);
+
+    if (!items.length) {
+      setReceiptStatus("I could not confidently detect grocery items from that receipt. Try a clearer image.");
+      toast("No pantry items found on that receipt.", "ERR");
+      return;
+    }
+
+    await Promise.all(items.map(item => pantryCollection().add({
+      name: item.name,
+      qty: item.qty || "",
+      cat: item.cat || "pantry",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })));
+
+    renderReceiptItems(items);
+    setReceiptStatus(`Imported ${items.length} item${items.length === 1 ? "" : "s"} from your receipt.`);
+    input.value = "";
+    toast(`Imported ${items.length} receipt item${items.length === 1 ? "" : "s"}.`, "OK");
+  } catch (err) {
+    setReceiptStatus(err.message || "Could not import that receipt.");
+    toast("Receipt import failed.", "ERR");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Import Receipt";
+  }
+}
+
+updateSetupInputs();
+renderPantry();
+renderUrls();
+updateStats();
+
+if (legacyPantry.length || legacyRecipeUrls.length) {
+  setSyncNote("Local browser data is loaded right now. Connect Firestore to import it and make this pantry live across devices.");
+}
+
+initFirebase();
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    const urlParams = new URLSearchParams(location.search);
+    const sharedParam = urlParams.get("pantry");
+    const savedLinked = localStorage.getItem(LINKED_PANTRY_KEY);
+
+    let isShared = false;
+    if (sharedParam && sharedParam !== user.uid) {
+      currentSpaceId = sharedParam;
+      localStorage.setItem(LINKED_PANTRY_KEY, sharedParam);
+      history.replaceState(null, "", location.pathname);
+      isShared = true;
+    } else if (savedLinked && savedLinked !== user.uid) {
+      currentSpaceId = savedLinked;
+      isShared = true;
+    } else {
+      currentSpaceId = user.uid;
+    }
+
+    pantryUnlocked = true;
+    localStorage.setItem(FIREBASE_SPACE_KEY, currentSpaceId);
+    document.getElementById("space-id").value = currentSpaceId;
+    const display = document.getElementById("auth-user-display");
+    if (display) display.textContent = user.email;
+    document.getElementById("shared-pantry-banner").classList.toggle("hidden", !isShared);
+    document.getElementById("password-gate").classList.add("hidden");
+    document.getElementById("app-shell").classList.remove("locked");
+    setSyncStatus("Live On Firestore", true);
+    setSyncNote(`Connected. Pantry space: ${currentSpaceId}`);
+    subscribeToFirestore();
+  } else {
+    pantryUnlocked = false;
+    showGate();
+  }
+});
+</script>
+</body>
+</html>
