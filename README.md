@@ -6,53 +6,32 @@ This version is built to work as a static site on GitHub Pages.
 
 - Live pantry sync with Firebase Firestore
 - Live recipe URL queue with Firebase Firestore
-- H-E-B receipt import from receipt images or text files
-- Browser-side Firebase config storage for quick setup
+- Email/password sign-in via Firebase Auth
 - Automatic import of the app's old localStorage pantry and recipe data into Firestore the first time you connect
-- Lightweight pantry password screen that maps a password to a shared pantry space
+- Share-by-link access to view another user's pantry
 
-## What is intentionally not live in this static version
+## Account & access flow
 
-- Recipe analysis against AI APIs
-- Recipe suggestion generation against AI APIs
+The app is gated behind Firebase Auth email/password sign-in.
 
-Those two features need a secure backend or serverless function because a GitHub Pages site should not expose private API keys in browser code.
+- `Sign In` authenticates an existing account
+- `Create Account` registers a new Firebase Auth user
+- Each signed-in user gets their own pantry space, keyed by their Firebase UID
+- `Share Pantry` copies a link that lets another signed-in user view your pantry space
 
 ## Firestore setup
 
-1. Create a Firebase project.
-2. Enable Firestore Database.
-3. Create a Web App inside Firebase.
-4. Copy the Firebase Web Config JSON from the Firebase console.
-5. Open the deployed app, paste that JSON into the setup box, choose a pantry space name, and click `Save and Connect`.
+The app ships with a default Firebase project already wired up. To point it at your own Firebase project instead:
 
-## Pantry access flow
-
-The current site includes a lightweight access gate before the app loads.
-
-- `Open Pantry` only opens passwords that were already created
-- `Create Pantry` registers a new password-to-pantry mapping in Firestore
-- The lightweight built-in aliases live in `index.html` in `PANTRY_PASSWORD_MAP`
-- Firestore-backed password mappings are stored in the `pantryAccess` collection
-
-Current built-in examples:
-
-- `demo` -> `demo-pantry`
-- `family` -> `family-kitchen`
-- `caden` -> `caden-pantry`
-
-Important:
-
-- This is not real authentication
-- It is only a lightweight access pattern for shared static-site use
-- Anyone with the password can access that pantry
+1. Create a Firebase project and enable Firestore Database + Authentication (Email/Password provider).
+2. Create a Web App inside Firebase and copy the Firebase Web Config JSON.
+3. Open the deployed app, sign in, then use the "Sync" settings panel to paste in your config and reconnect.
 
 ## GitHub Pages deploy
 
 1. Commit `index.html` and this README to your repo.
 2. Push to GitHub.
 3. In GitHub repo settings, enable GitHub Pages for your branch.
-4. Open the published site and connect it to Firestore using your Firebase web config.
 
 ## Firestore rules
 
@@ -62,4 +41,4 @@ Important:
 
 - These rules allow public read and write access.
 - That is okay for a quick prototype, but not for a production app with sensitive data.
-- If you want, the next step can be adding Firebase Auth and tightening the rules.
+- If you want, the next step can be tightening these rules to require a matching Firebase Auth UID.
