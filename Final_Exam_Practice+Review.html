@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOVT 2306 - Final Exam Practice (Test 3)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    color: #f1f5f9;
+  }
+  .subtitle { color: #94a3b8; margin-bottom: 24px; font-size: 0.95rem; }
+
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .mode-btn {
+    background: #334155;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    padding: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .mode-btn:hover { background: #475569; border-color: #64748b; }
+  .mode-btn .mode-title { font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+  .mode-btn .mode-desc { font-size: 0.85rem; color: #94a3b8; }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .cat-btn {
+    background: #334155;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .cat-btn:hover { background: #475569; }
+  .cat-btn .cat-name { font-weight: 600; }
+  .cat-btn .cat-count { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+  .progress {
+    background: #334155;
+    border-radius: 8px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.3s;
+  }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+
+  .question-meta {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    color: #f1f5f9;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    background: #334155;
+    border: 2px solid #475569;
+    color: #e2e8f0;
+    padding: 14px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    transition: all 0.15s;
+  }
+  .option:hover:not(:disabled) { background: #475569; border-color: #64748b; }
+  .option:disabled { cursor: default; }
+  .option.selected { background: #1e3a8a; border-color: #3b82f6; }
+  .option.correct { background: #14532d; border-color: #22c55e; color: #dcfce7; }
+  .option.incorrect { background: #7f1d1d; border-color: #ef4444; color: #fecaca; }
+
+  .explanation {
+    background: #0f172a;
+    border-left: 4px solid #3b82f6;
+    padding: 14px 16px;
+    margin-top: 16px;
+    border-radius: 4px;
+    font-size: 0.92rem;
+    color: #cbd5e1;
+  }
+  .explanation strong { color: #f1f5f9; }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: #2563eb; }
+  .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+  .btn-secondary { background: #475569; }
+  .btn-secondary:hover { background: #64748b; }
+  .btn-danger { background: #dc2626; }
+  .btn-danger:hover { background: #b91c1c; }
+
+  .results-summary {
+    text-align: center;
+    padding: 24px 0;
+  }
+  .score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 8px;
+  }
+  .score-label { color: #94a3b8; margin-bottom: 24px; }
+  .pass { color: #22c55e; }
+  .fail { color: #ef4444; }
+
+  .breakdown { margin-top: 20px; text-align: left; }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #334155;
+    font-size: 0.92rem;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .pct-good { color: #22c55e; }
+  .pct-mid { color: #eab308; }
+  .pct-bad { color: #ef4444; }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .timer {
+    background: #334155;
+    color: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: ui-monospace, monospace;
+  }
+  .timer.warning { background: #7f1d1d; color: #fecaca; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stat-box {
+    background: #334155;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+  .stat-lbl {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+  }
+
+  .review-q {
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid #ef4444;
+  }
+  .review-q.correct-review { border-left-color: #22c55e; }
+  .review-q-num { color: #94a3b8; font-size: 0.82rem; margin-bottom: 6px; }
+  .review-q-text { color: #f1f5f9; font-weight: 500; margin-bottom: 8px; }
+  .review-answer { font-size: 0.9rem; color: #cbd5e1; margin: 4px 0; }
+  .review-correct { color: #4ade80; }
+  .review-wrong { color: #f87171; }
+
+  .info-box {
+    background: #1e3a8a;
+    border-left: 4px solid #3b82f6;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: #dbeafe;
+  }
+
+  .term-card {
+    background: #0f172a;
+    border-left: 3px solid #475569;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    transition: border-left-color 0.15s;
+  }
+  .term-card:hover { border-left-color: #60a5fa; }
+  .term-name {
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+    font-size: 1.0rem;
+  }
+  .term-cat {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .term-def {
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>GOVT 2306 - Final Exam Practice</h1>
+  <p class="subtitle">Test 3 / Cumulative Final | Two question pools + terms reference</p>
+  <div id="app"></div>
+</div>
+
+<script>
+// ============== EASY POOL (definition-recognition style) ==============
+const EASY_QUESTIONS = [
+  { id: 1, category: "Federalism", question: "Which constitutional rule states that valid federal law defeats conflicting state law?", options: ["The Necessary and Proper Clause", "The Commerce Clause", "The Supremacy Clause", "The Tenth Amendment"], correct: 2, explanation: "The Supremacy Clause (Article VI) makes valid federal law the supreme law of the land, overriding conflicting state law. This was a Bingo Review clue." },
+  { id: 2, category: "Federalism", question: "Powers specifically listed for the national government, such as coining money and regulating interstate commerce, are called:", options: ["Reserved powers", "Enumerated powers", "Concurrent powers", "Police powers"], correct: 1, explanation: "Enumerated powers are those expressly listed in the Constitution for the national government. Bingo Review term." },
+  { id: 3, category: "Federalism", question: "The state authority to regulate for the health, safety, and welfare of residents is called:", options: ["Reserved powers", "Concurrent powers", "Police powers", "Implied powers"], correct: 2, explanation: "Police powers are the broad state authority to regulate for health, safety, and welfare. Lottery and casino gambling decisions are classic examples. Bingo Review term." },
+  { id: 4, category: "Federalism", question: "Which 1819 Supreme Court case defended implied federal powers and rejected state taxation of a valid federal institution (the national bank)?", options: ["Gibbons v. Ogden", "Marbury v. Madison", "McCulloch v. Maryland", "Wickard v. Filburn"], correct: 2, explanation: "McCulloch v. Maryland (1819) established implied federal powers via the Necessary and Proper Clause and ruled states cannot tax legitimate federal institutions. Bingo Review term." },
+  { id: 5, category: "Federalism", question: "When a higher level of government requires a policy but does not provide enough money to cover the cost, this is called a(n):", options: ["Categorical grant", "Block grant", "Unfunded mandate", "Matching requirement"], correct: 2, explanation: "Unfunded mandates require states or localities to take action without sufficient funding. Bingo Review term." },
+  { id: 6, category: "Federalism", question: "Which type of federal grant gives state and local governments broad discretion and the fewest restrictions on how funds are spent?", options: ["Categorical grants", "Block grants", "Matching grants", "Project grants"], correct: 1, explanation: "Block grants give recipients broad discretion. Categorical grants come with strict conditions. TANF is an example of a block grant. Bingo Review term." },
+  { id: 7, category: "Federalism", question: "A system that gives lower-level governments most authority and lets them significantly limit the national government is known as:", options: ["Unitary government", "Federalism", "Confederation", "Devolution"], correct: 2, explanation: "A confederation gives subnational governments most authority. The Articles of Confederation are the U.S. example before the Constitution. Bingo Review term." },
+
+  { id: 8, category: "Local Government & Metro Politics", question: "The doctrine that limits local government to powers expressly granted by the state or closely implied by those grants is known as:", options: ["Home Rule", "Dillon's Rule", "The Tiebout Model", "Cooley Doctrine"], correct: 1, explanation: "Dillon's Rule limits local governments to powers expressly granted by the state. Bingo Review term." },
+  { id: 9, category: "Local Government & Metro Politics", question: "Which provision gives a city broader authority to govern itself so long as it does not conflict with state law?", options: ["General law", "Home rule", "Dillon's Rule", "Police powers"], correct: 1, explanation: "Home rule allows cities to adopt their own charter and pass ordinances so long as they don't conflict with state or federal law. In Texas, cities over 5,000 may adopt home rule. Bingo Review term." },
+  { id: 10, category: "Local Government & Metro Politics", question: "In which city form do voters elect a council and mayor, and the council hires a professional administrator to run day-to-day government?", options: ["Strong mayor system", "Weak mayor system", "Council-manager system", "Commission system"], correct: 2, explanation: "The council-manager system originated in the Progressive Era to fight corruption. Most large Texas cities (Dallas, Austin, San Antonio, Fort Worth) use it. Bingo Review term." },
+  { id: 11, category: "Local Government & Metro Politics", question: "In which city form does the mayor have broad executive responsibility over administration and implementation?", options: ["Council-manager system", "Strong mayor system", "Commission system", "Weak mayor system"], correct: 1, explanation: "In a strong mayor system, the mayor has significant executive authority. Houston is the major Texas city using this system. Bingo Review term." },
+  { id: 12, category: "Local Government & Metro Politics", question: "A local institution that handles one service or policy area, such as schools, water, transit, or fire control, is called a:", options: ["Special-purpose government", "Municipal corporation", "Regional council", "Charter authority"], correct: 0, explanation: "Special-purpose governments handle one specific service. School districts and water districts are common examples. Bingo Review term." },
+  { id: 13, category: "Local Government & Metro Politics", question: "Which model argues that competition among local governments can improve public goods provision as people 'vote with their feet'?", options: ["The Dillon Model", "The Tiebout Model", "The Madisonian Model", "The Wagner Model"], correct: 1, explanation: "The Tiebout Model argues residents move to communities offering the bundle of services and taxes they prefer, creating market-like pressure on local governments. Bingo Review term." },
+  { id: 14, category: "Local Government & Metro Politics", question: "Which group is more likely to monitor and influence single-purpose districts because they have intense interest in a narrow issue?", options: ["Casual voters", "Political parties", "High demanders", "Average taxpayers"], correct: 2, explanation: "High demanders are intensely interested groups (parents in school districts, farmers in water districts) who dominate single-purpose elections due to low turnout. Bingo Review term." },
+
+  { id: 15, category: "State Constitutions", question: "A state-level governing document that often includes rights, institutional rules, amendment procedures, and specific policy limits is called a:", options: ["Bill of rights", "City charter", "State constitution", "Statute book"], correct: 2, explanation: "State constitutions are the supreme law within each state, subordinate only to the U.S. Constitution. They are typically much longer and more detailed than the federal one. Bingo Review term." },
+  { id: 16, category: "State Constitutions", question: "The section of many state constitutions that lists protections for individual rights and freedoms is called the:", options: ["Preamble", "State Bill of Rights", "Article of Liberties", "Reservation Clause"], correct: 1, explanation: "A state Bill of Rights lists individual rights and freedoms. Most state constitutions include one, sometimes broader than the federal version. Bingo Review term." },
+  { id: 17, category: "State Constitutions", question: "A formal change to a constitution, often proposed by legislatures or voters and ratified by voters, is called a(n):", options: ["Statute", "Resolution", "Constitutional amendment", "Executive order"], correct: 2, explanation: "Constitutional amendments formally change the document. Texas's constitution has been amended hundreds of times. Bingo Review term." },
+  { id: 18, category: "State Constitutions", question: "A constitutional provision that requires government to provide or protect something, such as public schools or a clean environment, is called a(n):", options: ["Reserved power", "Affirmative duty", "Police power", "Discretionary mandate"], correct: 1, explanation: "Affirmative duties require government to act, unlike negative rights that protect citizens from government. Many state constitutions impose affirmative duties on schooling and environment. Bingo Review term." },
+  { id: 19, category: "State Constitutions", question: "Which states model their constitutions most closely on the U.S. Constitution by placing all executive power in the governor's hands?", options: ["Texas, California, and Florida", "Alaska, Hawaii, New Hampshire, New Jersey, and Tennessee", "New York, Ohio, and Pennsylvania", "All 50 states"], correct: 1, explanation: "Alaska, Hawaii, New Hampshire, New Jersey, and Tennessee place all executive power with the governor. Most states use split executives instead." },
+  { id: 20, category: "State Constitutions", question: "Compared to the U.S. Constitution, state constitutions tend to be:", options: ["Shorter and more general", "Longer and more detailed, with more specific policy", "About the same length", "Identical in structure"], correct: 1, explanation: "State constitutions are typically much longer and contain detailed policy-specific provisions, which is part of why they're amended so often." },
+  { id: 21, category: "State Constitutions", question: "The phrase 'laboratories of democracy' captures the idea that:", options: ["States must mirror federal policies exactly", "States can test different policy approaches and other states can learn from results", "Universities should design state policy", "Federal policy should be uniform across all states"], correct: 1, explanation: "Justice Brandeis's metaphor: states experiment with policies, and successful experiments can spread. Bingo Review term." },
+
+  { id: 22, category: "State Legislatures", question: "A legislative structure with two chambers, usually an upper chamber and a lower chamber, is called:", options: ["Unicameral", "Bicameral", "Tricameral", "Monocameral"], correct: 1, explanation: "Bicameral legislatures have two chambers. Every state except Nebraska (which is unicameral) uses a bicameral system. Bingo Review term." },
+  { id: 23, category: "State Legislatures", question: "A legislature with full-time members, higher pay, more staff, and greater policy capacity is called a(n):", options: ["Citizen legislature", "Amateur legislature", "Professionalized legislature", "Hybrid legislature"], correct: 2, explanation: "Professionalized legislatures (like California, New York) have full-time members and significant resources. Texas has a hybrid legislature. Bingo Review term." },
+  { id: 24, category: "State Legislatures", question: "Drawing district lines to advantage one party, group, or set of incumbents is called:", options: ["Apportionment", "Reapportionment", "Gerrymandering", "Redistricting"], correct: 2, explanation: "Gerrymandering manipulates district boundaries for political advantage. Redistricting is the neutral term for drawing lines. Bingo Review term." },
+  { id: 25, category: "State Legislatures", question: "The constitutional principle requiring state legislative districts to represent people equally under the Equal Protection Clause is:", options: ["Separation of powers", "One person, one vote", "Federalism", "Judicial review"], correct: 1, explanation: "One person, one vote (Reynolds v. Sims, 1964) requires districts to have roughly equal populations in both chambers. Bingo Review term." },
+  { id: 26, category: "State Legislatures", question: "How long does the Texas legislature meet in regular session?", options: ["Year-round", "140 days every other year, beginning in January of odd-numbered years", "Six months every year", "Ninety days every year"], correct: 1, explanation: "Texas's legislature meets only 140 days every other year (biennial), beginning in January of odd-numbered years. One of the shortest sessions in the country." },
+  { id: 27, category: "State Legislatures", question: "Which Texas official has significant legislative power as President of the state Senate?", options: ["The Speaker of the House", "The Governor", "The Lieutenant Governor", "The Attorney General"], correct: 2, explanation: "In Texas, the Lieutenant Governor presides over the state Senate and has significant control over which bills move forward. Currently this is Dan Patrick." },
+  { id: 28, category: "State Legislatures", question: "How many members are in the Texas House of Representatives, and how many are in the Texas Senate?", options: ["100 House, 50 Senate", "150 House, 31 Senate", "200 House, 40 Senate", "120 House, 30 Senate"], correct: 1, explanation: "The Texas House has 150 members; the Texas Senate has 31 members." },
+
+  { id: 29, category: "State Judiciary", question: "The authority to be the first court to hear a case is called:", options: ["Appellate jurisdiction", "Original jurisdiction", "Discretionary jurisdiction", "Concurrent jurisdiction"], correct: 1, explanation: "Original jurisdiction is the power to be the first court to hear a case. Trial courts have original jurisdiction over most cases. Bingo Review term." },
+  { id: 30, category: "State Judiciary", question: "The court that hears disputes first, determines what happened, and applies legal consequences is called the:", options: ["Appellate court", "Court of last resort", "Trial court", "Supreme court"], correct: 2, explanation: "Trial courts make determinations of fact (what happened) and law (legal consequences). They are the workhorses of the state judicial system. Bingo Review term." },
+  { id: 31, category: "State Judiciary", question: "The highest court in a state judicial hierarchy is called the:", options: ["Trial court", "Intermediate appellate court", "Court of last resort", "Specialized court"], correct: 2, explanation: "The court of last resort makes final decisions on state law. Most states call it the 'Supreme Court,' but Texas has TWO: the Supreme Court (civil) and the Court of Criminal Appeals. Bingo Review term." },
+  { id: 32, category: "State Judiciary", question: "The institutional design question of how someone becomes a judge in the first place is called:", options: ["Judicial retention", "Judicial selection", "Judicial review", "Judicial appointment"], correct: 1, explanation: "Judicial selection is about how someone first becomes a judge. Methods include appointment, partisan/nonpartisan elections, and the Missouri Plan. Bingo Review term." },
+  { id: 33, category: "State Judiciary", question: "The Missouri Plan is a system in which:", options: ["Judges are elected in partisan elections", "The legislature appoints all judges", "A governor appoints judges from a nominating commission's list, then the judge faces a retention election", "Judges serve life terms"], correct: 2, explanation: "Under the Missouri Plan, the governor selects from a pre-screened list of candidates, and the appointed judge later faces a retention election. It is the single most common system in the U.S." },
+  { id: 34, category: "State Judiciary", question: "How are most Texas judges from the district level and up selected?", options: ["Appointed by the governor for life", "Selected by the Missouri Plan", "Elected in partisan judicial elections", "Appointed by the legislature"], correct: 2, explanation: "Texas uses partisan judicial elections for district judges and above. Each position on the Texas Supreme Court and Court of Criminal Appeals is a statewide partisan election." },
+  { id: 35, category: "State Judiciary", question: "If you are convicted of a serious crime in a Texas trial court and lose your appeal at the intermediate appellate court, your next appeal would go to:", options: ["The Texas Supreme Court", "The Texas Court of Criminal Appeals", "A Texas County Court", "The U.S. Court of Appeals"], correct: 1, explanation: "Texas has two courts of last resort. The Texas Court of Criminal Appeals handles criminal cases; the Texas Supreme Court handles civil cases." },
+
+  { id: 36, category: "Executive Branch", question: "The official who is the chief executive of a state and often the most visible state-level politician is the:", options: ["Lieutenant governor", "Attorney general", "Governor", "Secretary of state"], correct: 2, explanation: "The governor is the chief executive of the state, with general executive authority. Bingo Review term." },
+  { id: 37, category: "Executive Branch", question: "The official who is the chief legal officer of the state and often works on consumer protection is the:", options: ["Governor", "Attorney general", "Lieutenant governor", "Secretary of state"], correct: 1, explanation: "The attorney general is the state's chief legal officer, representing the state in court and often handling consumer protection. Bingo Review term." },
+  { id: 38, category: "Executive Branch", question: "The power that lets governors remove individual appropriation items from a budget bill is called the:", options: ["Pocket veto", "Line-item veto", "Executive veto", "Override"], correct: 1, explanation: "The line-item veto lets governors strip individual appropriation items from bills. 44 governors have this power; the U.S. president does not. Bingo Review term." },
+  { id: 39, category: "Executive Branch", question: "A system that divides executive power among multiple significant offices instead of concentrating it in one governor is called:", options: ["Unitary executive", "Plural executive / split executives", "Council-manager", "Strong mayor"], correct: 1, explanation: "Split executives (or plural executives) divide power across multiple independently elected offices. Texas uses this system with the Governor, Lt. Governor, AG, Comptroller, etc. Bingo Review term." },
+  { id: 40, category: "Executive Branch", question: "Which of the following is true about the Texas governorship?", options: ["Governors serve two-year terms with no limits", "Governors serve four-year terms with no limits on consecutive terms", "Governors are limited to two consecutive terms", "Governors are limited to a single eight-year term"], correct: 1, explanation: "Texas elects governors to four-year terms with NO limits on how many terms one person can serve. Texas is unusual in lacking term limits." },
+  { id: 41, category: "Executive Branch", question: "In Texas, how can the legislature override a governor's veto?", options: ["A simple majority in both chambers", "A 2/3 supermajority in each legislative chamber", "A 3/5 supermajority in each chamber", "Only by direct citizen referendum"], correct: 1, explanation: "Texas uses the federal-style veto override: 2/3 supermajorities in both the House and Senate. In some other states, a simple majority is enough." },
+
+  { id: 42, category: "Taxes and Spending", question: "A state fiscal rule that restricts spending so budgets usually cannot operate like the federal deficit model is a:", options: ["Continuing resolution", "Balanced budget law", "Tax expenditure limit", "Sunset provision"], correct: 1, explanation: "Balanced budget laws require revenues to cover expenses. Almost every state has one, unlike the federal government. Bingo Review term." },
+  { id: 43, category: "Taxes and Spending", question: "A reserve account that saves money in prosperous years for use during fiscal downturns is called a:", options: ["Trust fund", "Rainy day fund", "Endowment fund", "Bond reserve"], correct: 1, explanation: "A rainy day fund (budget stabilization fund) saves money for downturns and emergencies. Bingo Review term." },
+  { id: 44, category: "Taxes and Spending", question: "Revenues generated by taxes and fees paid within the government's jurisdiction, excluding transfers, are called:", options: ["Intergovernmental revenues", "Categorical revenues", "Own-source revenues", "Discretionary revenues"], correct: 2, explanation: "Own-source revenues are raised by the government itself through taxes and fees, distinguishing them from intergovernmental transfers. Bingo Review term." },
+  { id: 45, category: "Taxes and Spending", question: "The major local revenue source tied to taxable wealth in land and buildings is the:", options: ["Sales tax", "Income tax", "Property tax", "Excise tax"], correct: 2, explanation: "Property taxes are the largest own-source revenue for local governments (over 30%). They are based on assessed market value. Bingo Review term." },
+  { id: 46, category: "Taxes and Spending", question: "Which is the largest category of combined state and local government spending?", options: ["Transportation", "Education", "Public Safety", "Public Welfare"], correct: 1, explanation: "Education is the largest spending category for combined state and local government in every state. Public welfare is second." },
+
+  { id: 47, category: "Context & Demographics", question: "Everyday services like schools, roads, utilities, policing, and fire response are usually delivered by:", options: ["Federal employees", "State employees", "Local employees", "Private contractors"], correct: 2, explanation: "Local employees deliver most everyday services. This is why state and local government matter so much in daily life. Bingo Review term." },
+  { id: 48, category: "Context & Demographics", question: "The long-running demographic shift moving people toward cities and metropolitan areas, increasing pressure on local planning, is called:", options: ["Migration", "Urbanization", "Suburbanization", "Globalization"], correct: 1, explanation: "Urbanization is the shift toward cities. It puts pressure on local planning, infrastructure, and services. Bingo Review term." },
+  { id: 49, category: "Context & Demographics", question: "Which demographic trend increases fiscal pressure through Medicaid, pensions, and tradeoffs with other spending priorities?", options: ["Rising birth rate", "Aging population", "Immigration surge", "Suburban flight"], correct: 1, explanation: "An aging population strains state budgets through Medicaid (long-term care), public pensions, and crowding out other spending. Bingo Review term." },
+  { id: 50, category: "Context & Demographics", question: "Which of the following is true about Texas's political demographics in recent years?", options: ["Democrats have controlled both chambers since 2002", "Republicans have controlled the governorship and both chambers since 2002", "Power has alternated regularly between parties", "The state legislature is officially nonpartisan"], correct: 1, explanation: "Republicans have held the governorship and both legislative chambers in Texas since 2002, giving them effective full control of state policy." },
+
+  { id: 51, category: "Public Opinion & Lobbying", question: "The aggregation of individual values and attitudes in a given society is called:", options: ["Political ideology", "Public opinion", "Civic culture", "Political socialization"], correct: 1, explanation: "Public opinion aggregates individual attitudes. Polls measure it but always with a margin of error. Bingo Review term." },
+  { id: 52, category: "Public Opinion & Lobbying", question: "A statistic describing how far a polling estimate may be from the true population value is called:", options: ["Standard deviation", "Margin of error", "Sample bias", "Confidence interval"], correct: 1, explanation: "The margin of error indicates polling uncertainty. A 3-point margin means the true value could reasonably be 3 points higher or lower than reported. Bingo Review term." },
+  { id: 53, category: "Public Opinion & Lobbying", question: "A cohesive set of values about the proper role of government is called a:", options: ["Public opinion", "Political ideology", "Party identification", "Civic culture"], correct: 1, explanation: "Political ideology is a coherent worldview about government's role. Liberalism and conservatism are the most common American examples. Bingo Review term." },
+  { id: 54, category: "Public Opinion & Lobbying", question: "An organized interest that lets competing firms pool resources around shared policy goals is called a:", options: ["Political party", "Public interest group", "Trade association", "PAC"], correct: 2, explanation: "Trade associations represent industries (e.g., the National Association of Realtors). Member firms compete in markets but cooperate in lobbying. Bingo Review term." },
+
+  { id: 55, category: "Participation & Elections", question: "Under which voting rule is the winner the candidate with the most votes, even without a majority?", options: ["Majority rule", "Plurality voting", "Ranked-choice voting", "Proportional representation"], correct: 1, explanation: "Plurality voting ('first past the post') declares the candidate with the most votes the winner, even if under 50%. Most U.S. elections use this. Bingo Review term." },
+  { id: 56, category: "Participation & Elections", question: "Which voting formula says a person votes when the probability-weighted benefit exceeds the cost (pB > C)?", options: ["The Tiebout formula", "The Downsian / rational choice voting model (pB > C)", "The Madisonian formula", "The duty-based model"], correct: 1, explanation: "The pB > C formula treats voting as a cost-benefit calculation: probability of being decisive (p) times benefit (B), compared to cost (C). The paradox: pB rarely exceeds C, yet people still vote. Bingo Review term." },
+  { id: 57, category: "Participation & Elections", question: "Official or systemic efforts that decrease access to the polls are called:", options: ["Voter mobilization", "Voter suppression", "Voter purging", "Get-out-the-vote efforts"], correct: 1, explanation: "Voter suppression refers to laws or practices that decrease ballot access (strict ID laws, polling place closures, registration purges). Bingo Review term." }
+];
+
+// ============== HARD POOL (trap, application, Texas-specific) ==============
+const HARD_QUESTIONS = [
+  // ===== FEDERALISM (7) =====
+  {
+    id: 101, category: "Federalism",
+    question: "Texas refuses to enforce a new federal regulation, citing its sovereign police powers. The federal regulation is constitutional and was passed under Congress's enumerated powers. Which constitutional principle determines the outcome?",
+    options: ["The Tenth Amendment, which protects state sovereignty", "The Supremacy Clause, which makes valid federal law override conflicting state action", "Police powers, which give states final authority over health and safety", "Concurrent powers, which allow states to opt out of federal programs"],
+    correct: 1,
+    explanation: "The Supremacy Clause means valid federal law defeats conflicting state action regardless of state sovereignty arguments. Police powers and the Tenth Amendment cannot override constitutional federal law."
+  },
+  {
+    id: 102, category: "Federalism",
+    question: "The federal government provides $50 million to states for transportation projects but requires that all state highway speed limits not exceed 70 mph to receive the funds. This is an example of:",
+    options: ["A categorical grant with conditions", "A block grant with broad discretion", "An unfunded mandate", "A direct preemption"],
+    correct: 0,
+    explanation: "Trap: this is a categorical grant, not a block grant (block grants have FEW conditions; this has STRICT conditions). It's also not an unfunded mandate because money is provided. Categorical grants let the federal government shape policy by attaching conditions."
+  },
+  {
+    id: 103, category: "Federalism",
+    question: "Which of the following best distinguishes a confederation from a federal system?",
+    options: ["A confederation has no constitution; a federal system has one", "In a confederation, subnational units have most authority and can limit the national government; in federalism, power is shared", "Confederations always involve more than 13 states", "Federal systems always have a stronger military"],
+    correct: 1,
+    explanation: "A confederation gives subnational governments most authority. In federalism, both levels share genuine power. The Articles of Confederation made the national government too weak; the Constitution moved the U.S. to federalism."
+  },
+  {
+    id: 104, category: "Federalism",
+    question: "Congress passes a law requiring all states to adopt a new voter registration system but provides no funding for implementation. Texas estimates this will cost $200 million. This is best described as:",
+    options: ["A categorical grant", "A block grant", "An unfunded mandate", "A police power exercise"],
+    correct: 2,
+    explanation: "Application: an unfunded mandate is when the federal government requires action but does not provide enough money. The cost falls on states. This is distinct from grants, which involve federal money flowing to states."
+  },
+  {
+    id: 105, category: "Federalism",
+    question: "Which of the following is NOT a power that McCulloch v. Maryland (1819) established or affirmed?",
+    options: ["Implied powers under the Necessary and Proper Clause", "The supremacy of valid federal law over state law", "The federal power to regulate interstate commerce", "The protection of federal institutions from state taxation"],
+    correct: 2,
+    explanation: "Trap: McCulloch v. Maryland was about the national bank and dealt with implied powers, supremacy, and protecting federal institutions from state taxes. The Commerce Clause was developed in Gibbons v. Ogden (1824), a different case."
+  },
+  {
+    id: 106, category: "Federalism",
+    question: "Which is an example of a state exercising its police powers rather than a concurrent or enumerated power?",
+    options: ["Collecting state income tax", "Regulating who may operate a casino within the state", "Coining money", "Negotiating treaties with other countries"],
+    correct: 1,
+    explanation: "Police powers cover health, safety, welfare, and morals (gambling decisions). Taxation is concurrent (both levels do it). Coining money and treaties are enumerated federal powers."
+  },
+  {
+    id: 107, category: "Federalism",
+    question: "A state government accepts federal Medicaid funds, which require the state to contribute matching funds and follow federal program rules. Which best describes this?",
+    options: ["A block grant with full state discretion", "A categorical grant with a matching requirement", "An unfunded mandate", "Cooperative federalism without strings attached"],
+    correct: 1,
+    explanation: "Medicaid is a categorical grant (defined purpose, conditions attached) with a matching requirement (states must contribute funds). This is a classic example used in Chapter 11."
+  },
+
+  // ===== LOCAL GOVERNMENT / METRO POLITICS (7) =====
+  {
+    id: 108, category: "Local Government & Metro Politics",
+    question: "A Texas city of 4,500 residents wants to ban single-use plastic bags. Can it do so under home rule?",
+    options: ["Yes, all Texas cities have home rule authority", "No, only cities of 5,000 or more may adopt a home rule charter; cities below that follow general law", "Yes, but only if the county commissioners' court approves", "No, plastic bag bans are entirely a federal matter"],
+    correct: 1,
+    explanation: "Application: in Texas, only cities over 5,000 may adopt a home rule charter. A city of 4,500 must operate under general law and only has powers expressly granted by the state."
+  },
+  {
+    id: 109, category: "Local Government & Metro Politics",
+    question: "Which Texas city uses a strong-mayor system rather than the council-manager system used by most large Texas cities?",
+    options: ["Dallas", "San Antonio", "Houston", "Fort Worth"],
+    correct: 2,
+    explanation: "Houston is the major Texas city with a strong-mayor system. Dallas, Austin, San Antonio, and Fort Worth all use council-manager systems."
+  },
+  {
+    id: 110, category: "Local Government & Metro Politics",
+    question: "Which of the following best illustrates the Tiebout Model in action?",
+    options: ["A state legislature passing a bill that preempts city ordinances", "A family moving from one suburb to another because the schools are better and taxes are lower", "A city council hiring a professional manager to run day-to-day operations", "Federal courts striking down a partisan gerrymander"],
+    correct: 1,
+    explanation: "The Tiebout Model says people 'vote with their feet,' choosing communities that offer their preferred bundle of services and taxes. The family moving illustrates this market-like sorting behavior."
+  },
+  {
+    id: 111, category: "Local Government & Metro Politics",
+    question: "Which statement about Texas counties is correct?",
+    options: ["All Texas counties operate under home rule charters", "Texas counties are general law and have only powers expressly granted by the state", "Texas counties may adopt home rule if they exceed 50,000 residents", "Texas has no county government"],
+    correct: 1,
+    explanation: "Trap: home rule applies to MUNICIPALITIES in Texas, not counties. ALL Texas counties are general law, regardless of size. Texas has 254 counties, more than any other state."
+  },
+  {
+    id: 112, category: "Local Government & Metro Politics",
+    question: "Why are special-purpose governments often dominated by 'high demanders' rather than the general public?",
+    options: ["High demanders have more money than other voters", "Single-purpose elections have low turnout, so groups intensely interested in the narrow function (like school employees and parents) wield outsized influence", "State law requires high demanders to be appointed to special district boards", "High demanders are the only people legally allowed to vote in these elections"],
+    correct: 1,
+    explanation: "Special-purpose elections have very low turnout, so the people who do show up are those most directly affected (high demanders), giving them disproportionate influence over policy."
+  },
+  {
+    id: 113, category: "Local Government & Metro Politics",
+    question: "A common criticism of the council-manager system is that:",
+    options: ["It produces more corruption than strong-mayor systems", "The professional administrator with significant influence is unelected, weakening democratic accountability", "It is too expensive for small cities to afford", "It cannot be combined with home rule"],
+    correct: 1,
+    explanation: "Trap: research shows council-manager cities have LESS corruption, not more. The main critique is that the city manager has significant power but is hired (not elected), creating a democratic accountability gap."
+  },
+  {
+    id: 114, category: "Local Government & Metro Politics",
+    question: "What is the governing body of a Texas county called, and how is the county judge selected?",
+    options: ["The county council; county judge is appointed by the governor", "The commissioners' court; county judge is elected county-wide", "The county legislature; county judge is appointed by the four commissioners", "The county supervisors; county judge is elected from a single district"],
+    correct: 1,
+    explanation: "Texas counties are governed by a 'commissioners' court' (a legislative body, not judicial). The county judge is elected county-wide; the four commissioners are elected from precincts within the county."
+  },
+
+  // ===== STATE CONSTITUTIONS (7) =====
+  {
+    id: 115, category: "State Constitutions",
+    question: "The Texas Constitution was adopted in 1876. Which best explains its very long, detailed, and restrictive nature?",
+    options: ["It was modeled directly on the U.S. Constitution", "It was a reaction to perceived overreach during Reconstruction-era government, deliberately limiting state power", "It was drafted to encourage rapid economic development", "It was written by a single committee in just one week"],
+    correct: 1,
+    explanation: "The 1876 Texas Constitution was a reaction against Reconstruction-era government. It deliberately limits state power through extensive detail and restrictions, which is why it is one of the longest state constitutions and is amended very frequently."
+  },
+  {
+    id: 116, category: "State Constitutions",
+    question: "Which of the following is an example of an affirmative duty in a state constitution rather than a negative right?",
+    options: ["A protection against unreasonable searches", "A guarantee of free speech", "A requirement that the state provide a system of public schools", "A prohibition on cruel and unusual punishment"],
+    correct: 2,
+    explanation: "Affirmative duties REQUIRE government to act (provide schools, protect environment). Negative rights LIMIT government action (no searches, no censorship). Most U.S. Constitution rights are negative; many state constitutions add affirmative duties."
+  },
+  {
+    id: 117, category: "State Constitutions",
+    question: "If a state Bill of Rights provides BROADER protection than the federal Bill of Rights, what happens when the two conflict?",
+    options: ["The federal Bill of Rights always applies, by the Supremacy Clause", "Citizens may invoke the broader state protection in state court; states may grant more rights than the federal floor, but not fewer", "State protections are never enforceable", "The state constitution must be amended to match the federal one"],
+    correct: 1,
+    explanation: "States can grant MORE rights than federal minimums but not fewer. The Supremacy Clause sets a floor, not a ceiling. Citizens can invoke broader state rights in state court."
+  },
+  {
+    id: 118, category: "State Constitutions",
+    question: "Which of the following states places ALL executive power in the governor's hands rather than using split executives?",
+    options: ["Texas", "California", "New Hampshire", "Florida"],
+    correct: 2,
+    explanation: "Alaska, Hawaii, New Hampshire, New Jersey, and Tennessee place all executive power with the governor. Texas, California, and Florida all use split executives with multiple independently elected officials."
+  },
+  {
+    id: 119, category: "State Constitutions",
+    question: "Compared to amending the U.S. Constitution, amending a typical state constitution is:",
+    options: ["Significantly harder", "Significantly easier, which is why state constitutions are amended frequently", "Equally difficult", "Impossible without a constitutional convention"],
+    correct: 1,
+    explanation: "State constitutional amendment is much easier than federal amendment. Many states allow amendment by simple legislative passage plus voter ratification. Texas's constitution has been amended hundreds of times."
+  },
+  {
+    id: 120, category: "State Constitutions",
+    question: "Which is true about state constitutions vs the U.S. Constitution?",
+    options: ["State constitutions are typically shorter and more general", "State constitutions are typically longer and contain more specific policy provisions", "State and federal constitutions are about the same length on average", "State constitutions cannot include a bill of rights"],
+    correct: 1,
+    explanation: "Trap: state constitutions are LONGER, not shorter, than the U.S. Constitution. They include detailed policy mandates (e.g., specific tax rates, funding formulas), which is why they are amended frequently."
+  },
+  {
+    id: 121, category: "State Constitutions",
+    question: "Justice Brandeis called states 'laboratories of democracy.' Which scenario best illustrates this concept?",
+    options: ["The federal government imposing uniform national standards on all states", "Wisconsin pioneering an unemployment insurance program in the 1930s that other states then adopted", "States being forced to comply with Supreme Court rulings", "Citizens moving from a high-tax state to a low-tax one"],
+    correct: 1,
+    explanation: "The 'laboratories' idea is about policy experimentation: states try things, and successes spread. Wisconsin's unemployment insurance is a classic example. (Citizens moving is the Tiebout Model, not laboratories of democracy.)"
+  },
+
+  // ===== STATE LEGISLATURES (7) =====
+  {
+    id: 122, category: "State Legislatures",
+    question: "Reynolds v. Sims (1964) established the 'one person, one vote' principle. Which of the following violates it?",
+    options: ["A state House district with 100,000 people next to a state House district with 102,000 people", "A state Senate that gives each county one seat regardless of population, so a county of 5,000 and a county of 5 million each get one senator", "A redistricting plan drawn by a commission instead of the legislature", "A state with 150 House seats and 31 Senate seats"],
+    correct: 1,
+    explanation: "Application: 'One person, one vote' requires roughly equal population per district in BOTH chambers. Geographic representation (one per county regardless of population) violates the rule. Small population variations are tolerated."
+  },
+  {
+    id: 123, category: "State Legislatures",
+    question: "Texas has a hybrid legislature, not a fully professionalized one. Which feature best supports this classification?",
+    options: ["The legislature has 150 House members", "The Texas Senate has standing committees", "The legislature meets only 140 days every other year and pays low salaries, but the chambers have significant staff and resources", "Republicans have controlled the legislature since 2002"],
+    correct: 2,
+    explanation: "Hybrid legislatures fall between amateur and professionalized. Texas pays low and meets briefly (amateur features) but has significant staff and resources (professional features), placing it in the hybrid category."
+  },
+  {
+    id: 124, category: "State Legislatures",
+    question: "After Rucho v. Common Cause (2019), partisan gerrymandering claims must be brought through:",
+    options: ["The U.S. Supreme Court using the 14th Amendment", "Federal district courts using the Voting Rights Act", "State courts using state law and state constitutions", "The U.S. Department of Justice"],
+    correct: 2,
+    explanation: "In Rucho, the Supreme Court ruled partisan gerrymandering is non-justiciable in federal courts. State courts CAN still hear partisan gerrymandering claims under state law and state constitutions."
+  },
+  {
+    id: 125, category: "State Legislatures",
+    question: "Why has Texas not decriminalized small-amount marijuana possession despite popular support, while many other states have?",
+    options: ["The Texas Constitution explicitly bans it", "Texas lacks a direct democracy mechanism (citizen initiative), and the legislature has not passed it", "The U.S. Supreme Court ruled against decriminalization", "Federal law prevents Texas from acting"],
+    correct: 1,
+    explanation: "Application: most decriminalization has happened through citizen ballot initiatives. Texas does not have direct democracy, so any change must come from the legislature, where leadership has blocked it."
+  },
+  {
+    id: 126, category: "State Legislatures",
+    question: "In Texas, how can the governor call special legislative sessions, and is there a limit?",
+    options: ["The governor cannot call special sessions; only the legislature can", "The governor may call them, but only with approval of both chambers", "The governor may call them with no restrictions on number or timing", "The governor may call only one special session per year"],
+    correct: 2,
+    explanation: "The Texas governor can call special sessions with no restrictions on number or timing. Governor Abbott called three special sessions in 2021. This gives the governor significant power over an otherwise short-session legislature."
+  },
+  {
+    id: 127, category: "State Legislatures",
+    question: "An argument FOR legislative term limits is that:",
+    options: ["They reduce partisan polarization", "They produce open-seat elections, which tend to be more competitive than races with incumbents", "They increase the influence of long-serving legislators", "They make the legislature more professional"],
+    correct: 1,
+    explanation: "Trap: research actually suggests term limits INCREASE polarization and may EMPOWER lobbyists/governors at the expense of legislators. The strongest pro-term-limit argument is the open-seat competitiveness effect."
+  },
+  {
+    id: 128, category: "State Legislatures",
+    question: "Which legislator is more likely to have a full-time career in the legislature, well-paid staff, and significant policy capacity?",
+    options: ["A Texas state senator", "A New Hampshire state senator", "A California state senator", "A Wyoming state senator"],
+    correct: 2,
+    explanation: "California has a fully professionalized legislature: high pay, full-time service, large staff. Texas is hybrid; New Hampshire and Wyoming are amateur/citizen legislatures with very low pay and small staff."
+  },
+
+  // ===== STATE JUDICIARY (7) =====
+  {
+    id: 129, category: "State Judiciary",
+    question: "A defendant is convicted of murder in a Texas trial court and loses the appeal at an intermediate appellate court. Which court hears the next appeal?",
+    options: ["The Texas Supreme Court, because it is the state's highest court", "The Texas Court of Criminal Appeals, because Texas has separate courts of last resort for civil and criminal matters", "The U.S. Supreme Court directly", "The federal district court for that region"],
+    correct: 1,
+    explanation: "Trap: Texas has TWO courts of last resort. The Texas Supreme Court hears civil cases; the Texas Court of Criminal Appeals hears criminal cases. Murder is criminal, so it goes to the Court of Criminal Appeals. Only Texas and Oklahoma have this split."
+  },
+  {
+    id: 130, category: "State Judiciary",
+    question: "Which judicial selection method is the SINGLE MOST COMMON in the United States?",
+    options: ["Partisan elections", "Nonpartisan elections", "Gubernatorial appointment without retention election", "The Missouri Plan (gubernatorial appointment from a nominating commission's list, followed by a retention election)"],
+    correct: 3,
+    explanation: "The Missouri Plan is the single most common system, though no method has a majority. It tries to balance expertise (commission filters), accountability (retention elections), and reduced partisanship."
+  },
+  {
+    id: 131, category: "State Judiciary",
+    question: "Which best describes how Texas selects its court of last resort judges?",
+    options: ["The Missouri Plan", "Nonpartisan elections statewide", "Partisan elections statewide, with each seat as its own race", "Gubernatorial appointment for life"],
+    correct: 2,
+    explanation: "Texas uses partisan judicial elections. Each seat on the Texas Supreme Court and Court of Criminal Appeals is a separate statewide partisan race. Currently all 18 members are Republicans."
+  },
+  {
+    id: 132, category: "State Judiciary",
+    question: "Original jurisdiction differs from appellate jurisdiction in that:",
+    options: ["Original jurisdiction is only used in criminal cases", "Original jurisdiction is the power to be the FIRST court to hear a case; appellate jurisdiction reviews lower court decisions", "Original jurisdiction is held only by courts of last resort", "Appellate jurisdiction allows juries; original does not"],
+    correct: 1,
+    explanation: "Original jurisdiction = first court to hear a case (typically trial courts, which determine facts). Appellate jurisdiction = power to review what lower courts did. The two are about WHEN in the process a court enters."
+  },
+  {
+    id: 133, category: "State Judiciary",
+    question: "A court of last resort with a discretionary docket (chooses which cases to hear) most resembles:",
+    options: ["A typical state trial court", "The U.S. Supreme Court", "An intermediate appellate court", "A specialized juvenile court"],
+    correct: 1,
+    explanation: "Most state courts of last resort, like the U.S. Supreme Court, have a discretionary docket. They cherry-pick cases of broad importance rather than hearing every appeal. Intermediate appellate courts usually have mandatory dockets."
+  },
+  {
+    id: 134, category: "State Judiciary",
+    question: "Critics of partisan judicial elections argue they:",
+    options: ["Filter out unqualified candidates", "Reduce the influence of money and party in shaping the judiciary", "Compromise judicial impartiality and produce decisions reflecting electoral pressures", "Are required by the U.S. Constitution"],
+    correct: 2,
+    explanation: "The main critique of partisan elections is that judges deciding cases are influenced by who they need to please to win re-election (party donors, party voters), undermining impartiality. Defenders counter that voters know nothing about judges otherwise."
+  },
+  {
+    id: 135, category: "State Judiciary",
+    question: "In a retention election, voters are asked:",
+    options: ["To choose between two competing candidates", "Whether to retain the sitting judge (yes/no), with no opponent on the ballot", "To rank multiple candidates by preference", "To approve a judge nominated by the legislature"],
+    correct: 1,
+    explanation: "Retention elections have only ONE name on the ballot (the sitting judge). Voters answer yes or no on retention. If 'no' wins, the seat opens and the governor appoints a replacement. Most judges are retained."
+  },
+
+  // ===== EXECUTIVE BRANCH (6) =====
+  {
+    id: 136, category: "Executive Branch",
+    question: "Which is true about the line-item veto?",
+    options: ["The U.S. president has it; most governors do not", "It allows the executive to strike individual appropriation items from a bill while keeping the rest", "It was abolished by the Supreme Court in 1996 in all states", "Only Texas governors have this power"],
+    correct: 1,
+    explanation: "Trap: 44 governors have the line-item veto; the U.S. president does NOT. It was struck down at the federal level (Clinton v. New York, 1998) but survives in states."
+  },
+  {
+    id: 137, category: "Executive Branch",
+    question: "Texas uses a 'plural executive' system. Which best illustrates this?",
+    options: ["The governor controls all executive functions through appointed cabinet officials", "The Lieutenant Governor, Attorney General, Comptroller, and others are independently elected and may be from a different party than the governor", "Only the governor and lieutenant governor are elected", "The legislature appoints the executive officials"],
+    correct: 1,
+    explanation: "Texas's plural/split executive: multiple statewide officials are independently elected, so the governor cannot fire them. They may even be from a different party. This DISPERSES executive power compared to the federal system."
+  },
+  {
+    id: 138, category: "Executive Branch",
+    question: "Which is unique about Texas governors compared to most other states?",
+    options: ["They have a four-year term", "They have NO term limits, can serve unlimited consecutive terms", "They can issue executive orders", "They preside over the state Senate"],
+    correct: 1,
+    explanation: "Most states limit governors to two terms. Texas does NOT. Greg Abbott, Rick Perry, and others could serve indefinitely. Term limits are common nationally, making this a Texas distinction."
+  },
+  {
+    id: 139, category: "Executive Branch",
+    question: "Which Texas official is APPOINTED rather than independently elected, making the office weaker than its counterparts in most other states?",
+    options: ["The Lieutenant Governor", "The Attorney General", "The Secretary of State", "The Comptroller"],
+    correct: 2,
+    explanation: "Trap: in Texas, the Secretary of State is APPOINTED by the governor (unusual). In most states, the SOS is independently elected. The Texas Lieutenant Governor and AG are elected and quite powerful."
+  },
+  {
+    id: 140, category: "Executive Branch",
+    question: "In Texas, how can the legislature override a gubernatorial veto?",
+    options: ["A simple majority in either chamber", "A 2/3 supermajority in both chambers", "A 3/5 supermajority in both chambers", "The veto cannot be overridden in Texas"],
+    correct: 1,
+    explanation: "Texas requires a 2/3 supermajority in BOTH chambers to override a veto, the same as the federal system. In some other states, the override requires only a simple majority, weakening the veto."
+  },
+  {
+    id: 141, category: "Executive Branch",
+    question: "Executive orders issued by a governor:",
+    options: ["Are legally equivalent to legislation passed by the legislature", "Can override existing statutory law if the governor declares an emergency", "Can direct state employees and create policy through implementation, but cannot create new spending or override statutory law", "Require legislative approval before taking effect"],
+    correct: 2,
+    explanation: "Executive orders direct how state employees do their jobs and can shape policy through implementation. They CANNOT create new spending, override existing statutes, or replace legislation. They are tools of implementation, not lawmaking."
+  },
+
+  // ===== TAXES AND SPENDING (5) =====
+  {
+    id: 142, category: "Taxes and Spending",
+    question: "Which type of tax is typically PROGRESSIVE, meaning higher-income people pay a higher percentage of their income?",
+    options: ["General sales tax", "Property tax", "Individual income tax with graduated brackets", "Excise tax on gasoline"],
+    correct: 2,
+    explanation: "Progressive: rate rises with income (graduated income tax). Regressive: low-income pays larger SHARE (sales, property, excise). Trap: a flat-rate income tax is not progressive (everyone pays the same %), though multi-bracket income taxes typically are."
+  },
+  {
+    id: 143, category: "Taxes and Spending",
+    question: "Why are sales taxes considered regressive?",
+    options: ["High-income people make more taxable purchases overall", "Low-income people spend a higher percentage of their income on consumption, so the tax takes a larger share of their income", "Sales tax rates are higher in low-income areas", "Sales taxes apply only to luxury items"],
+    correct: 1,
+    explanation: "Application: sales taxes hit consumption. Low-income people consume most of their income (saving little), so the tax takes a larger SHARE of their income than for high-income people who save and invest more."
+  },
+  {
+    id: 144, category: "Taxes and Spending",
+    question: "Texas does NOT have which of the following?",
+    options: ["A general sales tax", "A property tax", "A state individual income tax", "Excise taxes"],
+    correct: 2,
+    explanation: "Texas has no state individual income tax (banned by the Texas Constitution). It relies heavily on property taxes (local) and sales taxes. Texas is one of about 9 states with no broad-based individual income tax."
+  },
+  {
+    id: 145, category: "Taxes and Spending",
+    question: "If a state's revenues drop sharply during a recession, why must it cut spending or use reserves rather than borrow like the federal government?",
+    options: ["The U.S. Constitution forbids state borrowing", "Almost every state has a balanced budget law requiring revenues to cover expenses", "Federal law caps state spending during recessions", "States voluntarily refuse to borrow"],
+    correct: 1,
+    explanation: "Almost every state has a balanced budget law (sometimes constitutional). This is why states use rainy day funds and cut spending during downturns. The federal government has no such constraint, which is why it can run deficits."
+  },
+  {
+    id: 146, category: "Taxes and Spending",
+    question: "Which is the LARGEST source of state government own-source revenue (across U.S. states), and which is the LARGEST source for local governments?",
+    options: ["Both: property taxes", "State: individual income or sales taxes; Local: property taxes", "State: sales taxes only; Local: sales taxes only", "State: corporate income tax; Local: federal grants"],
+    correct: 1,
+    explanation: "States rely heavily on EITHER individual income taxes or general sales taxes (varies by state). Local governments overwhelmingly rely on PROPERTY TAXES (~30% of local revenue). Corporate income taxes raise surprisingly little for either level."
+  },
+
+  // ===== CONTEXT / DEMOGRAPHICS (4) =====
+  {
+    id: 147, category: "Context & Demographics",
+    question: "Which level of government employs the LARGEST number of public workers in the United States?",
+    options: ["The federal government", "State governments combined", "Local governments combined", "All three are roughly equal"],
+    correct: 2,
+    explanation: "Trap: most people guess federal because it is most visible. But LOCAL government employs the most workers (teachers, police, firefighters, etc.). Federal workforce has been roughly stagnant since the 1960s while local has grown enormously."
+  },
+  {
+    id: 148, category: "Context & Demographics",
+    question: "Approximately what percentage of Americans live in urban areas (as of 2020)?",
+    options: ["About 40%", "About 60%", "About 80%", "About 95%"],
+    correct: 2,
+    explanation: "About 80% of Americans live in urban areas. This is a major shift from a century ago and is why urbanization has such large effects on local planning, infrastructure, and politics."
+  },
+  {
+    id: 149, category: "Context & Demographics",
+    question: "Which is true comparing Texas and California?",
+    options: ["Texas is high-tax, high-service; California is low-tax, low-service", "Texas is low-tax, low-service; California is high-tax, high-service", "Both are roughly equal in taxes and services per capita", "California has no state income tax; Texas does"],
+    correct: 1,
+    explanation: "Texas: low-tax, low-service (~$4,500/person in state and local taxes). California: high-tax, high-service (~$8,000/person). Texas has NO state income tax; California has a steeply progressive one."
+  },
+  {
+    id: 150, category: "Context & Demographics",
+    question: "Why does an aging population create fiscal pressure on state budgets?",
+    options: ["Older voters demand lower taxes", "Older Americans require more Medicaid (long-term care) and pension obligations grow, crowding out other spending", "An aging population reduces all government revenue automatically", "Federal law forces states to fund Social Security"],
+    correct: 1,
+    explanation: "Application: aging populations strain Medicaid (states pay a share for long-term care) and pension funds (more retirees collecting). These are mostly mandatory spending, which crowds out discretionary items like education and infrastructure."
+  },
+
+  // ===== PUBLIC OPINION & LOBBYING (4) =====
+  {
+    id: 151, category: "Public Opinion & Lobbying",
+    question: "A poll shows Candidate A leading 51% to 47%, with a 4-point margin of error. What is the most accurate interpretation?",
+    options: ["Candidate A will definitely win", "The race is effectively a tie because the margin of error overlaps the gap", "The poll is invalid", "Margins of error don't apply to political polls"],
+    correct: 1,
+    explanation: "Application: margin of error is the uncertainty range. With a 4-point margin and a 4-point gap, both candidates' true support could overlap. This is called being 'within the margin of error.' The race is statistically too close to call."
+  },
+  {
+    id: 152, category: "Public Opinion & Lobbying",
+    question: "Which best distinguishes a TRADE ASSOCIATION from a PROFESSIONAL ASSOCIATION as types of interest groups?",
+    options: ["Trade associations represent firms in the same industry; professional associations represent individuals in the same profession (e.g., doctors, lawyers)", "Trade associations are illegal; professional associations are legal", "There is no difference; the terms are interchangeable", "Trade associations only operate at the federal level"],
+    correct: 0,
+    explanation: "Trade associations represent FIRMS in the same industry (e.g., the American Petroleum Institute). Professional associations represent INDIVIDUALS in a profession (e.g., the American Medical Association, the Bar Association)."
+  },
+  {
+    id: 153, category: "Public Opinion & Lobbying",
+    question: "Which of the following best illustrates political ideology rather than public opinion?",
+    options: ["55% of Texans support a specific transportation bill", "An individual's coherent worldview that government should be small, taxes should be low, and traditional values protected", "Polling data showing approval of the governor", "A specific stance on a single issue with no broader connection"],
+    correct: 1,
+    explanation: "Political ideology is a COHESIVE WORLDVIEW about government's proper role (e.g., conservatism, liberalism). Public opinion is the AGGREGATION of attitudes, often issue-by-issue. The first option is public opinion; the second is ideology."
+  },
+  {
+    id: 154, category: "Public Opinion & Lobbying",
+    question: "Lobbying tends to be more influential at the STATE level than the federal level partly because:",
+    options: ["State legislators are required by law to consult lobbyists", "Many state legislatures are not professionalized, so legislators rely more on outside expertise (often from interest groups)", "Federal lobbyists are banned by law", "States have more lobbyists than the federal government"],
+    correct: 1,
+    explanation: "Application: amateur and hybrid legislatures (Texas included) have less staff and policy capacity. Legislators rely on lobbyists for information and bill drafting, increasing lobby influence. Professionalized legislatures (California, etc.) reduce this dependence."
+  },
+
+  // ===== PARTICIPATION & ELECTIONS (3) =====
+  {
+    id: 155, category: "Participation & Elections",
+    question: "In a three-way race under plurality voting, Candidate A wins 38%, Candidate B wins 35%, and Candidate C wins 27%. Who wins?",
+    options: ["No one; a runoff is required because no one got 50%", "Candidate A, because plurality means most votes wins, even without a majority", "The election is voided", "All three share the office"],
+    correct: 1,
+    explanation: "Application: plurality voting awards the win to whoever has the MOST votes, even if under 50%. A majority is not required. This is why third-party candidates can act as 'spoilers' under plurality rules."
+  },
+  {
+    id: 156, category: "Participation & Elections",
+    question: "The pB > C model says a person votes when:",
+    options: ["The probability of being decisive (p) times the benefit (B) exceeds the cost (C) of voting", "The cost of voting is zero", "The benefits of voting always outweigh the costs", "The candidate they prefer is guaranteed to win"],
+    correct: 0,
+    explanation: "The Downsian rational-choice model: vote if pB > C. The 'paradox of voting' is that p (probability your vote is decisive) is so tiny that pB rarely exceeds C, yet people still vote (suggesting other factors like duty)."
+  },
+  {
+    id: 157, category: "Participation & Elections",
+    question: "Why do local elections held in off-years (separate from presidential and congressional elections) tend to produce lower turnout and inflate the influence of party activists?",
+    options: ["Off-year elections are always illegal", "Strategic timing reduces overall turnout, so the smaller electorate is dominated by the most engaged voters (activists, party members, high demanders)", "Off-year elections have shorter ballots", "Federal law mandates off-year local elections"],
+    correct: 1,
+    explanation: "Application: off-year timing depresses turnout. The remaining electorate is heavily skewed toward party activists, public employees, and high demanders, magnifying their influence on local outcomes."
+  }
+];
+
+// ============== TERMS (review reference) ==============
+const TERMS = [
+  // FEDERALISM
+  { term: "Supremacy Clause", category: "Federalism", definition: "Article VI of the U.S. Constitution: valid federal law defeats conflicting state law. The federal Constitution and laws made under it are the supreme law of the land." },
+  { term: "Enumerated Powers", category: "Federalism", definition: "Powers specifically listed in the Constitution for the national government (e.g., coin money, regulate interstate commerce, declare war)." },
+  { term: "Reserved Powers", category: "Federalism", definition: "Powers retained by the states under the Tenth Amendment. Whatever is not delegated to the federal government and not prohibited to the states." },
+  { term: "Concurrent Powers", category: "Federalism", definition: "Powers shared by both federal and state governments, such as the power to tax." },
+  { term: "Police Powers", category: "Federalism", definition: "State authority to regulate for the health, safety, welfare, and morals of residents. Examples: gambling laws, speed limits, professional licensing." },
+  { term: "McCulloch v. Maryland (1819)", category: "Federalism", definition: "Supreme Court case that affirmed implied federal powers under the Necessary and Proper Clause and ruled states cannot tax legitimate federal institutions." },
+  { term: "Unfunded Mandate", category: "Federalism", definition: "When a higher level of government requires a policy or action but does not provide enough money to cover the cost." },
+  { term: "Block Grant", category: "Federalism", definition: "Federal grant with broad discretion and few restrictions on how funds are spent. Example: TANF." },
+  { term: "Categorical Grant", category: "Federalism", definition: "Federal grant for a clearly defined purpose with strict conditions attached. Example: federal funding for schools requiring standardized testing." },
+  { term: "Confederation", category: "Federalism", definition: "System where lower-level (subnational) governments hold most authority and significantly limit the national government." },
+  { term: "Commerce Clause", category: "Federalism", definition: "Federal power to regulate interstate commerce. Became a major basis for national regulation of economic activity and civil rights legislation." },
+
+  // LOCAL GOVERNMENT & METRO POLITICS
+  { term: "Dillon's Rule", category: "Local Government & Metro Politics", definition: "Doctrine limiting local government to powers expressly granted by the state, or closely implied by those grants. Texas counties and general law cities follow this." },
+  { term: "Home Rule", category: "Local Government & Metro Politics", definition: "Provision giving a city broader authority to govern itself through its own charter, so long as it does not conflict with state law. In Texas, only municipalities of 5,000+ may adopt home rule." },
+  { term: "General Law City", category: "Local Government & Metro Politics", definition: "City with only the powers expressly granted by the state. The default in Texas for cities under 5,000 residents." },
+  { term: "Council-Manager System", category: "Local Government & Metro Politics", definition: "City form where voters elect a council and mayor, and the council hires a professional administrator (city manager) to run day-to-day government. Originated in the Progressive Era. Used by Dallas, Austin, San Antonio, Fort Worth." },
+  { term: "Strong Mayor System", category: "Local Government & Metro Politics", definition: "City form where the mayor has broad executive responsibility over administration and implementation. Houston is the major Texas example." },
+  { term: "Special-Purpose Government", category: "Local Government & Metro Politics", definition: "Local institution that handles one service or policy area (schools, water, transit, fire control). Independent school districts are the most common type." },
+  { term: "Tiebout Model", category: "Local Government & Metro Politics", definition: "Theory that competition among local governments improves public goods provision as people 'vote with their feet,' moving to communities offering their preferred mix of services and taxes." },
+  { term: "High Demanders", category: "Local Government & Metro Politics", definition: "Intensely interested groups (school employees, parents, farmers) who dominate special-district elections because turnout is low." },
+  { term: "Incorporation", category: "Local Government & Metro Politics", definition: "Process by which a city is formally founded as a municipal corporation." },
+  { term: "Commissioners' Court (Texas)", category: "Local Government & Metro Politics", definition: "Texas county governing body composed of the county judge and four commissioners. Despite the name, it is a legislative body, not a judicial one." },
+  { term: "County Judge (Texas)", category: "Local Government & Metro Politics", definition: "Elected county-wide; serves primarily legislative and executive functions on the commissioners' court. In small counties, also handles minor judicial cases." },
+
+  // STATE CONSTITUTIONS
+  { term: "State Constitution", category: "State Constitutions", definition: "State-level governing document containing rights, institutional rules, amendment procedures, and specific policy limits. Typically much longer and more detailed than the U.S. Constitution." },
+  { term: "State Bill of Rights", category: "State Constitutions", definition: "Section of state constitutions listing protections for individual rights and freedoms. May offer broader protection than the federal Bill of Rights." },
+  { term: "Constitutional Amendment", category: "State Constitutions", definition: "Formal change to a constitution, often proposed by legislatures or voters and ratified by voters." },
+  { term: "Affirmative Duty", category: "State Constitutions", definition: "Constitutional provision requiring government to provide or protect something (e.g., public schools, clean environment). Contrast with negative rights, which limit government action." },
+  { term: "Laboratories of Democracy", category: "State Constitutions", definition: "Justice Brandeis's metaphor: states can test different policy approaches and other states can learn from the results." },
+  { term: "Texas Constitution (1876)", category: "State Constitutions", definition: "Texas's current constitution, written in reaction to Reconstruction-era government. Very long, detailed, and restrictive of government power. One of the most amended state constitutions." },
+
+  // STATE LEGISLATURES
+  { term: "Bicameral", category: "State Legislatures", definition: "Legislative structure with two chambers (upper and lower). Every state except Nebraska uses bicameralism." },
+  { term: "Unicameral", category: "State Legislatures", definition: "Legislative structure with one chamber. Nebraska is the only U.S. state with a unicameral legislature." },
+  { term: "Professionalized Legislature", category: "State Legislatures", definition: "Legislature with full-time members, higher pay, more staff, and greater policy capacity. Examples: California, New York." },
+  { term: "Amateur Legislature", category: "State Legislatures", definition: "Legislators who do not serve full-time and draw their primary paychecks from a full-time job. Low pay, short sessions. Examples: New Hampshire, Wyoming." },
+  { term: "Hybrid Legislature", category: "State Legislatures", definition: "Falls between amateur and professional. Texas is hybrid: short sessions and low pay, but with significant staff and resources." },
+  { term: "Gerrymandering", category: "State Legislatures", definition: "Drawing district lines to advantage one party, group, or set of incumbents. Distinct from neutral redistricting." },
+  { term: "Redistricting", category: "State Legislatures", definition: "Process of redrawing legislative district boundaries, typically following the decennial census." },
+  { term: "One Person, One Vote", category: "State Legislatures", definition: "Constitutional principle (Reynolds v. Sims, 1964) requiring state legislative districts to represent people equally under the Equal Protection Clause. Both chambers must have roughly equal population per district." },
+  { term: "Rucho v. Common Cause (2019)", category: "State Legislatures", definition: "Supreme Court ruled partisan gerrymandering is non-justiciable in federal court. State courts may still hear claims under state law." },
+  { term: "Texas Legislature Structure", category: "State Legislatures", definition: "House: 150 members. Senate: 31 members. Meets 140 days every other year, beginning in January of odd-numbered years. Lt. Governor presides over Senate." },
+  { term: "Special Session (Texas)", category: "State Legislatures", definition: "The Texas governor may call special legislative sessions with no restrictions on number or timing." },
+  { term: "Term Limits", category: "State Legislatures", definition: "Restrictions on how many terms a legislator may serve. Some states have them; Texas does not for state legislators or governors." },
+
+  // STATE JUDICIARY
+  { term: "Trial Court", category: "State Judiciary", definition: "Court that hears disputes first, determines what happened (questions of fact), and applies legal consequences (questions of law). The workhorse of the state judicial system." },
+  { term: "Original Jurisdiction", category: "State Judiciary", definition: "Authority to be the first court to hear a case. Trial courts have original jurisdiction over most cases." },
+  { term: "Appellate Jurisdiction", category: "State Judiciary", definition: "Authority to review decisions of lower courts." },
+  { term: "Court of Last Resort", category: "State Judiciary", definition: "Highest court in a state judicial hierarchy. Typically called the 'Supreme Court,' but Texas has TWO: the Texas Supreme Court (civil) and the Texas Court of Criminal Appeals (criminal)." },
+  { term: "Intermediate Appellate Court", category: "State Judiciary", definition: "Level of courts above trial courts that hear appeals from those trial courts. Not all states have them." },
+  { term: "Judicial Selection", category: "State Judiciary", definition: "Institutional design question of how someone first becomes a judge. Methods include appointment, partisan election, nonpartisan election, and the Missouri Plan." },
+  { term: "Judicial Retention", category: "State Judiciary", definition: "Process by which a judge gets a new term when their current term expires. Often differs from initial selection method." },
+  { term: "Missouri Plan", category: "State Judiciary", definition: "System where the governor appoints judges from a nominating commission's list. Appointed judge serves a short term, then faces a retention election. The most common single system in the U.S." },
+  { term: "Retention Election", category: "State Judiciary", definition: "Special election with only the sitting judge's name on the ballot. Voters answer yes/no on retention. If 'no,' the seat becomes vacant." },
+  { term: "Texas Judicial Selection", category: "State Judiciary", definition: "Texas uses partisan judicial elections from district level up. Each Texas Supreme Court and Court of Criminal Appeals seat is a separate statewide partisan race." },
+  { term: "Discretionary Docket", category: "State Judiciary", definition: "A set of cases a court chooses to take, rather than is required to take. Most courts of last resort have discretionary dockets." },
+
+  // EXECUTIVE BRANCH
+  { term: "Governor", category: "Executive Branch", definition: "Chief executive of a state and often the most visible state-level politician. General portfolio of executive powers." },
+  { term: "Lieutenant Governor", category: "Executive Branch", definition: "Secondary general executive. Usually replaces the governor on vacancy. In Texas, also presides over the state Senate (a major source of legislative power)." },
+  { term: "Attorney General", category: "Executive Branch", definition: "Chief legal officer of the state. Represents the state in court, often handles consumer protection. A position of progressive ambition." },
+  { term: "Secretary of State", category: "Executive Branch", definition: "Generally the state's chief elections official and record keeper. In Texas, the Secretary of State is APPOINTED by the governor (not elected), making it weaker than in most states." },
+  { term: "Comptroller (Texas)", category: "Executive Branch", definition: "Texas executive in charge of public finances and revenue collection." },
+  { term: "Veto", category: "Executive Branch", definition: "Power to stop a bill from becoming law. Latin: 'I forbid.' Most states allow legislative override (often by 2/3 supermajority)." },
+  { term: "Line-Item Veto", category: "Executive Branch", definition: "Power to remove individual appropriation items from a budget bill while keeping the rest. 44 governors have it; the U.S. president does not." },
+  { term: "Pocket Veto", category: "Executive Branch", definition: "When a governor neither signs nor vetoes a bill within the allotted time and the bill dies. Used in roughly a third of states." },
+  { term: "Split Executives / Plural Executive", category: "Executive Branch", definition: "System dividing executive power among multiple independently elected offices instead of concentrating it in one governor. Used in Texas and most states." },
+  { term: "Executive Order", category: "Executive Branch", definition: "Direction to state employees on how to perform their jobs. Can shape policy through implementation but cannot create new spending or override statutory law." },
+  { term: "Texas Governor", category: "Executive Branch", definition: "Four-year term; no term limits (unusual). Must be 30+ and have lived in Texas for 5 years. Texas legislature can override veto with 2/3 in both chambers." },
+
+  // TAXES AND SPENDING
+  { term: "Balanced Budget Law", category: "Taxes and Spending", definition: "Law (often constitutional) requiring revenues to cover expenses. Almost every state has one, unlike the federal government. Texas localities are also required by state law to adopt balanced budgets." },
+  { term: "Rainy Day Fund", category: "Taxes and Spending", definition: "Reserve account that saves money in prosperous years for use during fiscal downturns. Also called a budget stabilization fund." },
+  { term: "Own-Source Revenues", category: "Taxes and Spending", definition: "Revenues raised by the government itself through taxes and fees, as opposed to intergovernmental transfers." },
+  { term: "Property Tax", category: "Taxes and Spending", definition: "Major local revenue source based on the assessed market value of land and buildings. The largest own-source revenue for local governments (~30%). Somewhat regressive." },
+  { term: "Progressive Tax", category: "Taxes and Spending", definition: "Tax where individuals with higher incomes pay a higher percentage of their income. Multi-bracket individual income taxes are typically progressive." },
+  { term: "Regressive Tax", category: "Taxes and Spending", definition: "Tax where individuals with lower incomes pay a higher percentage of their income. General sales taxes are regressive because lower-income people consume a larger share of their income." },
+  { term: "Tax and Expenditure Limitations (TELs)", category: "Taxes and Spending", definition: "Statutory or constitutional limits on growth in government revenues or spending. Example: Colorado's TABOR." },
+  { term: "Defined Benefit Retirement Plan", category: "Taxes and Spending", definition: "Pension plan promising qualified employees a specific benefit per year indefinitely after retirement. Common for teachers, police, firefighters. Many public pensions are underfunded." },
+  { term: "General Obligation Bonds", category: "Taxes and Spending", definition: "Bonds issued by a government with payment guaranteed by its general taxing authority ('full faith and credit'). Often require voter approval." },
+  { term: "Continuing Resolution", category: "Taxes and Spending", definition: "Legislative resolution authorizing temporary spending in absence of a regular budget. Some states allow these; not all." },
+  { term: "Largest State/Local Spending Categories", category: "Taxes and Spending", definition: "Education is the largest combined state/local spending category in every state. Public welfare is second. Local governments spend most of their education budget on K-12; states spend most on higher ed." },
+  { term: "Texas Tax Profile", category: "Taxes and Spending", definition: "No state individual income tax (banned by Texas Constitution). Heavy reliance on property taxes (local) and sales taxes (state). Low-tax, low-service profile." },
+
+  // CONTEXT & DEMOGRAPHICS
+  { term: "Local Employees", category: "Context & Demographics", definition: "Workers who deliver everyday services like schools, roads, utilities, policing, and fire response. Local governments employ more public workers than state and federal combined." },
+  { term: "Urbanization", category: "Context & Demographics", definition: "Long-running demographic shift moving people toward cities and metro areas. ~80% of Americans live in urban areas (2020). Increases pressure on local planning." },
+  { term: "Aging Population", category: "Context & Demographics", definition: "Demographic trend that increases fiscal pressure through Medicaid, pensions, and tradeoffs with other spending priorities." },
+  { term: "Texas vs California (taxes/services)", category: "Context & Demographics", definition: "Texas: low-tax, low-service (~$4,500/person state and local taxes). California: high-tax, high-service (~$8,000/person)." },
+  { term: "Texas Demographics", category: "Context & Demographics", definition: "Second-most populous state. Growth driven by high birth rates and migration. Republican dominance of state government since 2002 (governorship and both legislative chambers)." },
+
+  // PUBLIC OPINION & LOBBYING
+  { term: "Public Opinion", category: "Public Opinion & Lobbying", definition: "Aggregation of individual values and attitudes in a given society. Measured by polling, but always with a margin of error." },
+  { term: "Margin of Error", category: "Public Opinion & Lobbying", definition: "Statistic describing how far a polling estimate may be from the true population value. Determines whether differences in poll results are statistically meaningful." },
+  { term: "Political Ideology", category: "Public Opinion & Lobbying", definition: "Cohesive set of values about the proper role of government. Examples in the U.S.: liberalism, conservatism." },
+  { term: "Trade Association", category: "Public Opinion & Lobbying", definition: "Organized interest where competing firms in the same industry pool resources around shared policy goals (e.g., American Petroleum Institute)." },
+  { term: "Professional Association", category: "Public Opinion & Lobbying", definition: "Interest group representing individuals in the same profession (e.g., American Medical Association)." },
+  { term: "Interest Group", category: "Public Opinion & Lobbying", definition: "Organization that seeks to influence government policy on behalf of its members or causes. Includes trade associations, professional associations, and public interest groups." },
+
+  // PARTICIPATION & ELECTIONS
+  { term: "Plurality Voting", category: "Participation & Elections", definition: "Voting rule where the candidate with the most votes wins, even without a majority. Most U.S. elections use this ('first past the post')." },
+  { term: "pB > C (Rational Choice Voting Model)", category: "Participation & Elections", definition: "Voting formula: a person votes when probability of being decisive (p) times benefit (B) exceeds the cost (C) of voting. The 'paradox of voting' is that pB rarely exceeds C, yet people still vote." },
+  { term: "Voter Suppression", category: "Participation & Elections", definition: "Official or systemic efforts that decrease access to the polls (strict ID laws, polling place closures, voter roll purges)." },
+  { term: "Partisan Election", category: "Participation & Elections", definition: "Election where candidates appear on the ballot with party labels. Texas judicial elections at the district level and above are partisan." },
+  { term: "Nonpartisan Election", category: "Participation & Elections", definition: "Election without party labels on the ballot. Typically used for local races and school boards." },
+  { term: "Direct Democracy", category: "Participation & Elections", definition: "System allowing voters to make law directly through citizen initiatives, referendums, or recalls. Texas does NOT have direct democracy at the state level." }
+];
+
+
+// ============== STATE ==============
+let state = {
+  view: 'menu',          // 'menu', 'quiz', 'results', 'terms-page'
+  pool: 'easy',          // 'easy' or 'hard'
+  mode: null,            // 'exam', 'all', 'category', 'review-missed'
+  questions: [],
+  currentIdx: 0,
+  selected: null,
+  answered: false,
+  answers: [],
+  startTime: null,
+  easyMissed: [],
+  hardMissed: [],
+  timerInterval: null,
+  timeRemaining: 0,
+  termsView: 'alpha',    // 'alpha' or 'category'
+  termsFilter: '',
+};
+
+function getPoolQuestions() {
+  return state.pool === 'easy' ? EASY_QUESTIONS : HARD_QUESTIONS;
+}
+function getMissedList() {
+  return state.pool === 'easy' ? state.easyMissed : state.hardMissed;
+}
+function addToMissed(qid) {
+  const list = getMissedList();
+  if (!list.includes(qid)) list.push(qid);
+}
+
+// ============== UTILITIES ==============
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function categoryStats(pool) {
+  const qs = pool === 'easy' ? EASY_QUESTIONS : HARD_QUESTIONS;
+  const cats = {};
+  qs.forEach(q => { cats[q.category] = (cats[q.category] || 0) + 1; });
+  return cats;
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return m + ':' + s.toString().padStart(2, '0');
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============== RENDERING ==============
+function render() {
+  const app = document.getElementById('app');
+  if (state.view === 'menu') renderMenu(app);
+  else if (state.view === 'results') renderResults(app);
+  else if (state.view === 'terms-page') renderTerms(app);
+  else renderQuestion(app);
+}
+
+function renderMenu(app) {
+  const easyMissedCount = state.easyMissed.length;
+  const hardMissedCount = state.hardMissed.length;
+  const easyCats = categoryStats('easy');
+  const hardCats = categoryStats('hard');
+
+  app.innerHTML = `
+    <div class="info-box">
+      <strong>Final Exam / Test 3:</strong> Cumulative coverage with focus on chapters 8-11.
+      Distribution mirrors the Bingo Review's "Rough exam topic distribution" slide.
+      Real test format: 40 questions drawn from a 57-question pool, multiple choice, at the testing center.
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.2rem;margin-bottom:14px;color:#f1f5f9;">Choose a study path</h2>
+      <p style="color:#94a3b8;font-size:0.92rem;margin-bottom:14px;">Two question pools are available. Start with Easy if you want to drill the bingo-review terms. Switch to Exam-Realistic to test yourself the way the real exam will probably feel.</p>
+      <div class="mode-grid">
+        <button class="mode-btn" onclick="openPool('easy')">
+          <div class="mode-title">Easy Pool (warm-up)</div>
+          <div class="mode-desc">57 definition-recognition questions. Calibrated to the Bingo Review terms. Good for first pass.</div>
+          <div style="margin-top:6px;font-size:0.78rem;color:#60a5fa;">${easyMissedCount} missed across past attempts</div>
+        </button>
+        <button class="mode-btn" onclick="openPool('hard')" style="border-color:#a855f7;">
+          <div class="mode-title" style="color:#e9d5ff;">Exam-Realistic Pool ★</div>
+          <div class="mode-desc">57 harder questions: trap distinctions, application/scenario, and Texas-specific factual questions beyond the bingo card.</div>
+          <div style="margin-top:6px;font-size:0.78rem;color:#c4b5fd;">${hardMissedCount} missed across past attempts</div>
+        </button>
+        <button class="mode-btn" onclick="openTermsPage()" style="border-color:#22c55e;">
+          <div class="mode-title" style="color:#bbf7d0;">Terms & Definitions Review</div>
+          <div class="mode-desc">Browse all key terms. Switch between alphabetical order and the exam category breakdown.</div>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function openPool(pool) {
+  state.pool = pool;
+  state.view = 'menu-pool';
+  renderPoolMenu();
+}
+
+function renderPoolMenu() {
+  const app = document.getElementById('app');
+  const pool = state.pool;
+  const cats = categoryStats(pool);
+  const missed = getMissedList();
+  const isEasy = pool === 'easy';
+
+  app.innerHTML = `
+    <button class="btn btn-secondary" style="margin-bottom:16px;" onclick="goHome()">← Back to main menu</button>
+
+    <div class="card">
+      <h2 style="font-size:1.2rem;margin-bottom:6px;color:${isEasy ? '#60a5fa' : '#c4b5fd'};">
+        ${isEasy ? 'Easy Pool (warm-up)' : 'Exam-Realistic Pool ★'}
+      </h2>
+      <p style="color:#94a3b8;font-size:0.9rem;margin-bottom:18px;">
+        ${isEasy
+          ? 'Definition-recognition questions calibrated to the Bingo Review.'
+          : 'Trap distinctions, application/scenario, and Texas-specific facts. Closer to the real exam difficulty.'}
+      </p>
+
+      <div class="mode-grid">
+        <button class="mode-btn" onclick="startMode('exam')">
+          <div class="mode-title">Simulated Exam (40 questions)</div>
+          <div class="mode-desc">40 random questions, 60-min timer.</div>
+        </button>
+        <button class="mode-btn" onclick="startMode('all')">
+          <div class="mode-title">Full Pool (all 57)</div>
+          <div class="mode-desc">Walk every question with explanations.</div>
+        </button>
+        <button class="mode-btn" onclick="showCategoryDrill()">
+          <div class="mode-title">Drill by Category</div>
+          <div class="mode-desc">Focus on one weighted topic at a time.</div>
+        </button>
+        <button class="mode-btn" onclick="startMode('review-missed')" ${missed.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+          <div class="mode-title">Review Missed (${missed.length})</div>
+          <div class="mode-desc">${missed.length === 0 ? 'Take an exam first.' : 'Re-attempt only questions you got wrong.'}</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.05rem;margin-bottom:12px;color:#f1f5f9;">Pool composition (57 questions)</h2>
+      <div style="font-size:0.88rem;color:#cbd5e1;">
+        ${Object.entries(cats).map(([c, n]) => {
+          const pct = ((n / 57) * 100).toFixed(1);
+          return '<div class="breakdown-row"><span>' + escapeHtml(c) + '</span><span>' + n + ' q (' + pct + '%)</span></div>';
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function showCategoryDrill() {
+  const app = document.getElementById('app');
+  const cats = categoryStats(state.pool);
+  app.innerHTML = `
+    <button class="btn btn-secondary" style="margin-bottom:16px;" onclick="renderPoolMenu()">← Back</button>
+    <div class="card">
+      <h2 style="font-size:1.2rem;margin-bottom:14px;color:#f1f5f9;">Drill by Category (${state.pool === 'easy' ? 'Easy' : 'Exam-Realistic'})</h2>
+      <div class="category-grid">
+        ${Object.entries(cats).map(([c, n]) => `
+          <button class="cat-btn" onclick="startCategory('${c.replace(/'/g, "\\'")}')">
+            <div class="cat-name">${escapeHtml(c)}</div>
+            <div class="cat-count">${n} questions</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderQuestion(app) {
+  const q = state.questions[state.currentIdx];
+  if (!q) return;
+  const total = state.questions.length;
+  const progress = ((state.currentIdx + 1) / total) * 100;
+  const timerHTML = state.mode === 'exam'
+    ? '<div class="timer ' + (state.timeRemaining < 300 ? 'warning' : '') + '" id="timer">' + formatTime(state.timeRemaining) + '</div>'
+    : '';
+
+  const poolBadge = state.pool === 'hard'
+    ? '<span style="background:#7c3aed;color:#fff;padding:3px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">EXAM-REALISTIC</span>'
+    : '<span style="background:#3b82f6;color:#fff;padding:3px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">EASY</span>';
+
+  app.innerHTML = `
+    <div class="header-bar">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="confirmExit()">← Exit</button>
+        ${poolBadge}
+      </div>
+      ${timerHTML}
+    </div>
+    <div class="progress"><div class="progress-bar" style="width:${progress}%"></div></div>
+    <div class="progress-text">
+      <span>Question ${state.currentIdx + 1} of ${total}</span>
+      <span>${state.answers.filter(a => a.correct).length} correct so far</span>
+    </div>
+
+    <div class="card">
+      <div class="question-meta">${escapeHtml(q.category)}</div>
+      <div class="question-text">${escapeHtml(q.question)}</div>
+      <div class="options">
+        ${q.options.map((opt, i) => {
+          let cls = 'option';
+          if (state.answered) {
+            if (i === q.correct) cls += ' correct';
+            else if (i === state.selected) cls += ' incorrect';
+          } else if (i === state.selected) {
+            cls += ' selected';
+          }
+          return '<button class="' + cls + '" onclick="selectOption(' + i + ')" ' + (state.answered ? 'disabled' : '') + '>' + String.fromCharCode(65 + i) + '. ' + escapeHtml(opt) + '</button>';
+        }).join('')}
+      </div>
+      ${state.answered ? `
+        <div class="explanation">
+          <strong>${state.selected === q.correct ? '✓ Correct' : '✗ Incorrect'}.</strong> ${escapeHtml(q.explanation)}
+        </div>
+      ` : ''}
+      <div class="actions">
+        ${state.answered
+          ? '<button class="btn" onclick="nextQuestion()">' + (state.currentIdx + 1 === total ? 'See Results' : 'Next →') + '</button>'
+          : '<button class="btn" onclick="submitAnswer()" ' + (state.selected === null ? 'disabled' : '') + '>Submit Answer</button>'
+        }
+      </div>
+    </div>
+  `;
+}
+
+function renderResults(app) {
+  const total = state.questions.length;
+  const correct = state.answers.filter(a => a.correct).length;
+  const pct = Math.round((correct / total) * 100);
+  const missed = state.answers.filter(a => !a.correct);
+  const poolQs = getPoolQuestions();
+
+  const catResults = {};
+  state.answers.forEach(a => {
+    const q = poolQs.find(x => x.id === a.qid);
+    if (!q) return;
+    if (!catResults[q.category]) catResults[q.category] = { right: 0, total: 0 };
+    catResults[q.category].total++;
+    if (a.correct) catResults[q.category].right++;
+  });
+
+  const elapsed = state.startTime ? Math.round((Date.now() - state.startTime) / 1000) : 0;
+  const poolLabel = state.pool === 'hard' ? 'Exam-Realistic' : 'Easy';
+
+  app.innerHTML = `
+    <div class="card">
+      <div style="text-align:center;color:#94a3b8;font-size:0.85rem;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${poolLabel} Pool</div>
+      <div class="results-summary">
+        <div class="score ${pct >= 70 ? 'pass' : 'fail'}">${pct}%</div>
+        <div class="score-label">${correct} / ${total} correct</div>
+        <div style="color:#94a3b8;font-size:0.9rem;">Time: ${formatTime(elapsed)}</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num pass">${correct}</div><div class="stat-lbl">Correct</div></div>
+        <div class="stat-box"><div class="stat-num fail">${total - correct}</div><div class="stat-lbl">Missed</div></div>
+        <div class="stat-box"><div class="stat-num">${pct}%</div><div class="stat-lbl">Score</div></div>
+      </div>
+
+      <h3 style="font-size:1.05rem;margin:20px 0 10px;color:#f1f5f9;">Category Breakdown</h3>
+      <div class="breakdown">
+        ${Object.entries(catResults).map(([c, r]) => {
+          const p = Math.round((r.right / r.total) * 100);
+          const cls = p >= 80 ? 'pct-good' : p >= 60 ? 'pct-mid' : 'pct-bad';
+          return '<div class="breakdown-row"><span>' + escapeHtml(c) + '</span><span class="' + cls + '">' + r.right + '/' + r.total + ' (' + p + '%)</span></div>';
+        }).join('')}
+      </div>
+
+      <div class="actions">
+        <button class="btn" onclick="goHome()">Main Menu</button>
+        <button class="btn btn-secondary" onclick="renderPoolMenu(); state.view='menu-pool';">Back to Pool Menu</button>
+        ${missed.length > 0 ? '<button class="btn btn-secondary" onclick="reviewSession()">Review ' + missed.length + ' Missed</button>' : ''}
+        <button class="btn btn-secondary" onclick="restartSame()">Retry Same Mode</button>
+      </div>
+    </div>
+
+    ${missed.length > 0 ? `
+      <div class="card">
+        <h3 style="font-size:1.05rem;margin-bottom:14px;color:#f1f5f9;">Questions You Missed</h3>
+        ${missed.map(a => {
+          const q = poolQs.find(x => x.id === a.qid);
+          return `
+            <div class="review-q">
+              <div class="review-q-num">${escapeHtml(q.category)}</div>
+              <div class="review-q-text">${escapeHtml(q.question)}</div>
+              <div class="review-answer review-wrong">Your answer: ${escapeHtml(q.options[a.selected])}</div>
+              <div class="review-answer review-correct">Correct: ${escapeHtml(q.options[q.correct])}</div>
+              <div class="review-answer" style="margin-top:8px;color:#cbd5e1;">${escapeHtml(q.explanation)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+function renderTerms(app) {
+  const filter = state.termsFilter.toLowerCase();
+  const filtered = filter
+    ? TERMS.filter(t => t.term.toLowerCase().includes(filter) || t.definition.toLowerCase().includes(filter) || t.category.toLowerCase().includes(filter))
+    : TERMS;
+
+  let bodyHTML = '';
+  if (state.termsView === 'alpha') {
+    const sorted = [...filtered].sort((a, b) => a.term.localeCompare(b.term));
+    // Group by first letter
+    const byLetter = {};
+    sorted.forEach(t => {
+      const letter = t.term[0].toUpperCase();
+      if (!byLetter[letter]) byLetter[letter] = [];
+      byLetter[letter].push(t);
+    });
+    bodyHTML = Object.entries(byLetter).map(([letter, terms]) => `
+      <div style="margin-bottom:18px;">
+        <div style="font-size:1.3rem;font-weight:700;color:#60a5fa;border-bottom:2px solid #334155;padding-bottom:4px;margin-bottom:10px;">${letter}</div>
+        ${terms.map(t => `
+          <div class="term-card">
+            <div class="term-name">${escapeHtml(t.term)}</div>
+            <div class="term-cat">${escapeHtml(t.category)}</div>
+            <div class="term-def">${escapeHtml(t.definition)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  } else {
+    // by category, in the order of the exam weighting
+    const order = [
+      'Federalism',
+      'Local Government & Metro Politics',
+      'State Constitutions',
+      'State Legislatures',
+      'State Judiciary',
+      'Executive Branch',
+      'Taxes and Spending',
+      'Context & Demographics',
+      'Public Opinion & Lobbying',
+      'Participation & Elections',
+    ];
+    const weights = {
+      'Federalism': '12.8%',
+      'Local Government & Metro Politics': '12.8%',
+      'State Constitutions': '11.5%',
+      'State Legislatures': '11.5%',
+      'State Judiciary': '11.5%',
+      'Executive Branch': '10.3%',
+      'Taxes and Spending': '9.0%',
+      'Context & Demographics': '7.7%',
+      'Public Opinion & Lobbying': '6.4%',
+      'Participation & Elections': '5.1%',
+    };
+    bodyHTML = order.map(cat => {
+      const terms = filtered.filter(t => t.category === cat);
+      if (terms.length === 0) return '';
+      return `
+        <div style="margin-bottom:22px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #334155;padding-bottom:6px;margin-bottom:12px;">
+            <div style="font-size:1.15rem;font-weight:700;color:#60a5fa;">${escapeHtml(cat)}</div>
+            <div style="font-size:0.85rem;color:#94a3b8;">${weights[cat]} of exam · ${terms.length} terms</div>
+          </div>
+          ${terms.map(t => `
+            <div class="term-card">
+              <div class="term-name">${escapeHtml(t.term)}</div>
+              <div class="term-def">${escapeHtml(t.definition)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }).join('');
+  }
+
+  app.innerHTML = `
+    <button class="btn btn-secondary" style="margin-bottom:12px;" onclick="goHome()">← Main menu</button>
+
+    <div class="card" style="position:sticky;top:8px;z-index:10;">
+      <h2 style="font-size:1.2rem;margin-bottom:12px;color:#bbf7d0;">Terms & Definitions Review</h2>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <button class="btn ${state.termsView === 'alpha' ? '' : 'btn-secondary'}" onclick="setTermsView('alpha')">Alphabetical</button>
+        <button class="btn ${state.termsView === 'category' ? '' : 'btn-secondary'}" onclick="setTermsView('category')">By Exam Category</button>
+      </div>
+      <input type="text" id="terms-search" placeholder="Search terms or definitions..." value="${escapeHtml(state.termsFilter)}"
+        oninput="state.termsFilter = this.value; renderTermsKeepFocus();"
+        style="width:100%;padding:10px 12px;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:6px;font-size:0.92rem;">
+      <div style="margin-top:8px;color:#94a3b8;font-size:0.82rem;">${filtered.length} of ${TERMS.length} terms${filter ? ' (filtered)' : ''}</div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      ${bodyHTML || '<div style="color:#94a3b8;text-align:center;padding:40px;">No terms match your filter.</div>'}
+    </div>
+  `;
+}
+
+function renderTermsKeepFocus() {
+  // Re-render but try to preserve search input focus and cursor position
+  const input = document.getElementById('terms-search');
+  const pos = input ? input.selectionStart : null;
+  renderTerms(document.getElementById('app'));
+  const newInput = document.getElementById('terms-search');
+  if (newInput && pos !== null) {
+    newInput.focus();
+    try { newInput.setSelectionRange(pos, pos); } catch(e) {}
+  }
+}
+
+function setTermsView(v) {
+  state.termsView = v;
+  render();
+}
+
+function openTermsPage() {
+  state.view = 'terms-page';
+  state.termsFilter = '';
+  render();
+}
+
+// ============== MODE STARTERS ==============
+function startMode(mode) {
+  const pool = getPoolQuestions();
+  state.mode = mode;
+  state.view = 'quiz';
+  if (mode === 'exam') {
+    state.questions = shuffle(pool).slice(0, 40);
+    state.timeRemaining = 60 * 60;
+    startTimer();
+  } else if (mode === 'all') {
+    state.questions = shuffle(pool);
+  } else if (mode === 'review-missed') {
+    const missed = getMissedList();
+    state.questions = shuffle(pool.filter(q => missed.includes(q.id)));
+  }
+  state.currentIdx = 0;
+  state.selected = null;
+  state.answered = false;
+  state.answers = [];
+  state.startTime = Date.now();
+  render();
+}
+
+function startCategory(cat) {
+  const pool = getPoolQuestions();
+  state.mode = 'category';
+  state.view = 'quiz';
+  state.questions = shuffle(pool.filter(q => q.category === cat));
+  state.currentIdx = 0;
+  state.selected = null;
+  state.answered = false;
+  state.answers = [];
+  state.startTime = Date.now();
+  render();
+}
+
+function reviewSession() {
+  const missedIds = state.answers.filter(a => !a.correct).map(a => a.qid);
+  const pool = getPoolQuestions();
+  state.mode = 'review-missed';
+  state.view = 'quiz';
+  state.questions = shuffle(pool.filter(q => missedIds.includes(q.id)));
+  state.currentIdx = 0;
+  state.selected = null;
+  state.answered = false;
+  state.answers = [];
+  state.startTime = Date.now();
+  render();
+}
+
+function restartSame() {
+  startMode(state.mode);
+}
+
+// ============== INTERACTIONS ==============
+function selectOption(i) {
+  if (state.answered) return;
+  state.selected = i;
+  render();
+}
+
+function submitAnswer() {
+  if (state.selected === null) return;
+  const q = state.questions[state.currentIdx];
+  const isCorrect = state.selected === q.correct;
+  state.answers.push({ qid: q.id, selected: state.selected, correct: isCorrect });
+  if (!isCorrect) addToMissed(q.id);
+  state.answered = true;
+  render();
+}
+
+function nextQuestion() {
+  if (state.currentIdx + 1 >= state.questions.length) {
+    finishSession();
+    return;
+  }
+  state.currentIdx++;
+  state.selected = null;
+  state.answered = false;
+  render();
+}
+
+function finishSession() {
+  stopTimer();
+  state.view = 'results';
+  render();
+}
+
+function confirmExit() {
+  if (state.answers.length > 0 && !confirm("Exit and lose this session's progress?")) return;
+  stopTimer();
+  state.view = 'menu-pool';
+  renderPoolMenu();
+}
+
+function goHome() {
+  stopTimer();
+  state.view = 'menu';
+  state.mode = null;
+  state.currentIdx = 0;
+  state.selected = null;
+  state.answered = false;
+  state.answers = [];
+  state.questions = [];
+  render();
+}
+
+// ============== TIMER ==============
+function startTimer() {
+  stopTimer();
+  state.timerInterval = setInterval(() => {
+    state.timeRemaining--;
+    const t = document.getElementById('timer');
+    if (t) {
+      t.textContent = formatTime(state.timeRemaining);
+      if (state.timeRemaining < 300) t.classList.add('warning');
+    }
+    if (state.timeRemaining <= 0) {
+      stopTimer();
+      alert('Time is up. Submitting your exam.');
+      finishSession();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+}
+
+// ============== INIT ==============
+render();
+</script>
+</body>
+</html>
