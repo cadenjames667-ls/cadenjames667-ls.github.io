@@ -5,74 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Furnder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #fdead9;
+      --ink: #14110f;
+      --orange: #ff6a39;
+      --green: #2fae57;
+      --red: #ef4444;
+      --stripe-a: #f6d8b6;
+      --stripe-b: #fbe9d3;
+      --meta: #7a6a61;
+      --border-w: 3px;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: "Nunito", -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #fdf6fb;
+      background: var(--bg);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #33202f;
+      color: var(--ink);
     }
 
     header {
       width: 100%;
-      background: #fff;
-      padding: 18px 28px;
+      background: var(--bg);
+      padding: 20px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #f0dcee;
     }
 
-    header h1 { font-family: "Poppins", sans-serif; font-size: 1.5rem; font-weight: 800; color: #7f1878; letter-spacing: -0.02em; }
-    header h1 span { color: #ff8a5c; }
-
-    nav button {
-      background: none;
-      border: 1px solid #f0dcee;
-      border-radius: 999px;
-      padding: 7px 16px;
-      font-size: 0.85rem;
+    .brand {
+      font-family: "Poppins", sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--ink);
       cursor: pointer;
-      margin-left: 8px;
-      transition: all 0.15s;
-      color: #7a5f74;
-      font-weight: 700;
-      font-family: "Nunito", sans-serif;
+      user-select: none;
     }
 
-    nav button:hover, nav button.active {
-      border-color: #7f1878;
-      color: #7f1878;
-      background: #f6ecf5;
+    .brand span { color: var(--orange); }
+
+    nav { display: flex; gap: 12px; }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      border: var(--border-w) solid var(--ink);
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform 0.1s, box-shadow 0.1s;
+      font-family: "Poppins", sans-serif;
     }
+
+    .icon-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+    .icon-btn:active, .icon-btn.active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+    .icon-btn.active { background: var(--ink); color: #fff; }
 
     /* ── VIEWS ── */
-    .view { display: none; width: 100%; max-width: 480px; padding: 24px 16px; }
+    .view { display: none; width: 100%; max-width: 480px; padding: 8px 20px 40px; }
     .view.active { display: flex; flex-direction: column; align-items: center; }
 
     /* ── SWIPE VIEW ── */
     #card-stack {
       width: 100%;
       position: relative;
-      height: 420px;
-      margin-bottom: 24px;
+      height: 460px;
+      margin: 24px 0 36px;
     }
 
     .card {
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: 26px;
+      border-radius: 28px;
       overflow: hidden;
       background: #fff;
-      border: 1px solid #f0dcee;
-      box-shadow: 0 16px 36px rgba(127, 24, 120, 0.14);
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 8px 8px 0 var(--ink);
       display: flex;
       flex-direction: column;
       transition: transform 0.15s ease, opacity 0.15s ease;
@@ -89,94 +117,119 @@
       pointer-events: none;
     }
 
-    .card .card-info { padding: 14px 18px; background: #fff; }
-    .card .card-info h2 { font-family: "Poppins", sans-serif; font-size: 1.05rem; font-weight: 700; color: #33202f; margin-bottom: 4px; }
-    .card .card-info p  { font-size: 0.8rem; color: #8a7385; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-photo-fallback {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: repeating-linear-gradient(45deg, var(--stripe-a) 0 14px, var(--stripe-b) 14px 28px);
+    }
+
+    .card-photo-fallback span {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: #9a7a52;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .card .card-info { padding: 16px 20px 20px; background: #fff; }
+    .card .card-info h2 { font-family: "Poppins", sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .card .card-info p  { font-size: 0.85rem; color: var(--meta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .card .card-source {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.72rem;
-      color: #ff8a5c;
-      font-weight: 700;
-      margin-bottom: 2px;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--orange);
+      font-weight: 800;
+      margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
     .stamp {
       position: absolute;
-      top: 28px;
-      font-size: 2.4rem;
-      font-weight: 900;
-      border: 5px solid;
+      top: 24px;
+      font-family: "Poppins", sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      border: var(--border-w) solid var(--ink);
       border-radius: 10px;
-      padding: 4px 14px;
+      padding: 6px 16px;
       opacity: 0;
-      transform: rotate(-20deg);
       pointer-events: none;
       transition: opacity 0.1s;
+      box-shadow: 3px 3px 0 var(--ink);
       z-index: 10;
+      color: #fff;
     }
 
-    .stamp.like    { left: 20px;  color: #27ae60; border-color: #27ae60; transform: rotate(-15deg); }
-    .stamp.dislike { right: 20px; color: #e74c3c; border-color: #e74c3c; transform: rotate(15deg);  }
+    .stamp.like    { left: 20px;  background: var(--green); transform: rotate(-12deg); }
+    .stamp.dislike { right: 20px; background: var(--red);   transform: rotate(12deg);  }
 
     .card.going-right .stamp.like,
     .card.going-left  .stamp.dislike { opacity: 1; }
 
     .empty-state {
-      width: 100%; height: 420px;
-      border-radius: 26px; background: #fff;
-      border: 1px solid #f0dcee;
+      width: 100%; height: 460px;
+      border-radius: 28px; background: #fff;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 8px 8px 0 var(--ink);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      color: #a98da3; font-size: 1rem; gap: 12px;
-      box-shadow: 0 1px 3px rgba(127, 24, 120, 0.06);
+      color: var(--meta); font-size: 1rem; gap: 12px;
+      text-align: center;
+      padding: 24px;
     }
     .empty-state .big { font-size: 3rem; }
 
-    .action-btns { display: flex; gap: 32px; margin-top: 8px; }
+    .action-btns { display: flex; gap: 28px; }
 
     .action-btns button {
-      width: 64px; height: 64px;
-      border-radius: 50%; border: 1px solid #f0dcee;
-      font-size: 1.6rem; cursor: pointer;
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      border: var(--border-w) solid var(--ink);
+      font-size: 1.7rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(127, 24, 120, 0.10);
+      box-shadow: 5px 5px 0 var(--ink);
       transition: transform 0.1s, box-shadow 0.1s;
     }
 
-    .action-btns button:hover  { transform: scale(1.08); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-    .action-btns button:active { transform: scale(0.96); }
-    #btn-dislike { background: #fff; color: #e74c3c; }
-    #btn-like    { background: #fff; color: #27ae60; }
+    .action-btns button:hover  { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink); }
+    .action-btns button:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+    #btn-dislike { background: #fff; color: var(--ink); }
+    #btn-like    { background: var(--green); color: #fff; }
 
     /* ── ADD VIEW ── */
-    #view-add { gap: 16px; }
+    #view-add { gap: 18px; padding-top: 20px; }
 
     .form-group { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.85rem; font-weight: 700; color: #5c4557; }
+    .form-group label { font-size: 0.85rem; font-weight: 800; color: var(--ink); }
 
     .form-group input, .form-group textarea {
       width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #f0dcee;
+      padding: 13px 15px;
+      border: 2px solid var(--ink);
       border-radius: 14px;
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      transition: box-shadow 0.15s;
       font-family: inherit;
       background: #fff;
     }
 
-    .form-group input:focus, .form-group textarea:focus { border-color: #7f1878; box-shadow: 0 0 0 3px rgba(127, 24, 120, 0.10); }
+    .form-group input:focus, .form-group textarea:focus { box-shadow: 3px 3px 0 var(--ink); }
     .form-group textarea { resize: vertical; min-height: 80px; }
 
     .url-hint {
       font-size: 0.76rem;
-      color: #a98da3;
+      color: var(--meta);
       margin-top: -4px;
     }
 
@@ -186,13 +239,13 @@
       align-items: center;
       gap: 8px;
       font-size: 0.82rem;
-      color: #8a7385;
+      color: var(--meta);
       min-height: 20px;
       width: 100%;
     }
     .fetch-status.visible { display: flex; }
-    .fetch-status.ok   { color: #2e9e5b; }
-    .fetch-status.fail { color: #e0783e; }
+    .fetch-status.ok   { color: #1f8a45; }
+    .fetch-status.fail { color: #c2560f; }
 
     /* Preview box */
     .preview-box {
@@ -200,8 +253,8 @@
       border-radius: 16px;
       overflow: hidden;
       display: none;
-      border: 1.5px solid #f0dcee;
-      background: #fdf6fb;
+      border: 2px solid var(--ink);
+      background: var(--bg);
       flex-direction: column;
     }
     .preview-box.visible { display: flex; }
@@ -215,56 +268,58 @@
     .preview-box .preview-meta {
       padding: 10px 14px;
       font-size: 0.82rem;
-      color: #5c4557;
-      border-top: 1px solid #f0dcee;
+      color: var(--meta);
+      border-top: 2px solid var(--ink);
     }
 
     .preview-box .preview-meta strong {
       display: block;
-      color: #33202f;
+      color: var(--ink);
       font-size: 0.88rem;
       margin-bottom: 2px;
     }
 
     #btn-add-item {
       width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #7f1878, #a8267a);
+      padding: 15px;
+      background: var(--orange);
       color: #fff;
-      border: none;
+      border: var(--border-w) solid var(--ink);
       border-radius: 999px;
       font-size: 1rem;
-      font-weight: 700;
+      font-weight: 800;
       font-family: "Poppins", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.15s;
+      transition: transform 0.1s, box-shadow 0.1s;
       margin-top: 4px;
-      box-shadow: 0 8px 20px rgba(127, 24, 120, 0.24);
+      box-shadow: 5px 5px 0 var(--ink);
     }
 
-    #btn-add-item:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(127, 24, 120, 0.32); }
-    #btn-add-item:active { transform: scale(0.98); }
-    #btn-add-item:disabled { background: #ddd; box-shadow: none; cursor: not-allowed; }
+    #btn-add-item:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink); }
+    #btn-add-item:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+    #btn-add-item:disabled { background: #ddd; color: #888; box-shadow: none; cursor: not-allowed; }
 
-    .msg { font-size: 0.85rem; color: #27ae60; text-align: center; min-height: 20px; }
-    .msg.error { color: #e74c3c; }
+    .msg { font-size: 0.85rem; font-weight: 700; color: var(--green); text-align: center; min-height: 20px; }
+    .msg.error { color: var(--red); }
 
     /* ── LIKED VIEW ── */
-    #view-liked { gap: 16px; }
+    #view-liked { gap: 16px; padding-top: 20px; }
 
     #liked-grid {
       width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 16px;
     }
 
     .liked-card {
       background: #fff;
       border-radius: 18px;
       overflow: hidden;
-      border: 1px solid #f0dcee;
-      box-shadow: 0 4px 14px rgba(127, 24, 120, 0.08);
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
       display: flex;
       flex-direction: column;
     }
@@ -272,31 +327,31 @@
     .liked-card img { width: 100%; height: 140px; object-fit: cover; }
 
     .liked-card .liked-info {
-      padding: 10px 12px; flex: 1;
+      padding: 12px 14px; flex: 1;
       display: flex; flex-direction: column; gap: 4px;
     }
 
-    .liked-card .liked-info h3 { font-family: "Poppins", sans-serif; font-size: 0.9rem;  font-weight: 700; color: #33202f; }
-    .liked-card .liked-info p  { font-size: 0.75rem; color: #8a7385; }
+    .liked-card .liked-info h3 { font-family: "Poppins", sans-serif; font-size: 0.9rem;  font-weight: 700; color: var(--ink); }
+    .liked-card .liked-info p  { font-size: 0.75rem; color: var(--meta); }
 
     .liked-card .liked-info a {
       font-size: 0.75rem;
-      color: #ff8a5c;
+      color: var(--orange);
       text-decoration: none;
       margin-top: auto;
       padding-top: 4px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .liked-card .liked-info a:hover { text-decoration: underline; }
 
-    .no-liked { width: 100%; padding: 48px 0; text-align: center; color: #a98da3; font-size: 0.95rem; }
+    .no-liked { width: 100%; padding: 48px 0; text-align: center; color: var(--meta); font-size: 0.95rem; }
 
     /* ── LOADING ── */
     .spinner {
       width: 36px; height: 36px;
-      border: 4px solid #f0dcee;
-      border-top-color: #7f1878;
+      border: 4px solid #f0d9c2;
+      border-top-color: var(--orange);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
@@ -510,11 +565,11 @@
       <div class="stamp like">LIKE</div>
       <div class="stamp dislike">NOPE</div>
       ${imgSrc
-        ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'">`
-        : `<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:3rem;background:#f5f0eb;">🛋️</div>`
+        ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(item.name)}" onerror="this.outerHTML='&lt;div class=&quot;card-photo-fallback&quot;&gt;&lt;span&gt;NO PHOTO&lt;/span&gt;&lt;/div&gt;'">`
+        : `<div class="card-photo-fallback"><span>NO PHOTO</span></div>`
       }
       <div class="card-info">
-        ${domain ? `<div class="card-source">🔗 ${escHtml(domain)}</div>` : ""}
+        ${domain ? `<div class="card-source">📎 ${escHtml(domain)}</div>` : ""}
         <h2>${escHtml(item.name)}</h2>
         <p>${escHtml(item.description || domain || "")}</p>
       </div>`;
@@ -601,7 +656,7 @@
       el.innerHTML = `
         ${imgSrc
           ? `<img src="${escHtml(imgSrc)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'">`
-          : `<div style="height:140px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:#f5f0eb;">🛋️</div>`
+          : `<div class="card-photo-fallback" style="height:140px;"><span>NO PHOTO</span></div>`
         }
         <div class="liked-info">
           <h3>${escHtml(item.name)}</h3>
@@ -620,11 +675,10 @@
 </script>
 
 <header>
-  <h1>Furn<span>der</span></h1>
+  <h1 class="brand active" data-view="swipe">FURN<span>DER</span></h1>
   <nav>
-    <button data-view="swipe" class="active">Swipe</button>
-    <button data-view="add">+ Add</button>
-    <button data-view="liked">❤️ Liked</button>
+    <button class="icon-btn" data-view="add" title="Add furniture">+</button>
+    <button class="icon-btn" data-view="liked" title="Liked items">♥</button>
   </nav>
 </header>
 
@@ -653,7 +707,7 @@
   </div>
 
   <div class="form-group">
-    <label for="input-name">Name <span style="font-weight:400;color:#98a2b3">(auto-filled)</span></label>
+    <label for="input-name">Name <span style="font-weight:400;color:var(--meta)">(auto-filled)</span></label>
     <input id="input-name" type="text" placeholder="Mid-century sofa" />
   </div>
   <div class="form-group">
