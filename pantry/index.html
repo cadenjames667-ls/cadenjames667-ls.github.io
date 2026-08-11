@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pantry - Live Firestore Pantry</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #f7f3ec;
@@ -28,18 +29,10 @@
   }
 
   body {
-    font-family: "DM Sans", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--cream);
     color: var(--ink);
     min-height: 100vh;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231C1810' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
   }
 
   .app {
@@ -79,7 +72,8 @@
   }
 
   .gate-title {
-    font-family: "Playfair Display", serif;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
     font-size: 32px;
     margin-bottom: 10px;
   }
@@ -148,7 +142,7 @@
   .sync-bar summary::-webkit-details-marker { display: none; }
 
   .sync-bar-label {
-    font-family: "DM Mono", monospace;
+    font-family: "JetBrains Mono", monospace;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -159,7 +153,7 @@
   .sync-bar-caret {
     font-size: 12px;
     color: var(--ink-muted);
-    font-family: "DM Mono", monospace;
+    font-family: "JetBrains Mono", monospace;
   }
 
   .sync-bar[open] .sync-bar-caret { opacity: 0.5; }
@@ -199,7 +193,7 @@
   }
 
   .shared-badge {
-    font-family: "DM Mono", monospace;
+    font-family: "JetBrains Mono", monospace;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -226,7 +220,7 @@
   .badge,
   .status-pill,
   .mono {
-    font-family: "DM Mono", monospace;
+    font-family: "JetBrains Mono", monospace;
   }
 
   .logo-eyebrow,
@@ -245,7 +239,8 @@
   }
 
   .logo-title {
-    font-family: "Playfair Display", serif;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
     font-size: 42px;
     line-height: 1;
     letter-spacing: -0.02em;
@@ -266,7 +261,8 @@
   }
 
   .stat-num {
-    font-family: "Playfair Display", serif;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
     font-size: 30px;
     line-height: 1;
     color: var(--terracotta);
@@ -288,7 +284,8 @@
   }
 
   .section-title {
-    font-family: "Playfair Display", serif;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
     font-size: 24px;
     margin-bottom: 8px;
   }
@@ -344,7 +341,7 @@
   textarea {
     min-height: 170px;
     resize: vertical;
-    font-family: "DM Mono", monospace;
+    font-family: "JetBrains Mono", monospace;
     line-height: 1.5;
   }
 
@@ -507,29 +504,6 @@
     align-items: center;
   }
 
-  .receipt-status {
-    margin-top: 14px;
-    color: var(--ink-muted);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .receipt-list {
-    margin-top: 18px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .receipt-pill {
-    background: #f4eee3;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 12px;
-    font-size: 13px;
-    color: var(--ink-light);
-  }
-
   .item-name {
     font-weight: 500;
     margin-bottom: 6px;
@@ -564,8 +538,7 @@
     font-size: 12px;
   }
 
-  .empty,
-  .coming-soon {
+  .empty {
     text-align: center;
     padding: 56px 20px;
     color: var(--ink-muted);
@@ -574,8 +547,7 @@
     background: rgba(253, 250, 245, 0.5);
   }
 
-  .empty strong,
-  .coming-soon strong {
+  .empty strong {
     display: block;
     color: var(--ink);
     margin-bottom: 8px;
@@ -604,21 +576,6 @@
     opacity: 1;
   }
 
-  .notice-list {
-    margin-top: 18px;
-    display: grid;
-    gap: 14px;
-  }
-
-  .notice {
-    border-left: 4px solid var(--gold);
-    background: #fff8e8;
-    padding: 16px 18px;
-    border-radius: 12px;
-    color: var(--ink-light);
-    line-height: 1.6;
-  }
-
   .loading {
     display: flex;
     align-items: center;
@@ -635,75 +592,6 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     flex-shrink: 0;
-  }
-
-  .two-stack {
-    display: grid;
-    gap: 20px;
-  }
-
-  .missing-grid,
-  .shopping-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .missing-pill,
-  .have-pill,
-  .shopping-chip {
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 13px;
-  }
-
-  .missing-pill {
-    background: #fff5f2;
-    border: 1px solid #ffcfc0;
-    color: var(--terracotta);
-  }
-
-  .have-pill {
-    background: #f1f8f1;
-    border: 1px solid #c3dec3;
-    color: var(--sage);
-  }
-
-  .shopping-chip {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-
-  .shopping-list-export {
-    background: linear-gradient(135deg, var(--ink) 0%, #2c2416 100%);
-    color: #fff;
-  }
-
-  .suggest-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
-  }
-
-  .recipe-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-  }
-
-  .recipe-card h3 {
-    font-family: "Playfair Display", serif;
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-
-  .recipe-meta {
-    color: var(--ink-muted);
-    font-size: 12px;
-    margin-bottom: 12px;
   }
 
   @keyframes spin {
@@ -838,8 +726,6 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab('pantry')">Pantry</button>
     <button class="tab" onclick="switchTab('recipes')">Recipes</button>
-    <button class="tab" onclick="switchTab('analyze')">Analyze</button>
-    <button class="tab" onclick="switchTab('suggest')">Suggest</button>
   </div>
 
   <div id="tab-pantry" class="panel active">
@@ -862,18 +748,6 @@
         <button class="btn btn-primary" onclick="addIngredient()">Add Item</button>
       </div>
       <div class="tip">Bulk add works too. Example: olive oil, salt, black pepper, garlic</div>
-    </div>
-
-    <div class="card">
-      <h2 class="section-title">Import H-E-B Receipt</h2>
-      <p class="section-sub">Upload a receipt photo or text receipt and the app will try to pull grocery items into your pantry automatically.</p>
-      <div class="input-row" style="margin-top:18px;">
-        <input type="file" id="receipt-file" accept="image/*,.pdf,.txt" style="max-width:420px;">
-        <button class="btn btn-primary" id="receipt-btn" onclick="processHebReceipt()">Import Receipt</button>
-      </div>
-      <div class="tip">Upload your H-E-B online order PDF (print the order page as PDF) or a receipt photo. Items will be imported with their category automatically.</div>
-      <div id="receipt-status" class="receipt-status"></div>
-      <div id="receipt-results" class="receipt-list"></div>
     </div>
 
     <div class="filter-bar">
@@ -913,28 +787,6 @@
 
     <div id="url-list"></div>
   </div>
-
-  <div id="tab-analyze" class="panel">
-    <div class="card coming-soon">
-      <strong>Analysis Needs A Secure Backend</strong>
-      <p>This site is hosted on GitHub Pages, so it cannot safely store a private AI API key in the browser.</p>
-      <div class="notice-list">
-        <div class="notice">The Firestore database pieces are safe to run directly from a static site.</div>
-        <div class="notice">Recipe analysis should move to a serverless function later, such as Cloudflare Workers or another backend.</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-suggest" class="panel">
-    <div class="card coming-soon">
-      <strong>Recipe Suggestions Need A Proxy Too</strong>
-      <p>The suggestion workflow has the same constraint as analysis: a static GitHub Pages app should not expose private API credentials.</p>
-      <div class="notice-list">
-        <div class="notice">Your live Firestore pantry is ready now.</div>
-        <div class="notice">If you ever want, we can wire these two tabs back in with a backend later.</div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div class="toast" id="toast">
@@ -945,8 +797,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-auth-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/6.0.1/tesseract.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 const LEGACY_PANTRY_KEY = "pantry_app_v1";
 const LEGACY_RECIPE_KEY = "recipe_urls_v1";
@@ -954,7 +804,7 @@ const FIREBASE_CONFIG_KEY = "firebase_config_v1";
 const FIREBASE_SPACE_KEY = "pantry_space_id_v1";
 const PANTRY_PASSWORD_KEY = "pantry_password_v1";
 const LINKED_PANTRY_KEY = "linked_pantry_v1";
-const ALL_TABS = ["pantry", "recipes", "analyze", "suggest"];
+const ALL_TABS = ["pantry", "recipes"];
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBO8gvxEWSfUDZE07cSwSt2nFbg4NeveWo",
   authDomain: "pantry-app-2bb89.firebaseapp.com",
@@ -1245,222 +1095,6 @@ function renderUrls() {
     </div>`).join("");
 }
 
-function setReceiptStatus(text) {
-  document.getElementById("receipt-status").textContent = text;
-}
-
-function renderReceiptItems(items) {
-  const el = document.getElementById("receipt-results");
-  if (!items.length) {
-    el.innerHTML = "";
-    return;
-  }
-
-  el.innerHTML = items.map(item => {
-    const qty = item.qty ? ` (${esc(item.qty)})` : "";
-    return `<span class="receipt-pill">${esc(item.name)}${qty}</span>`;
-  }).join("");
-}
-
-// Maps HEB.com online order category headings to pantry categories
-const HEB_ONLINE_CATEGORIES = {
-  "beverages": "pantry",
-  "dairy & eggs": "dairy",
-  "dairy": "dairy",
-  "frozen food": "frozen",
-  "frozen": "frozen",
-  "fruit & vegetables": "produce",
-  "produce": "produce",
-  "health & beauty": "other",
-  "pantry": "pantry",
-  "meat": "meat",
-  "seafood": "meat",
-  "bakery": "bakery",
-  "deli": "meat",
-  "snacks & candy": "pantry",
-  "snacks": "pantry",
-  "breakfast": "pantry",
-  "condiments & sauces": "pantry",
-  "baby": "pantry",
-  "floral": "other",
-  "pet": "pantry",
-};
-
-function inferReceiptCategory(name) {
-  const n = name.toLowerCase();
-  if (/(banana|apple|avocado|lettuce|tomato|onion|lime|lemon|cilantro|spinach|grape|berry|pepper|potato|garlic|orange|broccoli|carrot|corn|cucumber|zucchini|celery|kale|arugula|radish|beet|squash|mushroom|herb|mint|basil|parsley|mango|pineapple|watermelon|cantaloupe|peach|plum|strawberr|blueberr|raspberry|cherry|pear|fig|date|coconut|ginger|turmeric)/.test(n)) return "produce";
-  if (/(milk|egg|cheese|yogurt|butter|cream|sour cream|half.and.half|cottage|ricotta|mozzarella|cheddar|gouda|brie|feta|parmesan|monterey|colby|queso|kefir|whey)/.test(n)) return "dairy";
-  if (/(chicken|beef|steak|ground beef|pork|bacon|ham|turkey|sausage|salmon|shrimp|fish|tilapia|tuna|crab|lobster|brisket|rib|roast|tenderloin|filet|wing|thigh|drum|chorizo|pepperoni|salami|prosciutto|venison|lamb|veal|bison)/.test(n)) return "meat";
-  if (/(bread|bagel|bun|roll|tortilla|croissant|muffin|toast|pita|naan|baguette|sourdough|rye|wheat|brioche|waffle|pancake|cake|cookie|brownie|pastry|pie|donut|pretzel)/.test(n)) return "bakery";
-  if (/(frozen|ice cream|gelato|sorbet|popsicle|pizza rolls|frozen pizza|tater tot|fries|edamame|pot pie)/.test(n)) return "frozen";
-  if (/(salt|pepper|paprika|cumin|oregano|cinnamon|seasoning|powder|spice|chili powder|garlic powder|onion powder|turmeric|curry|cayenne|thyme|rosemary|sage|bay leaf|cardamom|clove|nutmeg|allspice|fennel|anise|dill|tarragon|marjoram|coriander)/.test(n)) return "spice";
-  return "pantry";
-}
-
-// Parses an HEB.com online order page (PDF or text)
-function parseHebOnlineOrder(text) {
-  const SKIP = [
-    /^don'?t substitute$/i,
-    /^ready later$/i,
-    /^add items$/i,
-    /^quick actions$/i,
-    /^forgot something\??$/i,
-    /^you can add items/i,
-    /^pickup details$/i,
-    /^curbside$/i,
-    /^order #/i,
-    /^we'?ll see you$/i,
-    /^view store details$/i,
-    /^order details \|/i,
-    /^https?:\/\//i,
-    /^\d+ of \d+$/,
-    /^\d{1,2}\/\d{1,2}\/\d{4}/,
-    /^\(\d{3}\)/,
-    /^at \d{1,2}:\d{2}/i,
-    /^today,/i,
-    /^order placed on/i,
-    /^accept by/i,
-    /^\*online prices/i,
-    /^your (estimated|curbside)/i,
-    /^h-e-b (plano|san antonio|austin|houston|dallas|corpus|laredo|mcallen|waco|college station|killeen|round rock|pflugerville|cedar park|georgetown|kyle|buda|new braunfels|san marcos|victoria|beaumont|lufkin|nacogdoches|texarkana|longview|tyler|temple|harlingen|edinburg|mission|pharr|brownsville)/i,
-    /^\d{4,}\s+[a-z]/i,
-    /^(plano|san antonio|houston|austin|dallas),?\s+tx/i,
-    /^visa \d+/i,
-    /^(company|our services|customer service|more from h-e-b)$/i,
-    /^(find a store|about us|careers|community|newsroom|sustainability|our brands|store openings|suppliers)$/i,
-    /^(h-e-b credit card|pharmacy|restaurants|h-e-b services|gift cards|nutrition services|custom cakes|accessibility|help & faqs|review our website|coupon policy|refund policy|product recalls|all recipes|meal simple|sushiya)$/i,
-    /^(partners|copyright|privacy|terms|site map|h-e-b, lp|central market|mi tienda|joe v|favor delivery)$/i,
-    /^h-e-b corporate/i,
-    /earn \$\d+ bonus/i,
-  ];
-
-  const isEndMarker = l => /^(payment summary|estimated subtotal|payment method|earn \$)/.test(l.toLowerCase());
-  const isPriceLine = l => /^\$[\d,]+\.\d{2}\s*\/\s*(ea|lb|oz|ct)/i.test(l);
-  const isTotalLine = l => /^\$[\d,]+\.\d{2}$/.test(l.trim());
-
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const items = [];
-  let currentCat = "pantry";
-  let nameParts = [];
-  let qty = 1;
-  let inItems = false;
-
-  const flush = () => {
-    if (!nameParts.length) return;
-    const name = nameParts.join(" ").replace(/\s+/g, " ").trim();
-    if (name.length >= 3 && /[a-z]/i.test(name)) {
-      items.push({ name, qty: qty > 1 ? `${qty}x` : "1x", cat: currentCat });
-    }
-    nameParts = [];
-    qty = 1;
-  };
-
-  for (const line of lines) {
-    if (isEndMarker(line)) { flush(); break; }
-
-    const lower = line.toLowerCase();
-    if (HEB_ONLINE_CATEGORIES.hasOwnProperty(lower)) {
-      flush();
-      currentCat = HEB_ONLINE_CATEGORIES[lower];
-      inItems = true;
-      continue;
-    }
-
-    if (!inItems) continue;
-    if (SKIP.some(p => p.test(line))) continue;
-
-    if (isPriceLine(line)) {
-      const m = line.match(/qty[:\s]*(\d+)/i);
-      if (m) qty = parseInt(m[1]);
-      continue;
-    }
-
-    if (isTotalLine(line)) { flush(); continue; }
-
-    nameParts.push(line);
-  }
-
-  flush();
-  return items;
-}
-
-// Parses a physical HEB store receipt (image OCR / text file)
-function parseHebPhysicalReceipt(text) {
-  const skipLine = line => {
-    if (!/[a-z]/i.test(line) || line.length < 3) return true;
-    return /(heb|coupon|total|subtotal|tax|change|visa|mastercard|debit|credit|cash|savings|balance|thank you|store|cashier|register|lane|date|time|payment|tender|approval|auth|ref#|trace|fuel|points)/.test(line.toLowerCase());
-  };
-
-  const lines = text
-    .split(/\r?\n/)
-    .map(l => l.replace(/\s+/g, " ").replace(/^\d{3,}\s+/, "").replace(/\s+\d+\.\d{2}\s*$/, "").replace(/\s+[A-Z]$/, "").trim())
-    .filter(Boolean)
-    .filter(l => !skipLine(l));
-
-  const merged = new Map();
-  lines.forEach(line => {
-    const candidate = line.replace(/\s{2,}/g, " ").replace(/[^a-z0-9\s&'\-]/gi, " ").replace(/\b(lt|ea|oz|lb|pk|ct)\b/gi, " ").replace(/\s+/g, " ").trim();
-    if (!candidate || candidate.length < 3 || !/[a-z]/i.test(candidate)) return;
-    const name = candidate.toLowerCase().split(/\s+/).filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    const key = name.toLowerCase();
-    if (merged.has(key)) { const e = merged.get(key); e.count++; e.qty = `${e.count}x`; return; }
-    merged.set(key, { name, qty: "1x", cat: inferReceiptCategory(name), count: 1 });
-  });
-
-  return [...merged.values()].map(({ count, ...item }) => item).slice(0, 40);
-}
-
-function parseHebReceiptText(text) {
-  // Auto-detect: online order has HEB category headings
-  const lower = text.toLowerCase();
-  const isOnlineOrder = ["dairy & eggs", "frozen food", "fruit & vegetables", "health & beauty"].some(h => lower.includes(h));
-  return isOnlineOrder ? parseHebOnlineOrder(text) : parseHebPhysicalReceipt(text);
-}
-
-async function extractPdfText(file) {
-  if (typeof pdfjsLib === "undefined") throw new Error("PDF library did not load. Refresh and try again.");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const pageTexts = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    let lastY = null;
-    let line = "";
-    const lines = [];
-    for (const item of content.items) {
-      const y = item.transform[5];
-      if (lastY !== null && Math.abs(y - lastY) > 2) {
-        if (line.trim()) lines.push(line.trim());
-        line = item.str;
-      } else {
-        line += (line && item.str && !line.endsWith(" ") ? " " : "") + item.str;
-      }
-      lastY = y;
-    }
-    if (line.trim()) lines.push(line.trim());
-    pageTexts.push(lines.join("\n"));
-  }
-  return pageTexts.join("\n");
-}
-
-async function extractReceiptText(file) {
-  if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-    return extractPdfText(file);
-  }
-  if (file.type.startsWith("text/") || file.name.toLowerCase().endsWith(".txt")) {
-    return file.text();
-  }
-  if (file.type.startsWith("image/")) {
-    if (typeof Tesseract === "undefined") throw new Error("OCR library did not load.");
-    const { data } = await Tesseract.recognize(file, "eng");
-    return data?.text || "";
-  }
-  throw new Error("Upload a PDF, image, or .txt file.");
-}
-
-
 function subscribeToFirestore() {
   teardownSubscriptions();
 
@@ -1673,52 +1307,6 @@ async function clearUrls() {
     toast("Recipe queue cleared.", "OK");
   } catch (err) {
     toast("Could not clear recipe queue.", "ERR");
-  }
-}
-
-async function processHebReceipt() {
-  if (!ensureFirestoreReady("importing a receipt")) return;
-
-  const input = document.getElementById("receipt-file");
-  const btn = document.getElementById("receipt-btn");
-  const file = input.files?.[0];
-  if (!file) {
-    setReceiptStatus("Choose a receipt image or text file first.");
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Importing...";
-  setReceiptStatus(file.type.startsWith("image/") ? "Reading receipt image with OCR..." : "Reading receipt text...");
-  renderReceiptItems([]);
-
-  try {
-    const rawText = await extractReceiptText(file);
-    const items = parseHebReceiptText(rawText);
-
-    if (!items.length) {
-      setReceiptStatus("I could not confidently detect grocery items from that receipt. Try a clearer image.");
-      toast("No pantry items found on that receipt.", "ERR");
-      return;
-    }
-
-    await Promise.all(items.map(item => pantryCollection().add({
-      name: item.name,
-      qty: item.qty || "",
-      cat: item.cat || "pantry",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    })));
-
-    renderReceiptItems(items);
-    setReceiptStatus(`Imported ${items.length} item${items.length === 1 ? "" : "s"} from your receipt.`);
-    input.value = "";
-    toast(`Imported ${items.length} receipt item${items.length === 1 ? "" : "s"}.`, "OK");
-  } catch (err) {
-    setReceiptStatus(err.message || "Could not import that receipt.");
-    toast("Receipt import failed.", "ERR");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Import Receipt";
   }
 }
 
