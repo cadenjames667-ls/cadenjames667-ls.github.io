@@ -71,6 +71,25 @@
     padding: 36px 34px;
   }
 
+  .disclaimer-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #fff8ec;
+    border: 1px solid #f2d9a8;
+    border-left: 4px solid #b8790f;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #6b4e0e;
+    margin-bottom: 24px;
+  }
+
+  .disclaimer-banner strong {
+    color: #4a3609;
+  }
+
   .gate-title {
     font-family: "Inter", sans-serif;
     font-weight: 800;
@@ -634,6 +653,10 @@
 <body>
 <div class="gate" id="password-gate">
   <div class="gate-card">
+    <div class="disclaimer-banner">
+      <span>⚠️</span>
+      <span><strong>Unfinished testing project.</strong> This app is a work in progress and may be reset, break, or lose data at any time. Please don't enter real personal information — use a throwaway email/password and test data only.</span>
+    </div>
     <div class="logo-eyebrow">Pantry Access</div>
     <h1 class="gate-title" id="gate-title">Sign In</h1>
     <p class="gate-copy" id="gate-copy">Sign in to access your pantry. Your data stays private to your account.</p>
@@ -682,11 +705,16 @@
         <div class="stat-label">Recipes Queued</div>
       </div>
       <div class="stat" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-        <span id="auth-user-display" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
+        <span id="auth-user-display" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
         <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
       </div>
     </div>
   </header>
+
+  <div class="disclaimer-banner">
+    <span>⚠️</span>
+    <span><strong>Unfinished testing project.</strong> Don't store real personal information here — this app may be reset or break at any time.</span>
+  </div>
 
   <div id="shared-pantry-banner" class="shared-banner hidden">
     <div class="shared-banner-text">
