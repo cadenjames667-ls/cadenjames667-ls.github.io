@@ -90,6 +90,26 @@
     color: #4a3609;
   }
 
+  .btn-demo {
+    width: 100%;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.18);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+
+  .btn-demo:hover {
+    background: var(--terracotta);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(41, 82, 204, 0.28);
+  }
+
   .gate-title {
     font-family: "Inter", sans-serif;
     font-weight: 800;
@@ -655,11 +675,11 @@
   <div class="gate-card">
     <div class="disclaimer-banner">
       <span>⚠️</span>
-      <span><strong>Unfinished testing project.</strong> This app is a work in progress and may be reset, break, or lose data at any time. Please don't enter real personal information — use a throwaway email/password and test data only.</span>
+      <span><strong>Unfinished testing project.</strong> This app is a work in progress and may be reset, break, or lose data at any time. Data is stored in an open Firestore database with no real access control — the sign-in screen does not make your data private. Please don't enter real personal information — use a throwaway email/password and test data only.</span>
     </div>
     <div class="logo-eyebrow">Pantry Access</div>
     <h1 class="gate-title" id="gate-title">Sign In</h1>
-    <p class="gate-copy" id="gate-copy">Sign in to access your pantry. Your data stays private to your account.</p>
+    <p class="gate-copy" id="gate-copy">Sign in to access your pantry. Your login just keeps your pantry separate from others' — it isn't real data protection (see notice above).</p>
     <div class="gate-mode-row">
       <button class="btn btn-ghost gate-mode-btn active" id="mode-open-btn" onclick="setGateMode('open')">Sign In</button>
       <button class="btn btn-ghost gate-mode-btn" id="mode-create-btn" onclick="setGateMode('create')">Create Account</button>
@@ -686,6 +706,10 @@
     </div>
 
     <div class="gate-error" id="gate-error"></div>
+
+    <div class="gate-actions" style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px;">
+      <button class="btn btn-demo" onclick="enterDemoMode()">👀 Just Looking? Try Demo Mode</button>
+    </div>
   </div>
 </div>
 
@@ -706,14 +730,14 @@
       </div>
       <div class="stat" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
         <span id="auth-user-display" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.08em;"></span>
-        <button class="btn btn-ghost" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
+        <button class="btn btn-ghost" id="signout-btn" onclick="signOut()" style="font-size:12px;padding:4px 12px;">Sign Out</button>
       </div>
     </div>
   </header>
 
   <div class="disclaimer-banner">
     <span>⚠️</span>
-    <span><strong>Unfinished testing project.</strong> Don't store real personal information here — this app may be reset or break at any time.</span>
+    <span><strong>Unfinished testing project.</strong> Data lives in an open Firestore database with no real access control. Don't store real personal information here — this app may be reset or break at any time.</span>
   </div>
 
   <div id="shared-pantry-banner" class="shared-banner hidden">
@@ -722,6 +746,14 @@
       <span>You're viewing someone else's pantry.</span>
     </div>
     <button class="btn btn-ghost" onclick="leaveSharedPantry()" style="font-size:12px;padding:4px 12px;white-space:nowrap;">Leave &amp; use my own</button>
+  </div>
+
+  <div id="demo-banner" class="shared-banner hidden">
+    <div class="shared-banner-text">
+      <span class="shared-badge" style="background:#b8790f;color:#fff;">Demo</span>
+      <span>You're exploring sample data. Nothing you add or remove here is saved.</span>
+    </div>
+    <button class="btn btn-ghost" onclick="exitDemoMode()" style="font-size:12px;padding:4px 12px;white-space:nowrap;">Exit Demo</button>
   </div>
 
   <details class="sync-bar" id="sync-settings">
@@ -856,8 +888,58 @@ let currentSpaceId = sanitizeSpaceId(localStorage.getItem(FIREBASE_SPACE_KEY) ||
 let toastTimeout = null;
 let pantryUnlocked = false;
 let gateMode = "open";
+let demoMode = false;
+
+const DEMO_PANTRY = [
+  { id: "demo-1", name: "Tomatoes on the Vine", qty: "6", cat: "produce" },
+  { id: "demo-2", name: "Whole Milk", qty: "1 gal", cat: "dairy" },
+  { id: "demo-3", name: "Chicken Breast", qty: "2 lbs", cat: "meat" },
+  { id: "demo-4", name: "Jasmine Rice", qty: "5 lb bag", cat: "pantry" },
+  { id: "demo-5", name: "Fresh Basil", qty: "1 bunch", cat: "spice" },
+  { id: "demo-6", name: "Frozen Peas", qty: "1 bag", cat: "frozen" },
+  { id: "demo-7", name: "Sourdough Bread", qty: "1 loaf", cat: "bakery" },
+  { id: "demo-8", name: "Avocados", qty: "4", cat: "produce" }
+];
+
+const DEMO_RECIPES = [
+  { id: "demo-r1", url: "https://example.com/recipes/chicken-fried-rice" },
+  { id: "demo-r2", url: "https://example.com/recipes/tomato-basil-pasta" }
+];
+
+function enterDemoMode() {
+  demoMode = true;
+  pantryUnlocked = true;
+  teardownSubscriptions();
+  pantry = DEMO_PANTRY.map(item => ({ ...item }));
+  recipeUrls = DEMO_RECIPES.map(recipe => ({ ...recipe }));
+  renderPantry();
+  renderUrls();
+  updateStats();
+
+  document.getElementById("password-gate").classList.add("hidden");
+  document.getElementById("app-shell").classList.remove("locked");
+  document.getElementById("auth-user-display").textContent = "Demo Mode";
+  document.getElementById("signout-btn").textContent = "Exit Demo";
+  document.getElementById("sync-settings").style.display = "none";
+  document.getElementById("shared-pantry-banner").classList.add("hidden");
+  document.getElementById("demo-banner").classList.remove("hidden");
+  switchTab("pantry");
+  toast("Demo mode — nothing you add or remove here is saved.", "DEMO");
+}
+
+function exitDemoMode() {
+  demoMode = false;
+  pantryUnlocked = false;
+  pantry = [];
+  recipeUrls = [];
+  document.getElementById("sync-settings").style.display = "";
+  document.getElementById("demo-banner").classList.add("hidden");
+  document.getElementById("signout-btn").textContent = "Sign Out";
+  showGate();
+}
 
 function shareMyPantry() {
+  if (demoMode) { toast("Sharing isn't available in demo mode.", "DEMO"); return; }
   const user = auth.currentUser;
   if (!user) return;
   const url = `${location.origin}${location.pathname}?pantry=${user.uid}`;
@@ -1216,6 +1298,7 @@ async function signUpWithEmail() {
 }
 
 async function signOut() {
+  if (demoMode) { exitDemoMode(); return; }
   teardownSubscriptions();
   db = null;
   pantryUnlocked = false;
@@ -1236,8 +1319,6 @@ async function deleteAllDocs(collectionRef) {
 }
 
 async function addIngredient() {
-  if (!ensureFirestoreReady("adding pantry items")) return;
-
   const nameEl = document.getElementById("ing-name");
   const qtyEl = document.getElementById("ing-qty");
   const catEl = document.getElementById("ing-cat");
@@ -1248,6 +1329,19 @@ async function addIngredient() {
   }
 
   const names = raw.split(",").map(value => value.trim()).filter(Boolean);
+
+  if (demoMode) {
+    names.forEach(name => pantry.unshift({ id: `demo-new-${Date.now()}-${Math.random()}`, name, qty: qtyEl.value.trim(), cat: catEl.value }));
+    renderPantry();
+    updateStats();
+    nameEl.value = "";
+    qtyEl.value = "";
+    nameEl.focus();
+    toast(names.length > 1 ? `Added ${names.length} pantry items (demo only).` : `Added ${names[0]} (demo only).`, "DEMO");
+    return;
+  }
+
+  if (!ensureFirestoreReady("adding pantry items")) return;
   try {
     await Promise.all(names.map(name => pantryCollection().add({
       name,
@@ -1265,6 +1359,13 @@ async function addIngredient() {
 }
 
 async function removeItem(id) {
+  if (demoMode) {
+    pantry = pantry.filter(item => item.id !== id);
+    renderPantry();
+    updateStats();
+    toast("Pantry item removed (demo only).", "DEMO");
+    return;
+  }
   if (!ensureFirestoreReady("removing pantry items")) return;
   try {
     await pantryCollection().doc(id).delete();
@@ -1275,6 +1376,14 @@ async function removeItem(id) {
 }
 
 async function clearPantry() {
+  if (demoMode) {
+    if (!window.confirm("Clear all pantry items? (demo only)")) return;
+    pantry = [];
+    renderPantry();
+    updateStats();
+    toast("Pantry cleared (demo only).", "DEMO");
+    return;
+  }
   if (!ensureFirestoreReady("clearing the pantry")) return;
   if (!window.confirm("Clear all pantry items?")) return;
   try {
@@ -1286,8 +1395,6 @@ async function clearPantry() {
 }
 
 async function addRecipeUrl() {
-  if (!ensureFirestoreReady("adding recipe URLs")) return;
-
   const el = document.getElementById("recipe-url");
   const url = el.value.trim();
   if (!url) return;
@@ -1304,6 +1411,17 @@ async function addRecipeUrl() {
     return;
   }
 
+  if (demoMode) {
+    recipeUrls.unshift({ id: `demo-r-${Date.now()}`, url });
+    renderUrls();
+    updateStats();
+    el.value = "";
+    el.focus();
+    toast("Recipe URL added (demo only).", "DEMO");
+    return;
+  }
+
+  if (!ensureFirestoreReady("adding recipe URLs")) return;
   try {
     await recipeCollection().add({
       url,
@@ -1318,6 +1436,13 @@ async function addRecipeUrl() {
 }
 
 async function removeUrl(id) {
+  if (demoMode) {
+    recipeUrls = recipeUrls.filter(recipe => recipe.id !== id);
+    renderUrls();
+    updateStats();
+    toast("Recipe URL removed (demo only).", "DEMO");
+    return;
+  }
   if (!ensureFirestoreReady("removing recipe URLs")) return;
   try {
     await recipeCollection().doc(id).delete();
@@ -1328,6 +1453,14 @@ async function removeUrl(id) {
 }
 
 async function clearUrls() {
+  if (demoMode) {
+    if (!window.confirm("Remove all recipe URLs? (demo only)")) return;
+    recipeUrls = [];
+    renderUrls();
+    updateStats();
+    toast("Recipe queue cleared (demo only).", "DEMO");
+    return;
+  }
   if (!ensureFirestoreReady("clearing recipe URLs")) return;
   if (!window.confirm("Remove all recipe URLs?")) return;
   try {
