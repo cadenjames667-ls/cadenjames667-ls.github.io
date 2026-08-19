@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyCarRemote — Caden James</title>
+<meta name="description" content="A custom web-based remote control for an ESP32-powered mecanum-wheel smart car, built by Caden James.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #101828;
+    --ink-light: #475467;
+    --ink-muted: #98a2b3;
+    --accent: #2952cc;
+    --accent-light: #eef2fd;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px 96px;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0;
+  }
+
+  .nav-back {
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .nav-back:hover { color: var(--accent); }
+
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-light);
+    text-decoration: none;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .hero {
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .hero-name {
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero-bio {
+    max-width: 620px;
+    color: var(--ink-light);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .btn-outline {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--accent-light);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--accent);
+  }
+
+  section { margin-bottom: 48px; }
+
+  .section-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+
+  section p {
+    color: var(--ink-light);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 680px;
+  }
+
+  section p + p { margin-top: 12px; }
+
+  .feature-list {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .feature-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+  }
+
+  .feature-list strong { color: var(--ink); }
+
+  .pin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .pin-table th, .pin-table td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pin-table th {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    background: var(--bg);
+  }
+
+  .pin-table td:last-child { font-family: "JetBrains Mono", monospace; color: var(--ink-light); }
+  .pin-table tr:last-child td { border-bottom: none; }
+
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    display: grid;
+    gap: 14px;
+  }
+
+  .steps li {
+    counter-increment: step;
+    padding-left: 40px;
+    position: relative;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .steps code {
+    font-family: "JetBrains Mono", monospace;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .code-panel {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .code-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e1e27;
+    color: #9a9aab;
+    padding: 12px 18px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+  }
+
+  .code-panel-header a {
+    color: #6d7bff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .code-panel-header a:hover { text-decoration: underline; }
+
+  .code-panel pre {
+    margin: 0;
+    max-height: 640px;
+    overflow: auto;
+    font-size: 13px;
+  }
+
+  .code-panel pre code.hljs {
+    padding: 20px !important;
+  }
+
+  .site-footer {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .site-footer a { text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 16px 0 40px; }
+    .pin-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a class="nav-back" href="/">← Caden James</a>
+    <div class="nav-links">
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">Embedded · IoT</div>
+    <h1 class="hero-name">MyCarRemote</h1>
+    <p class="hero-bio">A custom web-based remote control for the Acebott QD001 ESP32 mecanum-wheel smart car, built from scratch on top of the kit's motor-control library. The ESP32 hosts its own WiFi access point and web server — no phone app, no router, no internet connection needed. Connect to the car's hotspot and drive it from any browser.</p>
+    <div class="hero-links">
+      <a class="btn btn-outline" href="MyCarRemote.ino" download>Download .ino</a>
+      <a class="btn btn-outline" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io/blob/main/mycarremote/MyCarRemote.ino" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+    <div class="tag-row">
+      <span class="tag">ESP32</span>
+      <span class="tag">C++ / Arduino</span>
+      <span class="tag">WiFi Access Point</span>
+      <span class="tag">Embedded Web Server</span>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="section-eyebrow">Features</div>
+    <ul class="feature-list">
+      <li><strong>Drive</strong> — mecanum drive/strafe/rotate via an on-screen D-pad, touch, or keyboard (WASD to drive, Q/E to strafe, arrow keys also supported)</li>
+      <li><strong>Adjustable speed</strong> slider (0–100%)</li>
+      <li><strong>Lights</strong> — independent left/right LEDs, each off / solid on / breathing (PWM fade)</li>
+      <li><strong>Buzzer</strong> — four presets: chirp, honk, alarm, victory jingle</li>
+      <li><strong>Head servo</strong> — manual slider control (0–180°)</li>
+      <li><strong>Radar sweep</strong> — sweeps the head servo end-to-end while plotting live ultrasonic distance readings on an on-screen radar display</li>
+      <li><strong>Autonomous obstacle avoidance</strong> — drives forward, rotates away when something's within 25cm</li>
+      <li><strong>Autonomous line following</strong> — follows a dark line using the car's 3-sensor line-tracking array</li>
+      <li><strong>Safety auto-stop</strong> — the browser sends a heartbeat every 300ms while driving; if it stops (dropped WiFi, closed tab, etc.) the car auto-stops within ~800ms instead of running blind</li>
+    </ul>
+  </section>
+
+  <section id="hardware">
+    <div class="section-eyebrow">Hardware</div>
+    <p>Written for the Acebott QD001 kit's ESP32 Car Shield V2.0 (ESP32-D0WD-V3, CH340 USB-serial), a 4WD mecanum-wheel chassis.</p>
+    <table class="pin-table" style="margin-top:16px;">
+      <tr><th>Function</th><th>Pin(s)</th></tr>
+      <tr><td>Buzzer</td><td>GPIO33</td></tr>
+      <tr><td>Head servo</td><td>GPIO25</td></tr>
+      <tr><td>Left / Right LED</td><td>GPIO12 / GPIO2</td></tr>
+      <tr><td>Ultrasonic trig / echo</td><td>GPIO13 / GPIO14</td></tr>
+      <tr><td>Line tracking (L/M/R)</td><td>GPIO35 / GPIO36 / GPIO39</td></tr>
+      <tr><td>Motor control</td><td>via ACB_SmartCar_V2 (SoftwareSerial on GPIO16/17)</td></tr>
+    </table>
+  </section>
+
+  <section id="setup">
+    <div class="section-eyebrow">Setup</div>
+    <ol class="steps">
+      <li>Install the ESP32 board package and libraries (<code>ACB_SmartCar_V2</code>, <code>ultrasonic</code>, <code>ESP32Servo</code>, <code>EspSoftwareSerial</code>), select <strong>ESP32 Dev Module</strong> as the board.</li>
+      <li>Flash <code>MyCarRemote.ino</code> to the car over USB via the Arduino IDE.</li>
+      <li>Connect your computer or phone to WiFi network <code>MyCarRemote</code> (password <code>12345678</code>).</li>
+      <li>Open <code>http://192.168.4.1</code> in a browser and drive.</li>
+    </ol>
+  </section>
+
+  <section id="code">
+    <div class="section-eyebrow">Source Code</div>
+    <div class="code-panel">
+      <div class="code-panel-header">
+        <span>MyCarRemote.ino</span>
+        <a href="MyCarRemote.ino" download>Download</a>
+      </div>
+      <pre><code class="language-cpp">
+/*
+  MyCarRemote
+  A custom web-based remote control for the QD001 car:
+  - drive (mecanum move/strafe/rotate) with adjustable speed, mouse/touch or keyboard
+  - left/right lights: off / solid / breathing
+  - buzzer presets: chirp / honk / alarm / victory
+  - head servo, manual or as a sweeping radar with the ultrasonic sensor
+  - autonomous modes: obstacle avoidance and line following
+  - auto-stop if the browser stops sending heartbeats mid-drive
+
+  Connect your computer's WiFi to the "MyCarRemote" hotspot below,
+  then open http://192.168.4.1 in a browser.
+*/
+
+#include &lt;ACB_SmartCar_V2.h&gt;
+#include &lt;ESP32Servo.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;WebServer.h&gt;
+#include &lt;ultrasonic.h&gt;
+
+const char* ssid = "MyCarRemote";
+const char* password = "12345678";  // must be 8+ characters
+
+const int BuzzerPin = 33;
+const int HeadPin = 25;
+const int LeftLedPin = 12;
+const int RightLedPin = 2;
+const int UltrasonicTrigPin = 13;
+const int UltrasonicEchoPin = 14;
+const int LeftTrackPin = 35;
+const int MiddleTrackPin = 36;
+const int RightTrackPin = 39;
+
+const unsigned long DriveTimeoutMs = 800;    // auto-stop if no heartbeat within this window
+const unsigned long DistancePollMs = 150;
+const unsigned long BreathePeriodMs = 2000;
+const unsigned long ObstacleTurnMs = 1200;
+const unsigned long LineFollowStepMs = 30;
+const int ObstacleDistanceCm = 25;
+const int BlackLineThreshold = 2000;
+
+ACB_SmartCar_V2 ACB_SmartCar;
+WebServer server(80);
+Servo headServo;
+ultrasonic myUltrasonic;
+
+int headAngle = 90;
+int driveSpeed = 255;
+
+// light mode: 0 = off, 1 = solid on, 2 = breathing
+int leftLightMode = 0;
+int rightLightMode = 0;
+
+bool isDriving = false;
+unsigned long lastMoveTime = 0;
+
+int currentDistance = 0;
+unsigned long lastDistanceRead = 0;
+
+// radar sweep (reuses the head servo + ultrasonic sensor)
+bool radarMode = false;
+int radarAngle = 0;
+int radarDir = 1;
+int radarDistances[19];  // one entry per 10 degrees, 0..180
+
+// autonomous drive: 0 = manual, 1 = obstacle avoid, 2 = line follow
+int autoMode = 0;
+bool oaTurning = false;
+unsigned long oaTurnStart = 0;
+unsigned long lastLineFollowStep = 0;
+
+void beepChirp() {
+  tone(BuzzerPin, 880);
+  delay(120);
+  noTone(BuzzerPin);
+  delay(40);
+  tone(BuzzerPin, 1175);
+  delay(150);
+  noTone(BuzzerPin);
+}
+
+void beepHonk() {
+  tone(BuzzerPin, 220);
+  delay(150);
+  noTone(BuzzerPin);
+  delay(60);
+  tone(BuzzerPin, 220);
+  delay(150);
+  noTone(BuzzerPin);
+}
+
+void beepAlarm() {
+  for (int i = 0; i &lt; 4; i++) {
+    tone(BuzzerPin, 1000);
+    delay(100);
+    noTone(BuzzerPin);
+    tone(BuzzerPin, 700);
+    delay(100);
+    noTone(BuzzerPin);
+  }
+}
+
+void beepVictory() {
+  int notes[] = { 262, 330, 392, 523 };
+  for (int i = 0; i &lt; 4; i++) {
+    tone(BuzzerPin, notes[i]);
+    delay(130);
+    noTone(BuzzerPin);
+    delay(20);
+  }
+}
+
+void updateLight(int pin, int mode, unsigned long now) {
+  if (mode == 0) {
+    ledcWrite(pin, 0);
+  } else if (mode == 1) {
+    ledcWrite(pin, 255);
+  } else {
+    unsigned long t = now % BreathePeriodMs;
+    unsigned long half = BreathePeriodMs / 2;
+    int duty = (t &lt; half) ? map(t, 0, half, 0, 255) : map(t, half, BreathePeriodMs, 255, 0);
+    ledcWrite(pin, duty);
+  }
+}
+
+void runObstacleAvoid(unsigned long now) {
+  if (oaTurning) {
+    if (now - oaTurnStart &gt; ObstacleTurnMs) {
+      ACB_SmartCar.Move(Stop, 0);
+      oaTurning = false;
+    }
+  } else if (currentDistance &gt; 0 &amp;&amp; currentDistance &lt;= ObstacleDistanceCm) {
+    ACB_SmartCar.Move(Contrarotate, 180);
+    oaTurning = true;
+    oaTurnStart = now;
+  } else {
+    ACB_SmartCar.Move(Forward, driveSpeed);
+  }
+}
+
+void runLineFollow(unsigned long now) {
+  if (now - lastLineFollowStep &lt; LineFollowStepMs) return;
+  lastLineFollowStep = now;
+
+  int l = analogRead(LeftTrackPin);
+  int m = analogRead(MiddleTrackPin);
+  int r = analogRead(RightTrackPin);
+  int turnSpeed = constrain((int)(driveSpeed * 0.85), 60, 255);
+
+  if (l &lt; BlackLineThreshold &amp;&amp; m &gt;= BlackLineThreshold &amp;&amp; r &lt; BlackLineThreshold) {
+    ACB_SmartCar.Move(Forward, driveSpeed);
+  } else if (l &lt; BlackLineThreshold &amp;&amp; m &gt;= BlackLineThreshold &amp;&amp; r &gt;= BlackLineThreshold) {
+    ACB_SmartCar.Move(Forward, driveSpeed);
+  } else if (l &gt;= BlackLineThreshold &amp;&amp; m &gt;= BlackLineThreshold &amp;&amp; r &lt; BlackLineThreshold) {
+    ACB_SmartCar.Move(Forward, driveSpeed);
+  } else if (l &gt;= BlackLineThreshold &amp;&amp; m &lt; BlackLineThreshold &amp;&amp; r &lt; BlackLineThreshold) {
+    ACB_SmartCar.Move(Contrarotate, turnSpeed);
+  } else if (l &lt; BlackLineThreshold &amp;&amp; m &lt; BlackLineThreshold &amp;&amp; r &gt;= BlackLineThreshold) {
+    ACB_SmartCar.Move(Clockwise, turnSpeed);
+  } else if (l &gt;= BlackLineThreshold &amp;&amp; m &gt;= BlackLineThreshold &amp;&amp; r &gt;= BlackLineThreshold) {
+    ACB_SmartCar.Move(Forward, driveSpeed);
+  }
+}
+
+void handleRoot() {
+  String page = R"HTML(
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;style&gt;
+  :root {
+    --bg: #14141a;
+    --panel: #1e1e27;
+    --panel-2: #262633;
+    --accent: #6d7bff;
+    --accent-2: #ff9d3d;
+    --text: #eee;
+    --text-dim: #9a9aab;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 14px 40px;
+    font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #23233066, var(--bg) 60%);
+    color: var(--text);
+    text-align: center;
+    user-select: none;
+  }
+  h1 {
+    font-size: 1.4em;
+    letter-spacing: 0.5px;
+    margin: 4px 0 20px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid #2e2e3a;
+    border-radius: 16px;
+    padding: 18px;
+    max-width: 340px;
+    margin: 0 auto 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin: 0 0 14px;
+  }
+  .pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .pad button {
+    aspect-ratio: 1;
+    font-size: 1.4em;
+    border-radius: 12px;
+    border: none;
+    background: var(--panel-2);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px #34344233;
+    transition: background .12s, transform .06s;
+  }
+  .pad button:active, .pad button.held {
+    background: var(--accent);
+    transform: scale(0.94);
+  }
+  .pad.disabled button { opacity: 0.3; pointer-events: none; }
+  .pad .label { font-size: 0.45em; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); display:block; margin-top:2px; }
+  .hint { font-size: 0.7em; color: var(--text-dim); margin-top: 12px; }
+
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .row + .row { margin-top: 14px; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--panel-2);
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff2;
+    cursor: pointer;
+  }
+  input[type=range]:disabled { opacity: 0.3; }
+  .valuePill {
+    min-width: 50px;
+    font-size: 0.85em;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lightLabel { font-size: 0.95em; }
+  .segmented {
+    display: flex;
+    background: var(--panel-2);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .segmented button {
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 0.75em;
+    padding: 7px 10px;
+    border-radius: 8px;
+  }
+  .segmented button.active {
+    background: var(--accent-2);
+    color: #1b1b1f;
+    font-weight: 700;
+  }
+
+  .beepGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .beepGrid button {
+    padding: 14px 0;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent-2), #ffb85e);
+    color: #1b1b1f;
+    font-weight: 800;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .beepGrid button:active { transform: scale(0.96); }
+
+  #radarBtn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--panel-2);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.85em;
+  }
+  #radarBtn.on { background: var(--accent); }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;My Car Remote&lt;/h1&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Drive&lt;/h2&gt;
+  &lt;div class="pad" id="drivePad"&gt;
+    &lt;button id="btn-tl" ontouchstart="startMove('tl')" ontouchend="stopMove()" onmousedown="startMove('tl')" onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8634;&lt;span class="label"&gt;Turn L&lt;/span&gt;&lt;/button&gt;
+    &lt;button id="btn-f"  ontouchstart="startMove('f')"  ontouchend="stopMove()" onmousedown="startMove('f')"  onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8593;&lt;span class="label"&gt;Fwd&lt;/span&gt;&lt;/button&gt;
+    &lt;button id="btn-tr" ontouchstart="startMove('tr')" ontouchend="stopMove()" onmousedown="startMove('tr')" onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8635;&lt;span class="label"&gt;Turn R&lt;/span&gt;&lt;/button&gt;
+
+    &lt;button id="btn-l"  ontouchstart="startMove('l')"  ontouchend="stopMove()" onmousedown="startMove('l')"  onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8592;&lt;span class="label"&gt;Left&lt;/span&gt;&lt;/button&gt;
+    &lt;button id="btn-b"  ontouchstart="startMove('b')"  ontouchend="stopMove()" onmousedown="startMove('b')"  onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8595;&lt;span class="label"&gt;Back&lt;/span&gt;&lt;/button&gt;
+    &lt;button id="btn-r"  ontouchstart="startMove('r')"  ontouchend="stopMove()" onmousedown="startMove('r')"  onmouseup="stopMove()" onmouseleave="stopMove()"&gt;&amp;#8594;&lt;span class="label"&gt;Right&lt;/span&gt;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="hint"&gt;Keyboard: W A S D to drive &amp;middot; Q E to strafe&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Auto Drive&lt;/h2&gt;
+  &lt;div class="segmented" id="autoSeg"&gt;
+    &lt;button class="active" data-v="manual" onclick="setAutoMode('manual')" style="flex:1;"&gt;Manual&lt;/button&gt;
+    &lt;button data-v="avoid" onclick="setAutoMode('avoid')" style="flex:1;"&gt;Avoid&lt;/button&gt;
+    &lt;button data-v="line" onclick="setAutoMode('line')" style="flex:1;"&gt;Line&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="hint"&gt;Avoid = dodges obstacles with the ultrasonic sensor &amp;middot; Line = follows a dark line under the car&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Sensor&lt;/h2&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="lightLabel"&gt;Distance ahead&lt;/span&gt;
+    &lt;span class="valuePill" id="distanceLabel"&gt;-- cm&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Radar&lt;/h2&gt;
+  &lt;svg id="radarSvg" viewBox="0 0 300 170" style="width:100%;max-width:300px;"&gt;
+    &lt;path d="M10,160 A140,140 0 0 1 290,160" fill="none" stroke="#33333f" stroke-width="1"/&gt;
+    &lt;path d="M55,160 A95,95 0 0 1 245,160" fill="none" stroke="#2a2a35" stroke-width="1"/&gt;
+    &lt;path d="M100,160 A50,50 0 0 1 200,160" fill="none" stroke="#2a2a35" stroke-width="1"/&gt;
+    &lt;line x1="150" y1="160" x2="150" y2="20" stroke="#2a2a35" stroke-width="1"/&gt;
+    &lt;g id="radarDots"&gt;&lt;/g&gt;
+  &lt;/svg&gt;
+  &lt;button id="radarBtn" onclick="toggleRadar()"&gt;Start Sweep&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Speed&lt;/h2&gt;
+  &lt;div class="row"&gt;
+    &lt;input type="range" min="60" max="255" value="255" id="speedSlider"
+           oninput="document.getElementById('speedLabel').innerText = Math.round(this.value/255*100) + '%'"
+           onchange="fetch('/speed?value=' + this.value)"&gt;
+    &lt;span class="valuePill" id="speedLabel"&gt;100%&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Lights&lt;/h2&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="lightLabel"&gt;Left&lt;/span&gt;
+    &lt;div class="segmented" id="leftSeg"&gt;
+      &lt;button class="active" data-v="off" onclick="setLight('left','off')"&gt;Off&lt;/button&gt;
+      &lt;button data-v="on" onclick="setLight('left','on')"&gt;On&lt;/button&gt;
+      &lt;button data-v="breathe" onclick="setLight('left','breathe')"&gt;Breathe&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="lightLabel"&gt;Right&lt;/span&gt;
+    &lt;div class="segmented" id="rightSeg"&gt;
+      &lt;button class="active" data-v="off" onclick="setLight('right','off')"&gt;Off&lt;/button&gt;
+      &lt;button data-v="on" onclick="setLight('right','on')"&gt;On&lt;/button&gt;
+      &lt;button data-v="breathe" onclick="setLight('right','breathe')"&gt;Breathe&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Head&lt;/h2&gt;
+  &lt;div class="row"&gt;
+    &lt;input type="range" min="0" max="180" value="90" id="headSlider"
+           oninput="moveHead(this.value)"
+           onchange="fetch('/head?angle=' + this.value)"&gt;
+    &lt;span class="valuePill" id="angleLabel"&gt;90&amp;deg;&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h2&gt;Beep&lt;/h2&gt;
+  &lt;div class="beepGrid"&gt;
+    &lt;button onclick="fetch('/beep?type=chirp')"&gt;Chirp&lt;/button&gt;
+    &lt;button onclick="fetch('/beep?type=honk')"&gt;Honk&lt;/button&gt;
+    &lt;button onclick="fetch('/beep?type=alarm')"&gt;Alarm&lt;/button&gt;
+    &lt;button onclick="fetch('/beep?type=victory')"&gt;Victory&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+var activeDir = null;
+var heartbeat = null;
+var autoModeActive = false;
+var dirButtonId = { f:'btn-f', b:'btn-b', l:'btn-l', r:'btn-r', tl:'btn-tl', tr:'btn-tr' };
+
+function startMove(dir) {
+  if (autoModeActive || activeDir === dir) return;
+  stopMove();
+  activeDir = dir;
+  fetch('/car?move=' + dir);
+  heartbeat = setInterval(function () { fetch('/car?move=' + dir); }, 300);
+  var btn = document.getElementById(dirButtonId[dir]);
+  if (btn) btn.classList.add('held');
+}
+
+function stopMove() {
+  if (heartbeat) { clearInterval(heartbeat); heartbeat = null; }
+  if (activeDir) {
+    var btn = document.getElementById(dirButtonId[activeDir]);
+    if (btn) btn.classList.remove('held');
+    fetch('/car?move=s');
+  }
+  activeDir = null;
+}
+
+var keyDirMap = {
+  'w': 'f', 'arrowup': 'f',
+  's': 'b', 'arrowdown': 'b',
+  'a': 'tl', 'd': 'tr',
+  'q': 'l', 'e': 'r',
+  'arrowleft': 'l', 'arrowright': 'r'
+};
+
+document.addEventListener('keydown', function (e) {
+  if (e.repeat || e.target.tagName === 'INPUT' || autoModeActive) return;
+  var dir = keyDirMap[e.key.toLowerCase()];
+  if (!dir) return;
+  e.preventDefault();
+  startMove(dir);
+});
+
+document.addEventListener('keyup', function (e) {
+  var dir = keyDirMap[e.key.toLowerCase()];
+  if (dir &amp;&amp; dir === activeDir) stopMove();
+});
+
+var lastHeadSend = 0;
+function moveHead(value) {
+  document.getElementById('angleLabel').innerText = value + '°';
+  var now = Date.now();
+  if (now - lastHeadSend &gt; 60) {
+    lastHeadSend = now;
+    fetch('/head?angle=' + value);
+  }
+}
+
+function setLight(side, mode) {
+  var seg = document.getElementById(side + 'Seg');
+  Array.prototype.forEach.call(seg.children, function (btn) {
+    btn.classList.toggle('active', btn.dataset.v === mode);
+  });
+  fetch('/light?side=' + side + '&amp;mode=' + mode);
+}
+
+function setAutoMode(mode) {
+  fetch('/automode?mode=' + mode);
+}
+
+var radarOn = false;
+function toggleRadar() {
+  radarOn = !radarOn;
+  fetch('/radarmode?state=' + (radarOn ? 'on' : 'off'));
+}
+
+var maxRadarDist = 150;
+function polarToXY(angle, dist) {
+  var r = Math.min(dist, maxRadarDist) / maxRadarDist * 140;
+  var theta = (180 - angle) * Math.PI / 180;
+  return { x: 150 + r * Math.cos(theta), y: 160 - r * Math.sin(theta) };
+}
+
+function refreshRadar() {
+  fetch('/radar').then(function (r) { return r.text(); }).then(function (txt) {
+    var dots = document.getElementById('radarDots');
+    dots.innerHTML = '';
+    txt.split(',').forEach(function (p) {
+      var parts = p.split(':');
+      var angle = parseInt(parts[0]);
+      var dist = parseInt(parts[1]);
+      if (dist &lt; 0) return;
+      var pt = polarToXY(angle, dist);
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', pt.x);
+      c.setAttribute('cy', pt.y);
+      c.setAttribute('r', 4);
+      c.setAttribute('fill', dist &lt;= 25 ? '#ff5d5d' : '#6d7bff');
+      dots.appendChild(c);
+    });
+  });
+}
+
+function applyStatus(radar, auto) {
+  radarOn = radar === 1;
+  var radarBtn = document.getElementById('radarBtn');
+  radarBtn.innerText = radarOn ? 'Stop Sweep' : 'Start Sweep';
+  radarBtn.classList.toggle('on', radarOn);
+  document.getElementById('headSlider').disabled = radarOn;
+
+  autoModeActive = auto !== 0;
+  var modes = ['manual', 'avoid', 'line'];
+  var seg = document.getElementById('autoSeg');
+  Array.prototype.forEach.call(seg.children, function (btn) {
+    btn.classList.toggle('active', btn.dataset.v === modes[auto]);
+  });
+  document.getElementById('drivePad').classList.toggle('disabled', autoModeActive);
+}
+
+setInterval(function () {
+  fetch('/status').then(function (r) { return r.text(); }).then(function (t) {
+    var parts = t.split(',');
+    applyStatus(parseInt(parts[0]), parseInt(parts[1]));
+  });
+}, 1000);
+
+setInterval(function () {
+  if (radarOn) refreshRadar();
+}, 300);
+
+setInterval(function () {
+  fetch('/distance').then(function (r) { return r.text(); }).then(function (d) {
+    document.getElementById('distanceLabel').innerText = d + ' cm';
+  });
+}, 400);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+)HTML";
+  server.send(200, "text/html", page);
+}
+
+void handleMove() {
+  if (autoMode != 0) {
+    server.send(200, "text/plain", "IGNORED");
+    return;
+  }
+  if (server.hasArg("move")) {
+    String move = server.arg("move");
+    lastMoveTime = millis();
+    if (move == "f") { ACB_SmartCar.Move(Forward, driveSpeed); isDriving = true; }
+    else if (move == "b") { ACB_SmartCar.Move(Backward, driveSpeed); isDriving = true; }
+    else if (move == "l") { ACB_SmartCar.Move(Move_Right, driveSpeed); isDriving = true; }
+    else if (move == "r") { ACB_SmartCar.Move(Move_Left, driveSpeed); isDriving = true; }
+    else if (move == "tl") { ACB_SmartCar.Move(Contrarotate, driveSpeed); isDriving = true; }
+    else if (move == "tr") { ACB_SmartCar.Move(Clockwise, driveSpeed); isDriving = true; }
+    else if (move == "s") { ACB_SmartCar.Move(Stop, 0); isDriving = false; }
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleSpeed() {
+  if (server.hasArg("value")) {
+    driveSpeed = constrain(server.arg("value").toInt(), 0, 255);
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleLight() {
+  if (server.hasArg("side") &amp;&amp; server.hasArg("mode")) {
+    String modeStr = server.arg("mode");
+    int mode = 0;
+    if (modeStr == "on") mode = 1;
+    else if (modeStr == "breathe") mode = 2;
+
+    if (server.arg("side") == "left") leftLightMode = mode;
+    else if (server.arg("side") == "right") rightLightMode = mode;
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleBeep() {
+  String type = server.hasArg("type") ? server.arg("type") : "chirp";
+  if (type == "honk") beepHonk();
+  else if (type == "alarm") beepAlarm();
+  else if (type == "victory") beepVictory();
+  else beepChirp();
+  server.send(200, "text/plain", "OK");
+}
+
+void handleHead() {
+  if (server.hasArg("angle")) {
+    headAngle = constrain(server.arg("angle").toInt(), 0, 180);
+    headServo.write(headAngle);
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleDistance() {
+  server.send(200, "text/plain", String(currentDistance));
+}
+
+void handleRadarMode() {
+  if (server.hasArg("state")) {
+    bool on = server.arg("state") == "on";
+    if (on) {
+      autoMode = 0;
+      radarMode = true;
+      radarAngle = 0;
+      radarDir = 1;
+      for (int i = 0; i &lt; 19; i++) radarDistances[i] = -1;
+    } else {
+      radarMode = false;
+      headServo.write(headAngle);
+    }
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleRadarData() {
+  String out = "";
+  for (int i = 0; i &lt; 19; i++) {
+    if (i &gt; 0) out += ",";
+    out += String(i * 10) + ":" + String(radarDistances[i]);
+  }
+  server.send(200, "text/plain", out);
+}
+
+void handleAutoMode() {
+  if (server.hasArg("mode")) {
+    String m = server.arg("mode");
+    if (m == "manual") autoMode = 0;
+    else if (m == "avoid") autoMode = 1;
+    else if (m == "line") autoMode = 2;
+
+    if (autoMode != 0) {
+      radarMode = false;
+      headServo.write(90);
+      oaTurning = false;
+    } else {
+      ACB_SmartCar.Move(Stop, 0);
+      isDriving = false;
+    }
+  }
+  server.send(200, "text/plain", "OK");
+}
+
+void handleStatus() {
+  server.send(200, "text/plain", String(radarMode ? 1 : 0) + "," + String(autoMode));
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  ACB_SmartCar.Init();
+  headServo.attach(HeadPin);
+  headServo.write(headAngle);
+  myUltrasonic.Init(UltrasonicTrigPin, UltrasonicEchoPin);
+
+  pinMode(LeftTrackPin, INPUT);
+  pinMode(MiddleTrackPin, INPUT);
+  pinMode(RightTrackPin, INPUT);
+
+  for (int i = 0; i &lt; 19; i++) radarDistances[i] = -1;
+
+  ledcAttach(LeftLedPin, 5000, 8);
+  ledcAttach(RightLedPin, 5000, 8);
+
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
+  Serial.print("Car ready. Connect to WiFi \"");
+  Serial.print(ssid);
+  Serial.println("\" then open http://192.168.4.1");
+
+  server.on("/", handleRoot);
+  server.on("/car", handleMove);
+  server.on("/speed", handleSpeed);
+  server.on("/light", handleLight);
+  server.on("/beep", handleBeep);
+  server.on("/head", handleHead);
+  server.on("/distance", handleDistance);
+  server.on("/radarmode", handleRadarMode);
+  server.on("/radar", handleRadarData);
+  server.on("/automode", handleAutoMode);
+  server.on("/status", handleStatus);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+
+  unsigned long now = millis();
+
+  if (now - lastDistanceRead &gt; DistancePollMs) {
+    lastDistanceRead = now;
+    int d = myUltrasonic.Ranging();
+    currentDistance = d;
+    if (radarMode) {
+      radarDistances[radarAngle / 10] = d;
+      radarAngle += radarDir * 10;
+      if (radarAngle &gt;= 180) { radarAngle = 180; radarDir = -1; }
+      else if (radarAngle &lt;= 0) { radarAngle = 0; radarDir = 1; }
+      headServo.write(radarAngle);
+    }
+  }
+
+  updateLight(LeftLedPin, leftLightMode, now);
+  updateLight(RightLedPin, rightLightMode, now);
+
+  if (autoMode == 1) {
+    runObstacleAvoid(now);
+  } else if (autoMode == 2) {
+    runLineFollow(now);
+  } else if (isDriving &amp;&amp; now - lastMoveTime &gt; DriveTimeoutMs) {
+    ACB_SmartCar.Move(Stop, 0);
+    isDriving = false;
+  }
+}
+</code></pre>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span>© 2026 Caden James</span>
+    <a href="/">← Back to portfolio</a>
+    <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
+  </footer>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
