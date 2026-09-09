@@ -183,7 +183,7 @@
   <header class="hero">
     <div class="hero-eyebrow">Systems · Infrastructure</div>
     <h1 class="hero-name">Homelab</h1>
-    <p class="hero-bio">A self-hosted Linux server I provision and administer entirely over SSH — no GUI, no control panel. It runs multiple private Minecraft servers for friends and family, secured with firewall rules and a private mesh network rather than exposed to the open internet.</p>
+    <p class="hero-bio">A self-hosted Linux server, set up at the local command line and administered remotely over SSH ever since — no GUI, no control panel. It runs multiple private Minecraft servers for friends and family, secured with firewall rules and a private mesh network rather than exposed to the open internet.</p>
     <div class="hero-byline">Built &amp; administered by Caden Bannon</div>
     <div class="tag-row">
       <span class="tag">Linux</span>
@@ -196,7 +196,7 @@
 
   <section id="overview">
     <div class="section-eyebrow">Overview</div>
-    <p>The server is headless — no desktop environment, no monitor attached day-to-day. Every task, from initial provisioning to ongoing maintenance, goes through SSH and the command line: installing packages, managing services, configuring the firewall, and running multiple concurrent Minecraft server instances for private multiplayer use.</p>
+    <p>The server is headless — no desktop environment, no monitor attached day-to-day. Initial OS installation and setup happened directly at the machine's own command line; every task since, from package installs to firewall changes to running multiple concurrent Minecraft server instances, is done remotely over SSH.</p>
     <p>Rather than port-forwarding and exposing the box directly to the internet, remote access runs over a private Tailscale mesh network, with UFW and iptables enforcing a strict default-deny stance on top. The server is reachable to people who are supposed to reach it, and effectively invisible to everyone else.</p>
   </section>
 
@@ -218,7 +218,7 @@ graph LR
   <section id="practices">
     <div class="section-eyebrow">Key Practices</div>
     <ul class="feature-list">
-      <li><strong>Everything over SSH.</strong> No GUI tools, no control panel software — provisioning, service management, and troubleshooting all happen at the command line, the same way production Linux systems are actually administered.</li>
+      <li><strong>Command-line first, then remote.</strong> Initial setup happened at the machine's local command line; every task since — service management, troubleshooting, firewall changes — happens remotely over SSH. No GUI tools, no control panel software, the same way production Linux systems are actually administered.</li>
       <li><strong>Private networking over port-forwarding.</strong> Tailscale creates a mesh VPN between the server and authorized devices, so remote access doesn't depend on opening inbound ports to the public internet.</li>
       <li><strong>Defense in depth at the firewall layer.</strong> UFW and iptables rules restrict traffic even within the private network, rather than treating "on the mesh" as automatically trusted.</li>
       <li><strong>Multiple isolated services on one host.</strong> Several dedicated Minecraft server instances run concurrently for different groups, without interfering with each other.</li>
