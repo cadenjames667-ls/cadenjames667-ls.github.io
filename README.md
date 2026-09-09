@@ -17,6 +17,7 @@ Source for my personal portfolio site, hosted on GitHub Pages.
 - `mycarremote/` — **MyCarRemote**, a project write-up + source for an ESP32-based web remote control for a mecanum-wheel smart car (embedded C++, not a hosted web app)
 - `iam-rbac-demo/` — **Meridian Trust**, a project write-up for a role-based access control system with audit logging (Flask/PostgreSQL/Docker) — full source lives in its own [iam-rbac-demo](https://github.com/cadenjames667-ls/iam-rbac-demo) repo, not this one
 - `homelab/` — **Homelab**, a write-up for a self-hosted Linux server (no code to show — it's ops/infrastructure work, not an app)
+- `this-site/` — **This Site**, a write-up about how the portfolio itself is built (site map, design-system tradeoffs)
 
 ## Deploying
 
@@ -69,6 +70,10 @@ A basic site visit log: the homepage logs a visit (timestamp, page path, referre
 ## Easter Egg
 
 The nav bar's "Caden James" has one hidden interactive letter — the "a" in "Caden" (`#trigger-a` in `index.html`). Clicking it morphs the name into "Bad Apple" with a slide transition and swaps the page background for a fullscreen, looping local video of *Bad Apple!!* (`assets/bad-apple.mp4`) with audio, playing behind all UI elements — which stay fully visible and interactive on top. Clicking it again reverses both. Using a local video file (rather than a YouTube embed) means it also works offline.
+
+## This Site (`this-site/`)
+
+A write-up about the portfolio itself: a site map of how the homepage, project write-ups, live apps, and the three separate Firebase projects connect, plus the deliberate tradeoffs behind it — no build step, no shared component library (styles are repeated per-page on purpose), and each sub-app kept on its own isolated Firebase project.
 
 ## How these were built
 
