@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pantry — Caden James</title>
+<meta name="description" content="The Pantry — a real-time kitchen inventory manager built with Firebase Firestore and Auth. Built by Caden Bannon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #101828;
+    --ink-light: #475467;
+    --ink-muted: #98a2b3;
+    --accent: #2952cc;
+    --accent-light: #eef2fd;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0;
+  }
+
+  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
+  .nav-back:hover { color: var(--accent); }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
+  .nav-links a:hover { color: var(--accent); }
+
+  .hero {
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .hero-name {
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero-bio {
+    max-width: 640px;
+    color: var(--ink-light);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .hero-byline {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--accent-light);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--accent);
+  }
+
+  section { margin-bottom: 48px; }
+
+  .section-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+
+  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
+  section > p + p { margin-top: 12px; }
+
+  .diagram-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .feature-list { list-style: none; display: grid; gap: 12px; }
+
+  .feature-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+  }
+
+  .feature-list strong { color: var(--ink); }
+
+  .notice {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #fff8ec;
+    border: 1px solid #f2d9a8;
+    border-left: 3px solid #b8790f;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #6b4e0e;
+    max-width: 680px;
+  }
+
+  .notice strong { color: #4a3609; }
+
+  .site-footer {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .site-footer a { text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 16px 0 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a class="nav-back" href="/">← Caden James</a>
+    <div class="nav-links">
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">Web App · Firebase</div>
+    <h1 class="hero-name">The Pantry</h1>
+    <p class="hero-bio">A real-time kitchen inventory manager. Add groceries, queue recipe links, and see changes sync instantly across every device signed into the same account — powered by Firebase Firestore and Auth underneath a static, serverless frontend.</p>
+    <div class="hero-byline">Built by Caden Bannon</div>
+    <div class="hero-links">
+      <a class="btn btn-primary" href="/pantry/">Try It</a>
+      <a class="btn btn-outline" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io/tree/main/pantry" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+    <div class="tag-row">
+      <span class="tag">Firebase</span>
+      <span class="tag">Firestore</span>
+      <span class="tag">Auth</span>
+      <span class="tag">Real-time Sync</span>
+    </div>
+  </header>
+
+  <section id="notice">
+    <div class="notice">
+      <span>⚠️</span>
+      <span><strong>Unfinished testing project.</strong> Firestore's security rules are currently open (public read/write) — the sign-in screen keeps pantries logically separate but isn't real data protection. Use Demo Mode on the live app to explore without creating an account.</span>
+    </div>
+  </section>
+
+  <section id="how-its-made">
+    <div class="section-eyebrow">How It's Made</div>
+    <p>Pantry is a single static HTML page — no build step, no backend server of its own. Everything that needs to persist or sync across devices goes through Firebase: Firestore holds the data, and Firebase Auth (email/password) gates access and determines whose pantry you're looking at.</p>
+    <p>Each signed-in account gets its own "pantry space," keyed by Firebase UID. Adding an item, queuing a recipe URL, or removing something writes directly to Firestore, and a live <code class="mono">onSnapshot</code> listener pushes that change back out to every open tab or device in real time — no manual refresh, no polling.</p>
+  </section>
+
+  <section id="architecture">
+    <div class="section-eyebrow">Architecture</div>
+    <div class="diagram-panel">
+      <pre class="mermaid">
+graph LR
+    Browser[Static HTML/JS on GitHub Pages] -->|email/password| Auth[Firebase Auth]
+    Auth -->|UID| Browser
+    Browser <-->|live onSnapshot sync| DB[(Firestore)]
+      </pre>
+    </div>
+    <p style="margin-top:16px;">There's no application server in the middle — the browser talks directly to Firebase. That keeps the whole app deployable as static files on GitHub Pages, with Firebase providing the only "backend" pieces: identity and a real-time database.</p>
+  </section>
+
+  <section id="data-model">
+    <div class="section-eyebrow">Data Model</div>
+    <div class="diagram-panel">
+      <pre class="mermaid">
+erDiagram
+    PANTRY_SPACE ||--o{ ITEM : contains
+    PANTRY_SPACE ||--o{ RECIPE : contains
+
+    PANTRY_SPACE {
+        string spaceId PK "usually the owner's Firebase UID"
+    }
+    ITEM {
+        string id PK
+        string name
+        string qty
+        string cat
+        timestamp createdAt
+    }
+    RECIPE {
+        string id PK
+        string url
+        timestamp createdAt
+    }
+      </pre>
+    </div>
+    <p style="margin-top:16px;">Items and recipes live under <code class="mono">pantries/{spaceId}/items</code> and <code class="mono">pantries/{spaceId}/recipes</code>. By default <code class="mono">spaceId</code> is just the signed-in user's UID, which is what makes "Share Pantry" possible — it copies a link with a <code class="mono">?pantry=&lt;uid&gt;</code> query param that re-points any other signed-in viewer's session at that same space.</p>
+  </section>
+
+  <section id="decisions">
+    <div class="section-eyebrow">Key Engineering Decisions</div>
+    <ul class="feature-list">
+      <li><strong>Auth UID doubles as the partition key.</strong> No separate "create a pantry" step exists — signing up automatically gives an account its own Firestore space, keyed by the UID Firebase already assigns.</li>
+      <li><strong>Share-by-link, not a permissions system.</strong> Pointing another signed-in user at your space is just a URL parameter, not a real ACL. It's flagged clearly in the app and here — it's convenient, not secure.</li>
+      <li><strong>Demo Mode never touches Firestore.</strong> It's a fully separate client-side code path with hardcoded sample data, so visitors can try every interaction (add, remove, search, filter) without creating an account or writing to the real database.</li>
+      <li><strong>Legacy data migration on first connect.</strong> Pantry started as a localStorage-only app before Firestore was added. The current version auto-imports any of that old local data into Firestore the first time a browser connects, instead of discarding it.</li>
+    </ul>
+  </section>
+
+  <footer class="site-footer">
+    <span>© 2026 Caden James</span>
+    <a href="/">← Back to portfolio</a>
+    <a href="/pantry/">Try It →</a>
+  </footer>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+</script>
+</body>
+</html>

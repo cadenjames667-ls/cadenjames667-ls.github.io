@@ -9,8 +9,10 @@ Source for my personal portfolio site, hosted on GitHub Pages.
 - `admin/` — real-auth-gated dashboard for viewing the site's basic visit log
   - `admin/firestore.rules` — security rules for the visit-log Firebase project (public create, owner-only read)
 - `pantry/` — **The Pantry**, a real-time kitchen inventory manager (Firebase Firestore + Auth)
+  - `pantry/about/` — write-up page (how it's made, architecture, data model) — this is what the homepage card links to
   - `pantry/firestore.rules` — security rules for Pantry's Firebase project (currently wide open — see below)
 - `furnder/` — **Furnder**, a swipe-based furniture discovery app (Firestore-backed)
+  - `furnder/about/` — write-up page (how it's made, architecture, data model) — this is what the homepage card links to
 - `mycarremote/` — **MyCarRemote**, a project write-up + source for an ESP32-based web remote control for a mecanum-wheel smart car (embedded C++, not a hosted web app)
 - `iam-rbac-demo/` — **Meridian Trust**, a project write-up for a role-based access control system with audit logging (Flask/PostgreSQL/Docker) — full source lives in its own [iam-rbac-demo](https://github.com/cadenjames667-ls/iam-rbac-demo) repo, not this one
 - `homelab/` — **Homelab**, a write-up for a self-hosted Linux server (no code to show — it's ops/infrastructure work, not an app)
@@ -23,7 +25,7 @@ Source for my personal portfolio site, hosted on GitHub Pages.
 
 ## The Pantry (`pantry/`)
 
-A real-time pantry and recipe-queue manager backed by Firebase.
+A real-time pantry and recipe-queue manager backed by Firebase. The homepage links to `pantry/about/` first — a write-up page with a "Try It" button to the actual app at `pantry/` — rather than linking straight to the live app.
 
 **What works:**
 - Live pantry sync and recipe URL queue via Firestore
@@ -39,7 +41,7 @@ To point Pantry at your own Firebase project: create a Firebase project with Fir
 
 ## Furnder (`furnder/`)
 
-A swipe-based furniture discovery app. Paste a product link from Wayfair, IKEA, Amazon, etc., and it pulls the image/title automatically (via the Microlink API) for a Tinder-style swipe deck. Liked items are stored in Firestore.
+A swipe-based furniture discovery app. Paste a product link from Wayfair, IKEA, Amazon, etc., and it pulls the image/title automatically (via the Microlink API) for a Tinder-style swipe deck. Liked items are stored in Firestore. Like Pantry, the homepage links to `furnder/about/` (write-up + "Try It" button) rather than straight to the live app at `furnder/`.
 
 ## MyCarRemote (`mycarremote/`)
 

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furnder — Caden James</title>
+<meta name="description" content="Furnder — a swipe-based furniture discovery app built with Firestore and automatic product-metadata fetching. Built by Caden Bannon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #101828;
+    --ink-light: #475467;
+    --ink-muted: #98a2b3;
+    --accent: #2952cc;
+    --accent-light: #eef2fd;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0;
+  }
+
+  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
+  .nav-back:hover { color: var(--accent); }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
+  .nav-links a:hover { color: var(--accent); }
+
+  .hero {
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .hero-name {
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero-bio {
+    max-width: 640px;
+    color: var(--ink-light);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .hero-byline {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--accent-light);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--accent);
+  }
+
+  section { margin-bottom: 48px; }
+
+  .section-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+
+  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
+  section > p + p { margin-top: 12px; }
+
+  .diagram-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .feature-list { list-style: none; display: grid; gap: 12px; }
+
+  .feature-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+  }
+
+  .feature-list strong { color: var(--ink); }
+
+  .site-footer {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .site-footer a { text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 16px 0 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a class="nav-back" href="/">← Caden James</a>
+    <div class="nav-links">
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">Web App · Firestore</div>
+    <h1 class="hero-name">Furnder</h1>
+    <p class="hero-bio">A swipe-based furniture discovery app. Paste a product link from Wayfair, IKEA, Amazon, or almost any retailer, and it automatically pulls the image and title to build a Tinder-style swipe deck — liked items land in a Firestore-backed collection you can revisit anytime.</p>
+    <div class="hero-byline">Built by Caden Bannon</div>
+    <div class="hero-links">
+      <a class="btn btn-primary" href="/furnder/">Try It</a>
+      <a class="btn btn-outline" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io/tree/main/furnder" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+    <div class="tag-row">
+      <span class="tag">Firestore</span>
+      <span class="tag">Gesture UI</span>
+      <span class="tag">Metadata Fetch</span>
+    </div>
+  </header>
+
+  <section id="how-its-made">
+    <div class="section-eyebrow">How It's Made</div>
+    <p>Furnder is a static HTML/JS page backed by a single open Firestore collection — there's no user accounts or sign-in, every visitor shares the same furniture deck. Pasting a product URL triggers a call to Microlink, a public Open Graph metadata API, which scrapes the target page's title and preview image without the browser needing to fetch and parse the retailer's HTML directly (most retail sites block that from a browser anyway).</p>
+    <p>The swipe deck itself is built on plain pointer events rather than a drag/gesture library — mouse and touch input both drive the same handler, translating and rotating the top card with a CSS transform as you drag, and animating it off-screen once a swipe threshold is crossed.</p>
+  </section>
+
+  <section id="architecture">
+    <div class="section-eyebrow">Architecture</div>
+    <div class="diagram-panel">
+      <pre class="mermaid">
+graph LR
+    Browser[Static HTML/JS on GitHub Pages] -->|paste product URL| Microlink[Microlink API]
+    Microlink -->|title + image| Browser
+    Browser <-->|read / write| DB[(Firestore: furniture)]
+      </pre>
+    </div>
+    <p style="margin-top:16px;">Two external calls, no server of its own: Microlink for one-shot metadata scraping when an item is added, and Firestore for everything that needs to persist — the swipe deck, swiped/liked state, and the liked-items grid.</p>
+  </section>
+
+  <section id="data-model">
+    <div class="section-eyebrow">Data Model</div>
+    <div class="diagram-panel">
+      <pre class="mermaid">
+erDiagram
+    FURNITURE_ITEM {
+        string id PK
+        string productUrl
+        string imageUrl
+        string name
+        string description
+        bool swiped
+        bool liked
+        number addedAt
+    }
+      </pre>
+    </div>
+    <p style="margin-top:16px;">A single flat collection, <code class="mono">furniture</code>. Each document represents one piece of furniture through its whole lifecycle: added with <code class="mono">swiped: false</code>, then flipped to <code class="mono">swiped: true</code> plus <code class="mono">liked: true/false</code> the moment someone swipes on it. The swipe view queries for <code class="mono">swiped == false</code>; the Liked view queries for <code class="mono">liked == true</code>.</p>
+  </section>
+
+  <section id="decisions">
+    <div class="section-eyebrow">Key Engineering Decisions</div>
+    <ul class="feature-list">
+      <li><strong>One document, one lifecycle.</strong> Rather than moving an item between collections as it gets swiped, its state just changes in place — simpler queries, no risk of an item existing in two places at once.</li>
+      <li><strong>Metadata fetch is fire-and-forget, not blocking.</strong> If Microlink fails to find a preview image (rate-limited, unsupported site, network error), the item can still be added with just a name — the UI degrades instead of dead-ending.</li>
+      <li><strong>No drag library.</strong> The swipe gesture is ~40 lines of pointer-event math (start/move/end, threshold check, CSS transform), which keeps the page dependency-free and easy to follow end to end.</li>
+    </ul>
+  </section>
+
+  <footer class="site-footer">
+    <span>© 2026 Caden James</span>
+    <a href="/">← Back to portfolio</a>
+    <a href="/furnder/">Try It →</a>
+  </footer>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+</script>
+</body>
+</html>
