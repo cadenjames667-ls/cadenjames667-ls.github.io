@@ -38,9 +38,40 @@
   }
 
   .page {
+    position: relative;
+    z-index: 1;
     max-width: 1040px;
     margin: 0 auto;
     padding: 0 32px 96px;
+  }
+
+  /* ── Easter egg background ── */
+  #bad-apple-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    display: none;
+    background: #000;
+  }
+
+  #bad-apple-bg.active { display: block; }
+
+  #bad-apple-bg iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw;
+    min-height: 100vh;
+    min-width: 177.78vh;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border: none;
+  }
+
+  .nav-name, .hero-name {
+    cursor: pointer;
   }
 
   /* ── Nav ── */
@@ -279,10 +310,11 @@
 </style>
 </head>
 <body>
+<div id="bad-apple-bg"></div>
 <div class="page">
 
   <nav class="nav">
-    <div class="nav-name">Caden James</div>
+    <div class="nav-name" onclick="toggleBadApple()">Caden James</div>
     <div class="nav-links">
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
@@ -292,7 +324,7 @@
 
   <header class="hero">
     <div class="hero-eyebrow">Enterprise IT Systems Student</div>
-    <h1 class="hero-name">Caden James</h1>
+    <h1 class="hero-name" onclick="toggleBadApple()">Caden James</h1>
     <p class="hero-bio">I build full-stack web applications — real-time data sync, live databases, and responsive interfaces from scratch. Below are a few live projects, each built and deployed independently.</p>
     <div class="hero-links">
       <a class="btn btn-primary" href="mailto:cadenjbannon@gmail.com">Email Me</a>
@@ -441,6 +473,22 @@
       createdAt: serverTimestamp()
     }).catch(() => {});
   } catch (err) {}
+</script>
+
+<script>
+  // Easter egg: click the name to swap the page background for Bad Apple!!
+  let badAppleOn = false;
+  function toggleBadApple() {
+    const bg = document.getElementById("bad-apple-bg");
+    badAppleOn = !badAppleOn;
+    if (badAppleOn) {
+      bg.innerHTML = '<iframe src="https://www.youtube.com/embed/FtutLA63Cp8?autoplay=1&controls=0&modestbranding=1&rel=0" allow="autoplay" allowfullscreen></iframe>';
+      bg.classList.add("active");
+    } else {
+      bg.classList.remove("active");
+      bg.innerHTML = "";
+    }
+  }
 </script>
 </body>
 </html>
