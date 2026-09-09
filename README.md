@@ -13,6 +13,7 @@ Source for my personal portfolio site, hosted on GitHub Pages.
 - `furnder/` — **Furnder**, a swipe-based furniture discovery app (Firestore-backed)
 - `mycarremote/` — **MyCarRemote**, a project write-up + source for an ESP32-based web remote control for a mecanum-wheel smart car (embedded C++, not a hosted web app)
 - `iam-rbac-demo/` — **Meridian Trust**, a project write-up for a role-based access control system with audit logging (Flask/PostgreSQL/Docker) — full source lives in its own [iam-rbac-demo](https://github.com/cadenjames667-ls/iam-rbac-demo) repo, not this one
+- `homelab/` — **Homelab**, a write-up for a self-hosted Linux server (no code to show — it's ops/infrastructure work, not an app)
 
 ## Deploying
 
@@ -51,6 +52,12 @@ A custom web-based remote control for an Acebott QD001 ESP32 mecanum-wheel smart
 A role-based access control system with compliance-grade audit logging, modeled on enterprise and banking identity patterns — separating authentication, authorization, and audit into three enforced layers. Backend is Python/Flask + PostgreSQL, containerized with Docker Compose.
 
 Like MyCarRemote, this is a write-up page rather than a hosted app (a Flask + Postgres stack can't run on GitHub Pages). The real, runnable source, setup instructions, and commit history live in the separate [iam-rbac-demo](https://github.com/cadenjames667-ls/iam-rbac-demo) repo.
+
+## Homelab (`homelab/`)
+
+A self-hosted Linux server, provisioned and administered entirely over SSH, hosting several private Minecraft servers. Remote access runs over a private Tailscale mesh rather than public port-forwarding, with UFW/iptables enforcing a default-deny stance on top of that.
+
+Unlike the other project pages, there's no source to show here — it's systems/ops work, not a codebase. `homelab/index.html` covers the architecture and practices instead.
 
 ## Admin (`admin/`)
 

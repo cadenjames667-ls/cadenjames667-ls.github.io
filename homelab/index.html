@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab — Caden James</title>
+<meta name="description" content="A self-hosted Linux homelab server administered entirely over SSH, secured with UFW/iptables and Tailscale. Built by Caden Bannon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #101828;
+    --ink-light: #475467;
+    --ink-muted: #98a2b3;
+    --accent: #2952cc;
+    --accent-light: #eef2fd;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0;
+  }
+
+  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
+  .nav-back:hover { color: var(--accent); }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
+  .nav-links a:hover { color: var(--accent); }
+
+  .hero {
+    padding: 24px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .hero-name {
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero-bio {
+    max-width: 640px;
+    color: var(--ink-light);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .hero-byline {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+  }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--accent-light);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--accent);
+  }
+
+  section { margin-bottom: 48px; }
+
+  .section-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+
+  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
+  section > p + p { margin-top: 12px; }
+
+  .diagram-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .feature-list { list-style: none; display: grid; gap: 12px; }
+
+  .feature-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+  }
+
+  .feature-list strong { color: var(--ink); }
+
+  .notice {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--ink-light);
+    max-width: 680px;
+  }
+
+  .site-footer {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .site-footer a { text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 16px 0 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a class="nav-back" href="/">← Caden James</a>
+    <div class="nav-links">
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">Systems · Infrastructure</div>
+    <h1 class="hero-name">Homelab</h1>
+    <p class="hero-bio">A self-hosted Linux server I provision and administer entirely over SSH — no GUI, no control panel. It runs multiple private Minecraft servers for friends and family, secured with firewall rules and a private mesh network rather than exposed to the open internet.</p>
+    <div class="hero-byline">Built &amp; administered by Caden Bannon</div>
+    <div class="tag-row">
+      <span class="tag">Linux</span>
+      <span class="tag">SSH</span>
+      <span class="tag">UFW / iptables</span>
+      <span class="tag">Tailscale</span>
+      <span class="tag">Self-Hosting</span>
+    </div>
+  </header>
+
+  <section id="overview">
+    <div class="section-eyebrow">Overview</div>
+    <p>The server is headless — no desktop environment, no monitor attached day-to-day. Every task, from initial provisioning to ongoing maintenance, goes through SSH and the command line: installing packages, managing services, configuring the firewall, and running multiple concurrent Minecraft server instances for private multiplayer use.</p>
+    <p>Rather than port-forwarding and exposing the box directly to the internet, remote access runs over a private Tailscale mesh network, with UFW and iptables enforcing a strict default-deny stance on top. The server is reachable to people who are supposed to reach it, and effectively invisible to everyone else.</p>
+  </section>
+
+  <section id="architecture">
+    <div class="section-eyebrow">Architecture</div>
+    <div class="diagram-panel">
+      <pre class="mermaid">
+graph LR
+    Admin[Admin & Players] -->|Tailscale private mesh| FW[UFW / iptables]
+    FW --> Server[Headless Linux Server]
+    Server --> MC1[Minecraft Server A]
+    Server --> MC2[Minecraft Server B]
+    Server -.->|in progress| Site[Self-Hosted Personal Website]
+      </pre>
+    </div>
+    <p style="margin-top:16px;">Nothing reaches the box directly from the public internet — every connection, admin or player, comes in over the Tailscale mesh first. UFW and iptables rules then gate what's reachable even on that private network, so a compromised device on the mesh still doesn't get a free pass to everything running on the server.</p>
+  </section>
+
+  <section id="practices">
+    <div class="section-eyebrow">Key Practices</div>
+    <ul class="feature-list">
+      <li><strong>Everything over SSH.</strong> No GUI tools, no control panel software — provisioning, service management, and troubleshooting all happen at the command line, the same way production Linux systems are actually administered.</li>
+      <li><strong>Private networking over port-forwarding.</strong> Tailscale creates a mesh VPN between the server and authorized devices, so remote access doesn't depend on opening inbound ports to the public internet.</li>
+      <li><strong>Defense in depth at the firewall layer.</strong> UFW and iptables rules restrict traffic even within the private network, rather than treating "on the mesh" as automatically trusted.</li>
+      <li><strong>Multiple isolated services on one host.</strong> Several dedicated Minecraft server instances run concurrently for different groups, without interfering with each other.</li>
+    </ul>
+  </section>
+
+  <section id="whats-next">
+    <div class="section-eyebrow">What's Next</div>
+    <div class="notice">Currently extending the server to self-host a personal website — managing the stack end-to-end from OS configuration through deployment, the same way the game servers are run.</div>
+  </section>
+
+  <footer class="site-footer">
+    <span>© 2026 Caden James</span>
+    <a href="/">← Back to portfolio</a>
+    <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
+  </footer>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+</script>
+</body>
+</html>
