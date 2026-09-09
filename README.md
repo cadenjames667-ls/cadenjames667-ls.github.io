@@ -4,8 +4,9 @@ Source for my personal portfolio site, hosted on GitHub Pages.
 
 ## Structure
 
-- `index.html` — portfolio homepage: intro, skills, resume link, project cards, and the visit-logging snippet
+- `index.html` — portfolio homepage: intro, skills, resume link, project cards, the visit-logging snippet, and a hidden easter egg (see below)
 - `resume.pdf` — downloadable resume, linked from the homepage
+- `assets/bad-apple.mp4` — local video for the homepage easter egg (see below)
 - `admin/` — real-auth-gated dashboard for viewing the site's basic visit log
   - `admin/firestore.rules` — security rules for the visit-log Firebase project (public create, owner-only read)
 - `pantry/` — **The Pantry**, a real-time kitchen inventory manager (Firebase Firestore + Auth)
@@ -64,6 +65,10 @@ Unlike the other project pages, there's no source to show here — it's systems/
 ## Admin (`admin/`)
 
 A basic site visit log: the homepage logs a visit (timestamp, page path, referrer, browser/language — no IP or personal data) to a dedicated Firebase project on every load. `admin/index.html` is a dashboard for viewing that log, gated by real Firebase Auth sign-in rather than a client-side password check — `admin/firestore.rules` restricts reads to one specific account UID, enforced server-side, so signing in as anyone else (were that even possible, since there's no public sign-up UI) still couldn't read the log.
+
+## Easter Egg
+
+The nav bar's "Caden James" has one hidden interactive letter — the "a" in "Caden" (`#trigger-a` in `index.html`). Clicking it morphs the name into "Bad Apple" with a slide transition and swaps the page background for a fullscreen, looping local video of *Bad Apple!!* (`assets/bad-apple.mp4`) with audio, playing behind all UI elements — which stay fully visible and interactive on top. Clicking it again reverses both. Using a local video file (rather than a YouTube embed) means it also works offline.
 
 ## How these were built
 

@@ -57,7 +57,7 @@
 
   #bad-apple-bg.active { display: block; }
 
-  #bad-apple-bg iframe {
+  #bad-apple-bg video {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -67,11 +67,30 @@
     min-width: 177.78vh;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    border: none;
+    object-fit: cover;
   }
 
-  .nav-name, .hero-name {
+  .trigger-a {
     cursor: pointer;
+  }
+
+  #nav-name-text {
+    display: inline-block;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease;
+  }
+
+  #nav-name-text.morph-out {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+
+  #nav-name-text.morph-in {
+    animation: navNameMorphIn 0.38s cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  @keyframes navNameMorphIn {
+    from { transform: translateY(14px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   /* ── Nav ── */
@@ -314,7 +333,7 @@
 <div class="page">
 
   <nav class="nav">
-    <div class="nav-name" onclick="toggleBadApple()">Caden James</div>
+    <div class="nav-name"><span id="nav-name-text">C<span id="trigger-a" class="trigger-a" onclick="toggleBadApple()">a</span>den James</span></div>
     <div class="nav-links">
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
@@ -324,7 +343,7 @@
 
   <header class="hero">
     <div class="hero-eyebrow">Enterprise IT Systems Student</div>
-    <h1 class="hero-name" onclick="toggleBadApple()">Caden James</h1>
+    <h1 class="hero-name">Caden James</h1>
     <p class="hero-bio">I build full-stack web applications — real-time data sync, live databases, and responsive interfaces from scratch. Below are a few live projects, each built and deployed independently.</p>
     <div class="hero-links">
       <a class="btn btn-primary" href="mailto:cadenjbannon@gmail.com">Email Me</a>
@@ -476,14 +495,36 @@
 </script>
 
 <script>
-  // Easter egg: click the name to swap the page background for Bad Apple!!
+  // Easter egg: click the hidden "a" in the nav name to swap the page
+  // background for Bad Apple!! (local video, works offline) and morph
+  // the name into "Bad Apple". Click the "a" again to reverse both.
   let badAppleOn = false;
+
+  function renderNavName(text) {
+    const el = document.getElementById("nav-name-text");
+    const i = text.indexOf("a");
+    el.innerHTML = i === -1
+      ? text
+      : text.slice(0, i) + '<span id="trigger-a" class="trigger-a" onclick="toggleBadApple()">a</span>' + text.slice(i + 1);
+  }
+
   function toggleBadApple() {
+    const nameEl = document.getElementById("nav-name-text");
     const bg = document.getElementById("bad-apple-bg");
     badAppleOn = !badAppleOn;
+
+    nameEl.classList.add("morph-out");
+    setTimeout(() => {
+      renderNavName(badAppleOn ? "Bad Apple" : "Caden James");
+      nameEl.classList.remove("morph-out");
+      nameEl.classList.add("morph-in");
+      setTimeout(() => nameEl.classList.remove("morph-in"), 380);
+    }, 320);
+
     if (badAppleOn) {
-      bg.innerHTML = '<iframe src="https://www.youtube.com/embed/FtutLA63Cp8?autoplay=1&controls=0&modestbranding=1&rel=0" allow="autoplay" allowfullscreen></iframe>';
+      bg.innerHTML = '<video id="bad-apple-video" autoplay loop playsinline src="/assets/bad-apple.mp4"></video>';
       bg.classList.add("active");
+      document.getElementById("bad-apple-video").play().catch(() => {});
     } else {
       bg.classList.remove("active");
       bg.innerHTML = "";
