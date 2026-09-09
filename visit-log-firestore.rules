@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /visits/{visitId} {
+      // Anyone (including anonymous site visitors) can create a visit record —
+      // this is what lets the tracking snippet log a visit without requiring sign-in.
+      allow create: if true;
+
+      // Only the site owner's account can read, update, or delete visit records.
+      // This is enforced server-side by Firestore, not by hiding a button in the UI.
+      allow read, update, delete: if request.auth != null
+        && request.auth.uid == "ABQJPeNUBJfpW6etIYzYckzQzVv2";
+    }
+  }
+}

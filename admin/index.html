@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Visits — Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #101828;
+    --ink-light: #475467;
+    --ink-muted: #98a2b3;
+    --accent: #2952cc;
+    --accent-light: #eef2fd;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page { max-width: 1040px; margin: 0 auto; padding: 0 32px 96px; }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 0;
+  }
+
+  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
+  .nav-back:hover { color: var(--accent); }
+
+  /* ── Sign-in gate ── */
+  .gate {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gate-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 32px;
+  }
+
+  .gate-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+
+  .gate-title { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+  }
+
+  input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 16px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-primary:hover { background: var(--accent); }
+
+  .btn-ghost {
+    background: var(--surface);
+    color: var(--ink-light);
+    border: 1px solid var(--border);
+    width: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .gate-error {
+    margin-top: 14px;
+    color: #b93a2d;
+    font-size: 13px;
+    min-height: 18px;
+  }
+
+  /* ── Dashboard ── */
+  .dashboard { display: none; }
+  .dashboard.active { display: block; }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0 24px;
+    flex-wrap: wrap;
+  }
+
+  .dash-title { font-size: 28px; font-weight: 800; }
+
+  .notice {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink-light);
+    margin-bottom: 24px;
+  }
+
+  .stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    min-width: 140px;
+  }
+
+  .stat-num { font-size: 26px; font-weight: 800; color: var(--accent); }
+  .stat-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  th, td {
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    background: var(--bg);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-light); }
+  td.time { white-space: nowrap; color: var(--ink); font-weight: 500; }
+
+  .empty { padding: 48px 20px; text-align: center; color: var(--ink-muted); }
+
+  @media (max-width: 700px) {
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 640px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a class="nav-back" href="/">← Caden James</a>
+  </nav>
+
+  <div class="gate" id="gate">
+    <div class="gate-card">
+      <div class="gate-eyebrow">Admin</div>
+      <h1 class="gate-title">Sign In</h1>
+      <label for="email">Email</label>
+      <input type="email" id="email" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('password').focus()">
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') signIn()">
+      <button class="btn btn-primary" onclick="signIn()">Sign In</button>
+      <div class="gate-error" id="gate-error"></div>
+    </div>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <div class="dash-header">
+      <h1 class="dash-title">Site Visits</h1>
+      <button class="btn btn-ghost" onclick="signOutAdmin()">Sign Out</button>
+    </div>
+
+    <div class="notice">Basic visit log — timestamp, page path, referrer, and browser/language info only. No IP addresses or other personal data are collected.</div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Visits Shown</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-today">0</div>
+        <div class="stat-label">Today</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="visits-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Page</th>
+            <th>Referrer</th>
+            <th>Browser / OS</th>
+            <th>Language</th>
+          </tr>
+        </thead>
+        <tbody id="visits-body"></tbody>
+      </table>
+      <div class="empty" id="empty-state" style="display:none;">No visits logged yet.</div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9vvAB_LMtzhvjiEzMOkzO1UQ3WJxXZK8",
+    authDomain: "audit-log-b1315.firebaseapp.com",
+    projectId: "audit-log-b1315",
+    storageBucket: "audit-log-b1315.firebasestorage.app",
+    messagingSenderId: "854672040155",
+    appId: "1:854672040155:web:a2ea61d0ab65c3b0f46cfe"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let unsubscribe = null;
+
+  function esc(value) {
+    return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function parseUserAgent(ua) {
+    if (!ua) return "Unknown";
+    let browser = "Unknown browser";
+    if (/Edg\//.test(ua)) browser = "Edge";
+    else if (/Chrome\//.test(ua) && !/Chromium/.test(ua)) browser = "Chrome";
+    else if (/Firefox\//.test(ua)) browser = "Firefox";
+    else if (/Safari\//.test(ua) && !/Chrome/.test(ua)) browser = "Safari";
+
+    let os = "Unknown OS";
+    if (/iPhone|iPad/.test(ua)) os = "iOS";
+    else if (/Android/.test(ua)) os = "Android";
+    else if (/Windows/.test(ua)) os = "Windows";
+    else if (/Mac OS X/.test(ua)) os = "macOS";
+    else if (/Linux/.test(ua)) os = "Linux";
+
+    return `${browser} · ${os}`;
+  }
+
+  function formatTime(ts) {
+    if (!ts || !ts.toDate) return "—";
+    const d = ts.toDate();
+    return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  }
+
+  function isToday(ts) {
+    if (!ts || !ts.toDate) return false;
+    const d = ts.toDate();
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  }
+
+  function renderVisits(docs) {
+    const body = document.getElementById("visits-body");
+    const empty = document.getElementById("empty-state");
+    document.getElementById("stat-total").textContent = docs.length;
+    document.getElementById("stat-today").textContent = docs.filter(d => isToday(d.createdAt)).length;
+
+    if (!docs.length) {
+      body.innerHTML = "";
+      empty.style.display = "block";
+      return;
+    }
+    empty.style.display = "none";
+
+    body.innerHTML = docs.map(v => `
+      <tr>
+        <td class="time">${esc(formatTime(v.createdAt))}</td>
+        <td class="mono">${esc(v.page || "/")}</td>
+        <td class="mono">${esc(v.referrer || "direct")}</td>
+        <td>${esc(parseUserAgent(v.userAgent))}</td>
+        <td class="mono">${esc(v.language || "—")}</td>
+      </tr>`).join("");
+  }
+
+  function subscribeToVisits() {
+    if (unsubscribe) unsubscribe();
+    const q = query(collection(db, "visits"), orderBy("createdAt", "desc"), limit(300));
+    unsubscribe = onSnapshot(q, snapshot => {
+      renderVisits(snapshot.docs.map(d => d.data()));
+    }, err => {
+      document.getElementById("empty-state").textContent = "Could not load visits: " + err.message;
+      document.getElementById("empty-state").style.display = "block";
+    });
+  }
+
+  function showDashboard() {
+    document.getElementById("gate").style.display = "none";
+    document.getElementById("dashboard").classList.add("active");
+    subscribeToVisits();
+  }
+
+  function showGate() {
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    document.getElementById("dashboard").classList.remove("active");
+    document.getElementById("gate").style.display = "flex";
+  }
+
+  function friendlyAuthError(err) {
+    switch (err.code) {
+      case "auth/user-not-found":
+      case "auth/invalid-credential": return "Invalid email or password.";
+      case "auth/wrong-password": return "Invalid email or password.";
+      case "auth/invalid-email": return "Enter a valid email address.";
+      case "auth/too-many-requests": return "Too many attempts. Try again later.";
+      default: return "Sign-in failed.";
+    }
+  }
+
+  window.signIn = async function () {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const errorEl = document.getElementById("gate-error");
+    errorEl.textContent = "";
+    if (!email || !password) { errorEl.textContent = "Enter your email and password."; return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      errorEl.textContent = friendlyAuthError(err);
+    }
+  };
+
+  window.signOutAdmin = async function () {
+    await signOut(auth);
+  };
+
+  onAuthStateChanged(auth, user => {
+    if (user) showDashboard();
+    else showGate();
+  });
+</script>
+</body>
+</html>

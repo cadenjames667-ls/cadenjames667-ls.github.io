@@ -396,5 +396,34 @@
   </footer>
 
 </div>
+
+<script type="module">
+  // Lightweight visit logger — timestamp, page, referrer, and browser info only.
+  // No IP address or personal data is collected. Write-only from the browser;
+  // reads are restricted to the site owner by Firestore security rules.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA9vvAB_LMtzhvjiEzMOkzO1UQ3WJxXZK8",
+    authDomain: "audit-log-b1315.firebaseapp.com",
+    projectId: "audit-log-b1315",
+    storageBucket: "audit-log-b1315.firebasestorage.app",
+    messagingSenderId: "854672040155",
+    appId: "1:854672040155:web:a2ea61d0ab65c3b0f46cfe"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    addDoc(collection(db, "visits"), {
+      page: location.pathname,
+      referrer: document.referrer || "direct",
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      createdAt: serverTimestamp()
+    }).catch(() => {});
+  } catch (err) {}
+</script>
 </body>
 </html>
