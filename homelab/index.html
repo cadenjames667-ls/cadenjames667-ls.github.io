@@ -6,167 +6,191 @@
 <title>Homelab — Caden James</title>
 <meta name="description" content="A self-hosted Linux homelab server administered entirely over SSH, secured with UFW/iptables and Tailscale. Built by Caden Bannon.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --ink: #101828;
-    --ink-light: #475467;
-    --ink-muted: #98a2b3;
-    --accent: #2952cc;
-    --accent-light: #eef2fd;
-    --border: #e4e7ec;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --bg: #0A0F0B;
+    --panel: #0E1610;
+    --green: #4CE07A;
+    --green-dim: #2C8F52;
+    --text: #C9E8D4;
+    --text-dim: #6B8E7B;
+    --amber: #E0B84C;
+    --rule: #1E2C22;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Fira Code", "JetBrains Mono", monospace;
     background: var(--bg);
-    color: var(--ink);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(circle at 15% 0%, rgba(76,224,122,0.05), transparent 45%);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14.5px;
   }
 
   a { color: inherit; }
-  .mono { font-family: "JetBrains Mono", monospace; }
 
-  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+  .page { max-width: 820px; margin: 0 auto; padding: 28px 24px 100px; }
 
+  /* ── Terminal window chrome ── */
+  .term {
+    border: 1px solid var(--rule);
+    background: var(--panel);
+  }
+
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-dim);
+    font-size: 12.5px;
+  }
+
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
+  .dot.r { background: #E06C5C; }
+  .dot.y { background: var(--amber); }
+  .dot.g { background: var(--green-dim); }
+  .term-title { margin-left: 8px; }
+
+  .term-body { padding: 22px 24px; }
+
+  /* ── Nav ── */
   .nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 28px 0;
-  }
-
-  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
-  .nav-back:hover { color: var(--accent); }
-  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
-  .nav-links a:hover { color: var(--accent); }
-
-  .hero {
-    padding: 24px 0 48px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
-  }
-
-  .hero-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 16px;
-  }
-
-  .hero-name {
-    font-size: clamp(32px, 5vw, 44px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 16px;
-  }
-
-  .hero-bio {
-    max-width: 640px;
-    color: var(--ink-light);
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  .hero-byline {
-    font-family: "JetBrains Mono", monospace;
+    padding-bottom: 20px;
+    color: var(--text-dim);
     font-size: 13px;
-    color: var(--ink-muted);
-    margin-bottom: 20px;
   }
 
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .nav-back { text-decoration: none; color: var(--text); }
+  .nav-back:hover { color: var(--green); }
+  .nav-links a { text-decoration: none; color: var(--text-dim); }
+  .nav-links a:hover { color: var(--green); }
 
-  .tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--accent-light);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--accent);
+  .prompt { color: var(--green); }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--green);
+    vertical-align: -2px;
+    animation: blink 1s step-end infinite;
   }
 
-  section { margin-bottom: 48px; }
+  @keyframes blink { 50% { opacity: 0; } }
 
-  .section-eyebrow {
-    font-family: "JetBrains Mono", monospace;
+  /* ── neofetch-style hero block ── */
+  .fetch {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .fetch-art {
+    color: var(--green-dim);
     font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted);
-    margin-bottom: 16px;
+    line-height: 1.25;
+    white-space: pre;
   }
 
-  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
-  section > p + p { margin-top: 12px; }
+  .fetch-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .fetch-rule { color: var(--rule); margin-bottom: 8px; }
+
+  .fetch-row { display: flex; gap: 8px; margin-bottom: 3px; }
+  .fetch-key { color: var(--amber); min-width: 76px; }
+  .fetch-val { color: var(--text); }
+
+  .lede {
+    margin-top: 22px;
+    color: var(--text);
+    max-width: 66ch;
+    line-height: 1.75;
+  }
+
+  .byline { margin-top: 14px; color: var(--text-dim); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tag { border: 1px solid var(--rule); color: var(--text-dim); padding: 3px 9px; font-size: 12.5px; }
+
+  /* ── Command sections ── */
+  .cmd-block { margin-top: 26px; }
+
+  .cmd-line {
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    font-size: 13.5px;
+  }
+
+  .cmd-line .prompt { margin-right: 6px; }
+  .cmd-line .cmd { color: var(--text); }
+
+  .cmd-out p { color: var(--text); max-width: 68ch; line-height: 1.75; margin-bottom: 12px; }
+  .cmd-out p:last-child { margin-bottom: 0; }
 
   .diagram-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 24px;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 20px;
     overflow-x: auto;
+    margin-bottom: 14px;
   }
 
-  .feature-list { list-style: none; display: grid; gap: 12px; }
+  .list { list-style: none; display: grid; gap: 10px; }
 
-  .feature-list li {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--ink-light);
-    line-height: 1.6;
-    box-shadow: var(--shadow);
+  .list li {
+    border: 1px solid var(--rule);
+    padding: 12px 16px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    font-size: 13.5px;
   }
 
-  .feature-list strong { color: var(--ink); }
+  .list li::before { content: "→ "; color: var(--green); }
+  .list li strong { color: var(--text); }
 
-  .notice {
-    background: var(--accent-light);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 10px 10px 0;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--ink-light);
-    max-width: 680px;
+  .warn {
+    border: 1px solid var(--green-dim);
+    background: rgba(76,224,122,0.06);
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.7;
   }
 
-  .site-footer {
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
+  .warn .prompt { color: var(--amber); }
+
+  .foot {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 16px;
     flex-wrap: wrap;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: var(--ink-muted);
+    gap: 10px;
+    color: var(--text-dim);
+    font-size: 12.5px;
   }
 
-  .site-footer a { text-decoration: none; }
-  .site-footer a:hover { color: var(--accent); }
+  .foot a { text-decoration: none; }
+  .foot a:hover { color: var(--green); }
 
-  @media (max-width: 640px) {
-    .hero { padding: 16px 0 40px; }
+  @media (max-width: 560px) {
+    .fetch { grid-template-columns: 1fr; }
+    .fetch-art { display: none; }
+    .term-body { padding: 18px; }
   }
 </style>
 </head>
@@ -174,72 +198,117 @@
 <div class="page">
 
   <nav class="nav">
-    <a class="nav-back" href="/">← Caden James</a>
+    <a class="nav-back" href="/">← caden-james</a>
     <div class="nav-links">
-      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github</a>
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="hero-eyebrow">Systems · Infrastructure</div>
-    <h1 class="hero-name">Homelab</h1>
-    <p class="hero-bio">A self-hosted Linux server, set up at the local command line and administered remotely over SSH ever since — no GUI, no control panel. It runs multiple private Minecraft servers for friends and family, secured with firewall rules and a private mesh network rather than exposed to the open internet.</p>
-    <div class="hero-byline">Built &amp; administered by Caden Bannon</div>
-    <div class="tag-row">
-      <span class="tag">Linux</span>
-      <span class="tag">SSH</span>
-      <span class="tag">UFW / iptables</span>
-      <span class="tag">Tailscale</span>
-      <span class="tag">Self-Hosting</span>
+  <div class="term">
+    <div class="term-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="term-title">caden@homelab: ~</span>
     </div>
-  </header>
+    <div class="term-body">
 
-  <section id="overview">
-    <div class="section-eyebrow">Overview</div>
-    <p>The server is headless — no desktop environment, no monitor attached day-to-day. Initial OS installation and setup happened directly at the machine's own command line; every task since, from package installs to firewall changes to running multiple concurrent Minecraft server instances, is done remotely over SSH.</p>
-    <p>Rather than port-forwarding and exposing the box directly to the internet, remote access runs over a private Tailscale mesh network, with UFW and iptables enforcing a strict default-deny stance on top. The server is reachable to people who are supposed to reach it, and effectively invisible to everyone else.</p>
-  </section>
+      <div class="fetch">
+        <pre class="fetch-art">    ___________
+   /          /|
+  /__________/ |
+  |  ______  | |
+  |  |    |  | |
+  |  |____|  | |
+  |__________|/</pre>
+        <div>
+          <div class="fetch-name">homelab</div>
+          <div class="fetch-rule">────────────────────</div>
+          <div class="fetch-row"><span class="fetch-key">os</span><span class="fetch-val">Linux, headless</span></div>
+          <div class="fetch-row"><span class="fetch-key">access</span><span class="fetch-val">SSH only, no GUI</span></div>
+          <div class="fetch-row"><span class="fetch-key">network</span><span class="fetch-val">Tailscale mesh</span></div>
+          <div class="fetch-row"><span class="fetch-key">firewall</span><span class="fetch-val">UFW + iptables</span></div>
+          <div class="fetch-row"><span class="fetch-key">services</span><span class="fetch-val">2× Minecraft servers</span></div>
+          <div class="fetch-row"><span class="fetch-key">maintainer</span><span class="fetch-val">Caden Bannon</span></div>
+        </div>
+      </div>
 
-  <section id="architecture">
-    <div class="section-eyebrow">Architecture</div>
-    <div class="diagram-panel">
-      <pre class="mermaid">
+      <p class="lede">A self-hosted Linux server, set up at the local command line and administered remotely over SSH ever since — no GUI, no control panel. It runs multiple private Minecraft servers for friends and family, secured with firewall rules and a private mesh network rather than exposed to the open internet.<span class="cursor"></span></p>
+
+      <div class="tag-row">
+        <span class="tag">linux</span>
+        <span class="tag">ssh</span>
+        <span class="tag">ufw / iptables</span>
+        <span class="tag">tailscale</span>
+        <span class="tag">self-hosting</span>
+      </div>
+
+      <div class="cmd-block" id="overview">
+        <div class="cmd-line"><span class="prompt">$</span><span class="cmd">cat overview.txt</span></div>
+        <div class="cmd-out">
+          <p>The server is headless — no desktop environment, no monitor attached day-to-day. Initial OS installation and setup happened directly at the machine's own command line; every task since, from package installs to firewall changes to running multiple concurrent Minecraft server instances, is done remotely over SSH.</p>
+          <p>Rather than port-forwarding and exposing the box directly to the internet, remote access runs over a private Tailscale mesh network, with UFW and iptables enforcing a strict default-deny stance on top. The server is reachable to people who are supposed to reach it, and effectively invisible to everyone else.</p>
+        </div>
+      </div>
+
+      <div class="cmd-block" id="architecture">
+        <div class="cmd-line"><span class="prompt">$</span><span class="cmd">./show-architecture.sh</span></div>
+        <div class="diagram-panel">
+          <pre class="mermaid">
 graph LR
     Admin[Admin & Players] -->|Tailscale private mesh| FW[UFW / iptables]
     FW --> Server[Headless Linux Server]
     Server --> MC1[Minecraft Server A]
     Server --> MC2[Minecraft Server B]
     Server -.->|in progress| Site[Self-Hosted Personal Website]
-      </pre>
+          </pre>
+        </div>
+        <div class="cmd-out">
+          <p>Nothing reaches the box directly from the public internet — every connection, admin or player, comes in over the Tailscale mesh first. UFW and iptables rules then gate what's reachable even on that private network, so a compromised device on the mesh still doesn't get a free pass to everything running on the server.</p>
+        </div>
+      </div>
+
+      <div class="cmd-block" id="practices">
+        <div class="cmd-line"><span class="prompt">$</span><span class="cmd">history | grep practices</span></div>
+        <ul class="list">
+          <li><strong>Command-line first, then remote.</strong> Initial setup happened at the machine's local command line; every task since — service management, troubleshooting, firewall changes — happens remotely over SSH. No GUI tools, no control panel software.</li>
+          <li><strong>Private networking over port-forwarding.</strong> Tailscale creates a mesh VPN between the server and authorized devices, so remote access doesn't depend on opening inbound ports to the public internet.</li>
+          <li><strong>Defense in depth at the firewall layer.</strong> UFW and iptables rules restrict traffic even within the private network, rather than treating "on the mesh" as automatically trusted.</li>
+          <li><strong>Multiple isolated services on one host.</strong> Several dedicated Minecraft server instances run concurrently for different groups, without interfering with each other.</li>
+        </ul>
+      </div>
+
+      <div class="cmd-block" id="whats-next">
+        <div class="cmd-line"><span class="prompt">$</span><span class="cmd">cat TODO.md</span></div>
+        <div class="warn"><span class="prompt">[ ]</span> Extending the server to self-host a personal website — managing the stack end-to-end from OS configuration through deployment, the same way the game servers are run.</div>
+      </div>
+
+      <div class="foot">
+        <span>© 2026 caden james</span>
+        <span>
+          <a href="/">← back to portfolio</a> &nbsp;
+          <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
+        </span>
+      </div>
+
     </div>
-    <p style="margin-top:16px;">Nothing reaches the box directly from the public internet — every connection, admin or player, comes in over the Tailscale mesh first. UFW and iptables rules then gate what's reachable even on that private network, so a compromised device on the mesh still doesn't get a free pass to everything running on the server.</p>
-  </section>
-
-  <section id="practices">
-    <div class="section-eyebrow">Key Practices</div>
-    <ul class="feature-list">
-      <li><strong>Command-line first, then remote.</strong> Initial setup happened at the machine's local command line; every task since — service management, troubleshooting, firewall changes — happens remotely over SSH. No GUI tools, no control panel software, the same way production Linux systems are actually administered.</li>
-      <li><strong>Private networking over port-forwarding.</strong> Tailscale creates a mesh VPN between the server and authorized devices, so remote access doesn't depend on opening inbound ports to the public internet.</li>
-      <li><strong>Defense in depth at the firewall layer.</strong> UFW and iptables rules restrict traffic even within the private network, rather than treating "on the mesh" as automatically trusted.</li>
-      <li><strong>Multiple isolated services on one host.</strong> Several dedicated Minecraft server instances run concurrently for different groups, without interfering with each other.</li>
-    </ul>
-  </section>
-
-  <section id="whats-next">
-    <div class="section-eyebrow">What's Next</div>
-    <div class="notice">Currently extending the server to self-host a personal website — managing the stack end-to-end from OS configuration through deployment, the same way the game servers are run.</div>
-  </section>
-
-  <footer class="site-footer">
-    <span>© 2026 Caden James</span>
-    <a href="/">← Back to portfolio</a>
-    <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
-  </footer>
+  </div>
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "dark",
+    themeVariables: {
+      fontFamily: "Fira Code, monospace",
+      background: "#0E1610",
+      primaryColor: "#0E1610",
+      primaryTextColor: "#C9E8D4",
+      primaryBorderColor: "#4CE07A",
+      lineColor: "#2C8F52",
+      secondaryColor: "#0E1610",
+      tertiaryColor: "#0A0F0B"
+    }
+  });
 </script>
 </body>
 </html>

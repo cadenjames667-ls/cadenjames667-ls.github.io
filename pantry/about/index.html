@@ -6,252 +6,260 @@
 <title>The Pantry — Caden James</title>
 <meta name="description" content="The Pantry — a real-time kitchen inventory manager built with Firebase Firestore and Auth. Built by Caden Bannon.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --ink: #101828;
-    --ink-light: #475467;
-    --ink-muted: #98a2b3;
-    --accent: #2952cc;
-    --accent-light: #eef2fd;
-    --border: #e4e7ec;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --paper: #FBF8F0;
+    --paper-2: #F2ECDD;
+    --ink: #2B2118;
+    --ink-light: #5C4F3F;
+    --ink-muted: #9C8F7A;
+    --tomato: #C1442D;
+    --basil: #4B6B3F;
+    --rule: #D8CCAE;
+    --shadow: 0 18px 40px rgba(43,33,24,0.16);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
+    font-family: "Courier Prime", monospace;
+    background: #E7E1D2;
     color: var(--ink);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding: 40px 16px 80px;
   }
 
   a { color: inherit; }
-  .mono { font-family: "JetBrains Mono", monospace; }
 
-  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+  .receipt {
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    padding: 30px 30px 0;
+    position: relative;
+  }
+
+  /* Perforated / torn top & bottom edges */
+  .receipt::before, .receipt::after {
+    content: "";
+    display: block;
+    height: 14px;
+    background-image: radial-gradient(circle at 8px 8px, #E7E1D2 8px, transparent 9px);
+    background-size: 16px 16px;
+    background-position: -8px -8px;
+  }
+
+  .receipt::after { transform: scaleY(-1); }
+
+  .receipt-body { padding-bottom: 26px; }
 
   .nav {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 28px 0;
-  }
-
-  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
-  .nav-back:hover { color: var(--accent); }
-  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
-  .nav-links a:hover { color: var(--accent); }
-
-  .hero {
-    padding: 24px 0 48px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
-  }
-
-  .hero-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 16px;
-  }
-
-  .hero-name {
-    font-size: clamp(32px, 5vw, 44px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 16px;
-  }
-
-  .hero-bio {
-    max-width: 640px;
-    color: var(--ink-light);
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  .hero-byline {
-    font-family: "JetBrains Mono", monospace;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
     font-size: 13px;
-    color: var(--ink-muted);
-    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px dashed var(--rule);
+    margin-bottom: 22px;
   }
 
-  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .nav a { text-decoration: none; color: var(--ink-light); }
+  .nav a:hover { color: var(--tomato); }
+
+  .store-head { text-align: center; margin-bottom: 22px; }
+
+  .store-name {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .store-sub { font-size: 12px; color: var(--ink-muted); margin-top: 4px; letter-spacing: 0.02em; }
+
+  .receipt-meta {
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    text-align: center;
+    margin: 14px 0 20px;
+    border-top: 1px dashed var(--rule);
+    border-bottom: 1px dashed var(--rule);
+    padding: 10px 0;
+  }
+
+  .lede { font-size: 13.5px; color: var(--ink-light); line-height: 1.75; margin-bottom: 18px; }
+
+  .actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 
   .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 600;
+    font-size: 12.5px;
     text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    padding: 9px 14px;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
   }
 
-  .btn-primary { background: var(--ink); color: #fff; }
-  .btn-primary:hover { background: var(--accent); }
-  .btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--tomato); border-color: var(--tomato); color: var(--paper); }
+  .btn:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .btn.primary:hover { background: #A23623; border-color: #A23623; }
 
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stamp-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .stamp { font-size: 10.5px; border: 1px dashed var(--basil); color: var(--basil); padding: 3px 8px; }
 
-  .tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--accent-light);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--accent);
-  }
-
-  section { margin-bottom: 48px; }
-
-  .section-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted);
-    margin-bottom: 16px;
-  }
-
-  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
-  section > p + p { margin-top: 12px; }
-
-  .diagram-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 24px;
-    overflow-x: auto;
-  }
-
-  .feature-list { list-style: none; display: grid; gap: 12px; }
-
-  .feature-list li {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--ink-light);
+  .warn {
+    border: 1.5px solid var(--tomato);
+    color: var(--tomato);
+    font-size: 12.5px;
+    padding: 10px 12px;
+    margin-bottom: 26px;
     line-height: 1.6;
-    box-shadow: var(--shadow);
   }
 
-  .feature-list strong { color: var(--ink); }
+  .warn strong { display: block; margin-bottom: 2px; }
 
-  .notice {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    background: #fff8ec;
-    border: 1px solid #f2d9a8;
-    border-left: 3px solid #b8790f;
-    border-radius: 0 10px 10px 0;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: #6b4e0e;
-    max-width: 680px;
-  }
+  /* Receipt line-item section */
+  .line-section { margin-bottom: 26px; }
 
-  .notice strong { color: #4a3609; }
-
-  .site-footer {
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
+  .line-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: var(--ink-muted);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
   }
 
-  .site-footer a { text-decoration: none; }
-  .site-footer a:hover { color: var(--accent); }
+  .line-section p { font-size: 13px; color: var(--ink-light); line-height: 1.75; margin-bottom: 10px; }
 
-  @media (max-width: 640px) {
-    .hero { padding: 16px 0 40px; }
+  .line-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12.5px;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
   }
+
+  .line-item .qty { color: var(--basil); white-space: nowrap; }
+
+  .diagram-panel {
+    background: var(--paper-2);
+    border: 1px dashed var(--rule);
+    padding: 16px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+
+  .decisions { list-style: none; display: grid; gap: 0; }
+
+  .decisions li {
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 12.5px;
+    color: var(--ink-light);
+    line-height: 1.7;
+  }
+
+  .decisions strong { font-family: "Space Grotesk", sans-serif; font-weight: 700; color: var(--ink); display: block; font-size: 12.5px; margin-bottom: 2px; }
+
+  code { font-family: "Courier Prime", monospace; background: var(--paper-2); color: var(--tomato); padding: 1px 4px; font-weight: 700; font-size: 12px; }
+
+  .totals {
+    border-top: 1px solid var(--ink);
+    padding-top: 12px;
+    margin-top: 4px;
+    font-size: 12.5px;
+  }
+
+  .totals-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .totals-row.grand { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 15px; border-top: 1px dashed var(--rule); margin-top: 6px; padding-top: 8px; }
+
+  .barcode {
+    margin: 26px 0 10px;
+    height: 46px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 9px, var(--ink) 9px 12px, transparent 12px 14px);
+  }
+
+  .thank-you {
+    text-align: center;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: var(--ink-light);
+    padding-bottom: 6px;
+  }
+
+  .thank-you span { display: block; font-family: "Courier Prime", monospace; font-weight: 400; font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="receipt">
+  <div class="receipt-body">
 
-  <nav class="nav">
-    <a class="nav-back" href="/">← Caden James</a>
-    <div class="nav-links">
-      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+    <nav class="nav">
+      <a href="/">← CADEN JAMES</a>
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GITHUB</a>
+    </nav>
+
+    <div class="store-head">
+      <div class="store-name">The Pantry</div>
+      <div class="store-sub">real-time kitchen inventory · receipt of build</div>
     </div>
-  </nav>
 
-  <header class="hero">
-    <div class="hero-eyebrow">Web App · Firebase</div>
-    <h1 class="hero-name">The Pantry</h1>
-    <p class="hero-bio">A real-time kitchen inventory manager. Add groceries, queue recipe links, and see changes sync instantly across every device signed into the same account — powered by Firebase Firestore and Auth underneath a static, serverless frontend.</p>
-    <div class="hero-byline">Built by Caden Bannon</div>
-    <div class="hero-links">
-      <a class="btn btn-primary" href="/pantry/">Try It</a>
-      <a class="btn btn-outline" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io/tree/main/pantry" target="_blank" rel="noopener">View on GitHub</a>
+    <div class="receipt-meta">web app · firebase · order no. 001</div>
+
+    <p class="lede">Add groceries, queue recipe links, and see changes sync instantly across every device signed into the same account — powered by Firebase Firestore and Auth underneath a static, serverless frontend.</p>
+
+    <div class="actions">
+      <a class="btn primary" href="/pantry/">Try it</a>
+      <a class="btn" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io/tree/main/pantry" target="_blank" rel="noopener">View on GitHub</a>
     </div>
-    <div class="tag-row">
-      <span class="tag">Real-time Firestore Sync</span>
-      <span class="tag">Firebase Auth</span>
-      <span class="tag">Share-by-Link</span>
-      <span class="tag">Client-side Demo Mode</span>
+
+    <div class="stamp-row">
+      <span class="stamp">real-time firestore sync</span>
+      <span class="stamp">firebase auth</span>
+      <span class="stamp">share-by-link</span>
+      <span class="stamp">demo mode</span>
     </div>
-  </header>
 
-  <section id="notice">
-    <div class="notice">
-      <span>⚠️</span>
-      <span><strong>Unfinished testing project.</strong> Firestore's security rules are currently open (public read/write) — the sign-in screen keeps pantries logically separate but isn't real data protection. Use Demo Mode on the live app to explore without creating an account.</span>
+    <div class="warn"><strong>⚠ Unfinished testing project</strong>Firestore's security rules are currently open (public read/write) — the sign-in screen keeps pantries logically separate but isn't real data protection. Use Demo Mode on the live app to explore without creating an account.</div>
+
+    <div class="line-section" id="how-its-made">
+      <div class="line-head"><span>How it's made</span><span>qty</span></div>
+      <p>Pantry is a single static HTML page — no build step, no backend server of its own. Everything that needs to persist or sync across devices goes through Firebase: Firestore holds the data, and Firebase Auth (email/password) gates access and determines whose pantry you're looking at.</p>
+      <p>Each signed-in account gets its own "pantry space," keyed by Firebase UID. Adding an item, queuing a recipe URL, or removing something writes directly to Firestore, and a live <code>onSnapshot</code> listener pushes that change back out to every open tab or device in real time — no manual refresh, no polling.</p>
+      <div class="line-item"><span>static html / js frontend</span><span class="qty">1x</span></div>
+      <div class="line-item"><span>firebase auth (email/password)</span><span class="qty">1x</span></div>
+      <div class="line-item"><span>onSnapshot live listeners</span><span class="qty">2x</span></div>
     </div>
-  </section>
 
-  <section id="how-its-made">
-    <div class="section-eyebrow">How It's Made</div>
-    <p>Pantry is a single static HTML page — no build step, no backend server of its own. Everything that needs to persist or sync across devices goes through Firebase: Firestore holds the data, and Firebase Auth (email/password) gates access and determines whose pantry you're looking at.</p>
-    <p>Each signed-in account gets its own "pantry space," keyed by Firebase UID. Adding an item, queuing a recipe URL, or removing something writes directly to Firestore, and a live <code class="mono">onSnapshot</code> listener pushes that change back out to every open tab or device in real time — no manual refresh, no polling.</p>
-  </section>
-
-  <section id="architecture">
-    <div class="section-eyebrow">Architecture</div>
-    <div class="diagram-panel">
-      <pre class="mermaid">
+    <div class="line-section" id="architecture">
+      <div class="line-head"><span>Architecture</span><span>—</span></div>
+      <div class="diagram-panel">
+        <pre class="mermaid">
 graph LR
     Browser[Static HTML/JS on GitHub Pages] -->|email/password| Auth[Firebase Auth]
     Auth -->|UID| Browser
     Browser <-->|live onSnapshot sync| DB[(Firestore)]
-      </pre>
+        </pre>
+      </div>
+      <p>There's no application server in the middle — the browser talks directly to Firebase. That keeps the whole app deployable as static files on GitHub Pages, with Firebase providing the only "backend" pieces: identity and a real-time database.</p>
     </div>
-    <p style="margin-top:16px;">There's no application server in the middle — the browser talks directly to Firebase. That keeps the whole app deployable as static files on GitHub Pages, with Firebase providing the only "backend" pieces: identity and a real-time database.</p>
-  </section>
 
-  <section id="data-model">
-    <div class="section-eyebrow">Data Model</div>
-    <div class="diagram-panel">
-      <pre class="mermaid">
+    <div class="line-section" id="data-model">
+      <div class="line-head"><span>Data model</span><span>—</span></div>
+      <div class="diagram-panel">
+        <pre class="mermaid">
 erDiagram
     PANTRY_SPACE ||--o{ ITEM : contains
     PANTRY_SPACE ||--o{ RECIPE : contains
@@ -271,31 +279,35 @@ erDiagram
         string url
         timestamp createdAt
     }
-      </pre>
+        </pre>
+      </div>
+      <p>Items and recipes live under <code>pantries/{spaceId}/items</code> and <code>pantries/{spaceId}/recipes</code>. By default <code>spaceId</code> is just the signed-in user's UID, which is what makes "Share Pantry" possible — it copies a link with a <code>?pantry=&lt;uid&gt;</code> query param that re-points any other signed-in viewer's session at that same space.</p>
     </div>
-    <p style="margin-top:16px;">Items and recipes live under <code class="mono">pantries/{spaceId}/items</code> and <code class="mono">pantries/{spaceId}/recipes</code>. By default <code class="mono">spaceId</code> is just the signed-in user's UID, which is what makes "Share Pantry" possible — it copies a link with a <code class="mono">?pantry=&lt;uid&gt;</code> query param that re-points any other signed-in viewer's session at that same space.</p>
-  </section>
 
-  <section id="decisions">
-    <div class="section-eyebrow">Key Engineering Decisions</div>
-    <ul class="feature-list">
-      <li><strong>Auth UID doubles as the partition key.</strong> No separate "create a pantry" step exists — signing up automatically gives an account its own Firestore space, keyed by the UID Firebase already assigns.</li>
-      <li><strong>Share-by-link, not a permissions system.</strong> Pointing another signed-in user at your space is just a URL parameter, not a real ACL. It's flagged clearly in the app and here — it's convenient, not secure.</li>
-      <li><strong>Demo Mode never touches Firestore.</strong> It's a fully separate client-side code path with hardcoded sample data, so visitors can try every interaction (add, remove, search, filter) without creating an account or writing to the real database.</li>
-      <li><strong>Legacy data migration on first connect.</strong> Pantry started as a localStorage-only app before Firestore was added. The current version auto-imports any of that old local data into Firestore the first time a browser connects, instead of discarding it.</li>
-    </ul>
-  </section>
+    <div class="line-section" id="decisions">
+      <div class="line-head"><span>Key decisions</span><span>—</span></div>
+      <ul class="decisions">
+        <li><strong>Auth UID doubles as the partition key.</strong> No separate "create a pantry" step exists — signing up automatically gives an account its own Firestore space, keyed by the UID Firebase already assigns.</li>
+        <li><strong>Share-by-link, not a permissions system.</strong> Pointing another signed-in user at your space is just a URL parameter, not a real ACL. It's flagged clearly in the app and here — it's convenient, not secure.</li>
+        <li><strong>Demo Mode never touches Firestore.</strong> It's a fully separate client-side code path with hardcoded sample data, so visitors can try every interaction without creating an account or writing to the real database.</li>
+        <li><strong>Legacy data migration on first connect.</strong> Pantry started as a localStorage-only app before Firestore was added. The current version auto-imports any of that old local data into Firestore the first time a browser connects, instead of discarding it.</li>
+      </ul>
+    </div>
 
-  <footer class="site-footer">
-    <span>© 2026 Caden James</span>
-    <a href="/">← Back to portfolio</a>
-    <a href="/pantry/">Try It →</a>
-  </footer>
+    <div class="totals">
+      <div class="totals-row"><span>items shipped</span><span>real-time sync</span></div>
+      <div class="totals-row"><span>auth method</span><span>firebase</span></div>
+      <div class="totals-row grand"><span>total</span><span>1 working app</span></div>
+    </div>
 
+    <div class="barcode"></div>
+    <div class="thank-you">thanks for stopping by<span>© 2026 caden james — cadenjames667-ls.github.io</span></div>
+
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Courier Prime, monospace", primaryColor: "#F2ECDD", primaryBorderColor: "#C1442D", lineColor: "#9C8F7A", tertiaryColor: "#FBF8F0" } });
 </script>
 </body>
 </html>

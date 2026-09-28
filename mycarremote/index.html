@@ -6,311 +6,237 @@
 <title>MyCarRemote — Caden James</title>
 <meta name="description" content="A custom web-based remote control for an ESP32-powered mecanum-wheel smart car, built by Caden James.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --ink: #101828;
-    --ink-light: #475467;
-    --ink-muted: #98a2b3;
-    --accent: #2952cc;
-    --accent-light: #eef2fd;
-    --border: #e4e7ec;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --bg: #0B1E33;
+    --panel: #0F2A47;
+    --ink: #EAF3FB;
+    --ink-light: #B9D2E8;
+    --ink-muted: #6E93B4;
+    --line: #7FB4E0;
+    --line-dim: #3D6D93;
+    --amber: #E8A33D;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.5;
+    font-family: "JetBrains Mono", monospace;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(rgba(127,180,224,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(127,180,224,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink-light);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
   a { color: inherit; }
-
   .mono { font-family: "JetBrains Mono", monospace; }
+  .display { font-family: "Space Grotesk", sans-serif; }
 
-  .page {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 0 32px 96px;
-  }
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
 
   .nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 28px 0;
+    font-size: 13px;
   }
 
-  .nav-back {
-    font-weight: 700;
-    font-size: 15px;
-    text-decoration: none;
-    color: var(--ink);
-  }
-
-  .nav-back:hover { color: var(--accent); }
-
-  .nav-links a {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink-light);
-    text-decoration: none;
-  }
-
-  .nav-links a:hover { color: var(--accent); }
+  .nav-back { font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; color: var(--ink); }
+  .nav-back:hover { color: var(--line); }
+  .nav-links a { color: var(--ink-muted); text-decoration: none; }
+  .nav-links a:hover { color: var(--line); }
 
   .hero {
-    padding: 24px 0 48px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
+    padding: 24px 0 44px;
+    border-bottom: 1px solid var(--line-dim);
+    margin-bottom: 44px;
   }
 
   .hero-eyebrow {
-    font-family: "JetBrains Mono", monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 16px;
+    color: var(--line);
+    border: 1px solid var(--line-dim);
+    padding: 4px 10px;
+    margin-bottom: 18px;
   }
 
+  .hero-eyebrow::before { content: "+"; color: var(--amber); }
+
   .hero-name {
-    font-size: clamp(32px, 5vw, 44px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(32px, 5vw, 46px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
     line-height: 1.1;
     margin-bottom: 16px;
+    color: var(--ink);
   }
 
   .hero-bio {
     max-width: 620px;
     color: var(--ink-light);
-    font-size: 16px;
-    line-height: 1.7;
+    font-size: 14.5px;
+    line-height: 1.8;
     margin-bottom: 24px;
   }
 
-  .hero-links {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
+  .hero-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
 
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
     text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    padding: 9px 16px;
+    border: 1px solid var(--line-dim);
+    color: var(--ink-light);
+    transition: border-color 0.15s, color 0.15s;
   }
 
-  .btn-outline {
-    background: var(--surface);
-    color: var(--ink);
-    border: 1px solid var(--border);
-  }
+  .btn-outline:hover { border-color: var(--line); color: var(--line); }
 
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-  .tag-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .tag {
-    font-family: "JetBrains Mono", monospace;
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--accent-light);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--accent);
+    border: 1px solid var(--line-dim);
+    padding: 4px 9px;
+    color: var(--line);
   }
 
-  section { margin-bottom: 48px; }
+  section { margin-bottom: 44px; }
 
   .section-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted);
-    margin-bottom: 16px;
-  }
-
-  section p {
-    color: var(--ink-light);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
     font-size: 15px;
-    line-height: 1.7;
-    max-width: 680px;
+    color: var(--ink);
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--line-dim);
   }
 
+  .section-eyebrow .fig { color: var(--line); margin-right: 8px; font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 13px; }
+
+  section p { color: var(--ink-light); font-size: 14px; line-height: 1.8; max-width: 680px; }
   section p + p { margin-top: 12px; }
 
-  .feature-list {
-    list-style: none;
-    display: grid;
-    gap: 12px;
-  }
+  .feature-list { list-style: none; display: grid; gap: 0; }
 
   .feature-list li {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
+    padding: 12px 4px;
+    font-size: 13.5px;
     color: var(--ink-light);
-    line-height: 1.6;
-    box-shadow: var(--shadow);
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(127,180,224,0.14);
+    position: relative;
+    padding-left: 18px;
   }
 
-  .feature-list strong { color: var(--ink); }
+  .feature-list li::before { content: "◇"; position: absolute; left: 0; top: 12px; color: var(--line); font-size: 11px; }
+  .feature-list strong { color: var(--ink); font-family: "Space Grotesk", sans-serif; font-weight: 600; }
 
   .pin-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    font-size: 14px;
-    box-shadow: var(--shadow);
+    font-size: 13px;
   }
 
   .pin-table th, .pin-table td {
     text-align: left;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(127,180,224,0.18);
   }
 
   .pin-table th {
-    font-family: "JetBrains Mono", monospace;
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ink-muted);
-    background: var(--bg);
+    color: var(--line);
+    border-bottom: 1px solid var(--line-dim);
+    font-weight: 500;
   }
 
-  .pin-table td:last-child { font-family: "JetBrains Mono", monospace; color: var(--ink-light); }
+  .pin-table td:last-child { color: var(--amber); }
   .pin-table tr:last-child td { border-bottom: none; }
 
-  .steps {
-    list-style: none;
-    counter-reset: step;
-    display: grid;
-    gap: 14px;
-  }
+  .steps { list-style: none; display: grid; gap: 10px; }
 
   .steps li {
-    counter-increment: step;
-    padding-left: 40px;
+    padding-left: 46px;
     position: relative;
-    font-size: 14px;
+    font-size: 13.5px;
     color: var(--ink-light);
-    line-height: 1.6;
+    line-height: 1.7;
+    counter-increment: step;
   }
 
+  .steps { counter-reset: step; }
+
   .steps li::before {
-    content: counter(step);
+    content: "[" counter(step, decimal-leading-zero) "]";
     position: absolute;
     left: 0;
     top: 0;
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--line);
+    font-size: 13px;
   }
 
   .steps code {
     font-family: "JetBrains Mono", monospace;
-    background: var(--accent-light);
-    color: var(--accent);
+    background: var(--panel);
+    color: var(--line);
     padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 13px;
+    font-size: 12.5px;
+    border: 1px solid var(--line-dim);
   }
 
-  .code-panel {
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
-  }
+  .code-panel { border: 1px solid var(--line-dim); }
 
   .code-panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #1e1e27;
-    color: #9a9aab;
-    padding: 12px 18px;
-    font-family: "JetBrains Mono", monospace;
+    background: var(--panel);
+    color: var(--line);
+    padding: 11px 16px;
     font-size: 12px;
+    border-bottom: 1px solid var(--line-dim);
   }
 
-  .code-panel-header a {
-    color: #6d7bff;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
+  .code-panel-header a { color: var(--amber); text-decoration: none; font-weight: 600; }
   .code-panel-header a:hover { text-decoration: underline; }
 
-  .code-panel pre {
-    margin: 0;
-    max-height: 640px;
-    overflow: auto;
-    font-size: 13px;
-  }
-
-  .code-panel pre code.hljs {
-    padding: 20px !important;
-  }
+  .code-panel pre { margin: 0; max-height: 640px; overflow: auto; font-size: 13px; }
+  .code-panel pre code.hljs { padding: 20px !important; background: #0A1628 !important; }
 
   .site-footer {
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
+    padding-top: 28px;
+    border-top: 1px solid var(--line-dim);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    font-family: "JetBrains Mono", monospace;
     font-size: 12px;
     color: var(--ink-muted);
   }
 
   .site-footer a { text-decoration: none; }
-  .site-footer a:hover { color: var(--accent); }
+  .site-footer a:hover { color: var(--line); }
 
   @media (max-width: 640px) {
     .hero { padding: 16px 0 40px; }
-    .pin-table { font-size: 13px; }
+    .pin-table { font-size: 12px; }
   }
 </style>
 </head>
@@ -325,7 +251,7 @@
   </nav>
 
   <header class="hero">
-    <div class="hero-eyebrow">Embedded · IoT</div>
+    <div class="hero-eyebrow">Embedded / IoT</div>
     <h1 class="hero-name">MyCarRemote</h1>
     <p class="hero-bio">A custom web-based remote control for the Acebott QD001 ESP32 mecanum-wheel smart car, built from scratch on top of the kit's motor-control library. The ESP32 hosts its own WiFi access point and web server — no phone app, no router, no internet connection needed. Connect to the car's hotspot and drive it from any browser.</p>
     <div class="hero-links">
@@ -341,7 +267,7 @@
   </header>
 
   <section id="features">
-    <div class="section-eyebrow">Features</div>
+    <div class="section-eyebrow"><span class="fig">FIG. 01</span>Features</div>
     <ul class="feature-list">
       <li><strong>Drive</strong> — mecanum drive/strafe/rotate via an on-screen D-pad, touch, or keyboard (WASD to drive, Q/E to strafe, arrow keys also supported)</li>
       <li><strong>Adjustable speed</strong> slider (0–100%)</li>
@@ -356,7 +282,7 @@
   </section>
 
   <section id="hardware">
-    <div class="section-eyebrow">Hardware</div>
+    <div class="section-eyebrow"><span class="fig">FIG. 02</span>Hardware</div>
     <p>Written for the Acebott QD001 kit's ESP32 Car Shield V2.0 (ESP32-D0WD-V3, CH340 USB-serial), a 4WD mecanum-wheel chassis.</p>
     <table class="pin-table" style="margin-top:16px;">
       <tr><th>Function</th><th>Pin(s)</th></tr>
@@ -370,7 +296,7 @@
   </section>
 
   <section id="setup">
-    <div class="section-eyebrow">Setup</div>
+    <div class="section-eyebrow"><span class="fig">FIG. 03</span>Setup procedure</div>
     <ol class="steps">
       <li>Install the ESP32 board package and libraries (<code>ACB_SmartCar_V2</code>, <code>ultrasonic</code>, <code>ESP32Servo</code>, <code>EspSoftwareSerial</code>), select <strong>ESP32 Dev Module</strong> as the board.</li>
       <li>Flash <code>MyCarRemote.ino</code> to the car over USB via the Arduino IDE.</li>
@@ -380,7 +306,7 @@
   </section>
 
   <section id="code">
-    <div class="section-eyebrow">Source Code</div>
+    <div class="section-eyebrow"><span class="fig">FIG. 04</span>Source code</div>
     <div class="code-panel">
       <div class="code-panel-header">
         <span>MyCarRemote.ino</span>

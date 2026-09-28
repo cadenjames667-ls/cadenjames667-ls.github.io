@@ -6,216 +6,224 @@
 <title>This Site — Caden James</title>
 <meta name="description" content="A look at how cadenjames667-ls.github.io itself is built — a hand-built multi-page static portfolio with three separate Firebase backends. Built by Caden Bannon.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --ink: #101828;
-    --ink-light: #475467;
-    --ink-muted: #98a2b3;
-    --accent: #2952cc;
-    --accent-light: #eef2fd;
-    --border: #e4e7ec;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --bg: #1E1E2E;
+    --gutter: #181825;
+    --surface: #262637;
+    --text: #CDD6F4;
+    --comment: #7B7F9E;
+    --keyword: #CBA6F7;
+    --string: #A6E3A1;
+    --func: #89B4FA;
+    --number: #FAB387;
+    --tag: #F38BA8;
+    --rule: #32324A;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "JetBrains Mono", monospace;
     background: var(--bg);
-    color: var(--ink);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 14px;
   }
 
   a { color: inherit; }
-  .mono { font-family: "JetBrains Mono", monospace; }
 
-  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 96px; }
+  .editor { max-width: 860px; margin: 0 auto; }
 
-  .nav {
+  /* Tab bar */
+  .tabbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 28px 0;
+    background: var(--gutter);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 8px;
   }
 
-  .nav-back { font-weight: 700; font-size: 15px; text-decoration: none; color: var(--ink); }
-  .nav-back:hover { color: var(--accent); }
-  .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink-light); text-decoration: none; }
-  .nav-links a:hover { color: var(--accent); }
-
-  .hero {
-    padding: 24px 0 48px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+    font-size: 12.5px;
+    color: var(--comment);
+    border-right: 1px solid var(--rule);
   }
 
-  .hero-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 16px;
+  .tab.active { background: var(--bg); color: var(--text); }
+  .tab .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--func); }
+
+  .top-nav {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+    padding: 0 12px;
+    font-size: 12.5px;
   }
 
-  .hero-name {
-    font-size: clamp(32px, 5vw, 44px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 16px;
+  .top-nav a { text-decoration: none; color: var(--comment); }
+  .top-nav a:hover { color: var(--func); }
+
+  .body-pad { padding: 22px 28px 100px; }
+
+  /* Code-line rows: gutter number + content */
+  .ln {
+    display: flex;
+    gap: 20px;
   }
 
-  .hero-bio {
-    max-width: 640px;
-    color: var(--ink-light);
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  .hero-byline {
-    font-family: "JetBrains Mono", monospace;
+  .ln .no {
+    flex-shrink: 0;
+    width: 28px;
+    text-align: right;
+    color: #4A4A63;
+    user-select: none;
     font-size: 13px;
-    color: var(--ink-muted);
-    margin-bottom: 24px;
+    padding-top: 1px;
   }
 
-  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .ln .code { flex: 1; min-width: 0; }
+
+  .comment { color: var(--comment); }
+  .kw { color: var(--keyword); }
+  .str { color: var(--string); }
+  .fn { color: var(--func); }
+  .num { color: var(--number); }
+  .tg { color: var(--tag); }
+
+  .blank { height: 10px; }
+
+  h1.title {
+    font-size: clamp(26px, 4.4vw, 36px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .lede-line .code { color: var(--text); max-width: 68ch; line-height: 1.85; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 6px; }
 
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
+    gap: 6px;
     text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-size: 13px;
+    padding: 8px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    color: var(--text);
   }
 
-  .btn-primary { background: var(--ink); color: #fff; }
-  .btn-primary:hover { background: var(--accent); }
-  .btn-outline { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:hover { border-color: var(--func); color: var(--func); }
+  .btn.primary { background: var(--surface); border-color: var(--func); color: var(--func); }
 
   .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { font-size: 11.5px; color: var(--string); border: 1px solid var(--rule); padding: 3px 9px; border-radius: 4px; }
 
-  .tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--accent-light);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--accent);
-  }
-
-  section { margin-bottom: 48px; }
-
-  .section-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted);
-    margin-bottom: 16px;
-  }
-
-  section > p { color: var(--ink-light); font-size: 15px; line-height: 1.7; max-width: 680px; }
-  section > p + p { margin-top: 12px; }
+  section { margin-top: 8px; }
 
   .diagram-panel {
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 24px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 20px;
     overflow-x: auto;
+    margin: 10px 0 10px 48px;
   }
 
-  .feature-list { list-style: none; display: grid; gap: 12px; }
+  .output-label { color: var(--comment); font-size: 12px; margin: 4px 0 4px 48px; }
 
-  .feature-list li {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--ink-light);
-    line-height: 1.6;
-    box-shadow: var(--shadow);
-  }
+  .obj-list { margin-top: 6px; }
 
-  .feature-list strong { color: var(--ink); }
+  .obj-item { margin-bottom: 14px; }
 
-  .site-footer {
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
+  .obj-item .key { color: var(--func); }
+  .obj-item .val { color: var(--text); }
+
+  .foot {
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 16px;
     flex-wrap: wrap;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: var(--ink-muted);
+    gap: 10px;
+    color: var(--comment);
+    font-size: 12.5px;
   }
 
-  .site-footer a { text-decoration: none; }
-  .site-footer a:hover { color: var(--accent); }
+  .foot a { text-decoration: none; }
+  .foot a:hover { color: var(--func); }
 
-  @media (max-width: 640px) {
-    .hero { padding: 16px 0 40px; }
+  @media (max-width: 620px) {
+    .body-pad { padding: 18px 16px 80px; }
+    .ln { gap: 12px; }
+    .ln .no { width: 20px; }
+    .diagram-panel, .output-label { margin-left: 0; }
   }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="editor">
 
-  <nav class="nav">
-    <a class="nav-back" href="/">← Caden James</a>
-    <div class="nav-links">
-      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
+  <div class="tabbar">
+    <div class="tab active"><span class="dot"></span>this-site/index.html</div>
+    <div class="top-nav">
+      <a href="/">← portfolio</a>
+      <a href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io" target="_blank" rel="noopener">github</a>
     </div>
-  </nav>
+  </div>
 
-  <header class="hero">
-    <div class="hero-eyebrow">Meta · Static Site</div>
-    <h1 class="hero-name">This Site</h1>
-    <p class="hero-bio">You're looking at it. A hand-built, multi-page static portfolio — no framework, no bundler, no build step — that happens to front three separate Firebase-backed apps and its own internal analytics dashboard. This page is the site turning around to describe itself.</p>
-    <div class="hero-byline">Built by Caden Bannon</div>
-    <div class="hero-links">
-      <a class="btn btn-primary" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io" target="_blank" rel="noopener">View on GitHub</a>
-      <a class="btn btn-outline" href="/">Back to Home</a>
-    </div>
-    <div class="tag-row">
-      <span class="tag">HTML / CSS / JS</span>
-      <span class="tag">No Framework</span>
-      <span class="tag">Firebase</span>
-      <span class="tag">GitHub Pages</span>
-    </div>
-  </header>
+  <div class="body-pad">
 
-  <section id="what-it-is">
-    <div class="section-eyebrow">What It Is</div>
-    <p>Every page on this site — this one included — is a single static HTML file with its styles and scripts inline. There's no React, no npm install, no build step: what's in the git repo is exactly what GitHub Pages serves. Pushing to <code class="mono">main</code> is the entire deploy pipeline.</p>
-    <p>Underneath that simplicity are three independent Firebase projects — one each for Pantry, Furnder, and the visit-log behind <code class="mono">/admin/</code> — plus a from-scratch design system (color tokens, type scale, card and diagram styles) reused across every project write-up page rather than pulled from a component library.</p>
-  </section>
+    <div class="ln"><span class="no">1</span><span class="code comment">// meta / static-site — this page describing its own repo</span></div>
+    <div class="blank"></div>
+    <div class="ln"><span class="no">2</span><span class="code"><span class="kw">const</span> <span class="fn">title</span> = <span class="str">"This Site"</span>;</span></div>
+    <div class="ln"><span class="no">3</span><span class="code title"><span class="kw">h1</span> → <span class="str">This Site</span></span></div>
+    <div class="blank"></div>
+    <div class="ln lede-line"><span class="no">4</span><span class="code">You're looking at it. A hand-built, multi-page static portfolio — no framework, no bundler, no build step — that happens to front three separate Firebase-backed apps and its own internal analytics dashboard. This page is the site turning around to describe itself.</span></div>
+    <div class="blank"></div>
+    <div class="ln"><span class="no">5</span><span class="code comment">// built by Caden Bannon</span></div>
+    <div class="blank"></div>
+    <div class="ln"><span class="no">6</span><span class="code">
+      <div class="btn-row">
+        <a class="btn primary" href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io" target="_blank" rel="noopener">view on github →</a>
+        <a class="btn" href="/">back home</a>
+      </div>
+    </span></div>
+    <div class="ln"><span class="no">7</span><span class="code">
+      <div class="tag-row">
+        <span class="tag">html / css / js</span>
+        <span class="tag">no framework</span>
+        <span class="tag">firebase</span>
+        <span class="tag">github pages</span>
+      </div>
+    </span></div>
 
-  <section id="architecture">
-    <div class="section-eyebrow">Site Map</div>
-    <div class="diagram-panel">
-      <pre class="mermaid">
+    <div class="blank"></div><div class="blank"></div>
+
+    <section id="what-it-is">
+      <div class="ln"><span class="no">9</span><span class="code comment">// —— what it is ——</span></div>
+      <div class="blank"></div>
+      <div class="ln"><span class="no">10</span><span class="code">Every page on this site — this one included — is a single static HTML file with its styles and scripts inline. There's no React, no <span class="fn">npm install</span>, no build step: what's in the git repo is exactly what GitHub Pages serves. Pushing to <span class="str">main</span> is the entire deploy pipeline.</span></div>
+      <div class="blank"></div>
+      <div class="ln"><span class="no">11</span><span class="code">Underneath that simplicity are <span class="num">3</span> independent Firebase projects — one each for Pantry, Furnder, and the visit-log behind <span class="str">/admin/</span> — plus a from-scratch design system reused across every write-up page rather than pulled from a component library.</span></div>
+    </section>
+
+    <div class="blank"></div>
+
+    <section id="architecture">
+      <div class="ln"><span class="no">14</span><span class="code comment">// —— site map ——</span></div>
+      <div class="output-label">▶ output</div>
+      <div class="diagram-panel">
+        <pre class="mermaid">
 graph TD
     Home[Homepage] --> PantryAbout[Pantry write-up]
     Home --> FurnderAbout[Furnder write-up]
@@ -231,33 +239,52 @@ graph TD
     FurnderApp --> FurnderFB[(Firebase: Furnder)]
     Home -.->|visit log| VisitFB[(Firebase: Visit Log)]
     Admin["/admin/ dashboard"] --> VisitFB
-      </pre>
+        </pre>
+      </div>
+      <div class="ln"><span class="no">15</span><span class="code">Three separate Firebase projects, on purpose — Pantry, Furnder, and the visit-log each get their own, so a misconfigured or intentionally open rule set in one (Pantry's are wide open, by design, for a test project) has no way to touch the others' data.</span></div>
+    </section>
+
+    <div class="blank"></div>
+
+    <section id="decisions">
+      <div class="ln"><span class="no">18</span><span class="code comment">// —— key engineering decisions ——</span></div>
+      <div class="blank"></div>
+      <div class="obj-list">
+        <div class="ln"><span class="no">19</span><span class="code obj-item"><span class="key">zeroBuildStep:</span> <span class="val">Every file is deploy-ready as written. No bundler, no <span class="str">node_modules</span>, no CI step beyond "push to main" — GitHub Pages serves the repo directly.</span></span></div>
+        <div class="ln"><span class="no">20</span><span class="code obj-item"><span class="key">designSystemWithoutLibrary:</span> <span class="val">The same CSS custom properties and component patterns are repeated at the top of each page rather than centralized. That's a real tradeoff — some duplication — made deliberately to keep every page a fully self-contained file with no build-time dependency between them.</span></span></div>
+        <div class="ln"><span class="no">21</span><span class="code obj-item"><span class="key">writeUpsBeforeApps:</span> <span class="val">Pantry and Furnder's homepage cards link to a write-up page first (architecture, data model, decisions), with an explicit "Try It" through to the running app — context before the demo, not after.</span></span></div>
+        <div class="ln"><span class="no">22</span><span class="code obj-item"><span class="key">adminIsReallyGated:</span> <span class="val"><span class="str">/admin/</span> requires a real Firebase Auth sign-in, and Firestore's rules restrict reads to one account UID server-side — the same "enforced by the server" principle behind Meridian Trust, applied here too.</span></span></div>
+        <div class="ln"><span class="no">23</span><span class="code obj-item"><span class="key">weaknessesDocumented:</span> <span class="val">Pantry's open Firestore rules are called out in plain language on its own write-up page, in the README, and on the live app itself. Naming a project's rough edges reads as more credible than hiding them.</span></span></div>
+        <div class="ln"><span class="no">24</span><span class="code obj-item"><span class="key">funIncluded:</span> <span class="val"><span class="kw">true</span> <span class="comment">// somewhere on the homepage is a hidden, fully interactive easter egg. no spoilers.</span></span></span></div>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>© 2026 caden james</span>
+      <span>
+        <a href="/">← back to portfolio</a> &nbsp;
+        <a href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io" target="_blank" rel="noopener">github.com/cadenjames667-ls/cadenjames667-ls.github.io</a>
+      </span>
     </div>
-    <p style="margin-top:16px;">Three separate Firebase projects, on purpose — Pantry, Furnder, and the visit-log each get their own, so a misconfigured or intentionally open rule set in one (Pantry's are wide open, by design, for a test project) has no way to touch the others' data.</p>
-  </section>
 
-  <section id="decisions">
-    <div class="section-eyebrow">Key Engineering Decisions</div>
-    <ul class="feature-list">
-      <li><strong>Zero build step.</strong> Every file is deploy-ready as written. No bundler, no <code class="mono">node_modules</code>, no CI step beyond "push to main" — GitHub Pages serves the repo directly.</li>
-      <li><strong>A design system without a component library.</strong> The same CSS custom properties and component patterns (cards, tag pills, diagram panels) are repeated at the top of each page rather than centralized in a shared stylesheet. That's a real tradeoff — some duplication — made deliberately to keep every page a fully self-contained file with no build-time dependency between them.</li>
-      <li><strong>Write-ups separate from live apps.</strong> Pantry and Furnder's homepage cards link to a write-up page first (architecture, data model, decisions), with an explicit "Try It" through to the actual running app — so context comes before the demo, not after.</li>
-      <li><strong>The admin dashboard is really auth-gated, not just hidden.</strong> <code class="mono">/admin/</code> requires a real Firebase Auth sign-in, and Firestore's security rules restrict reads to one specific account UID server-side — the same "enforcement lives in one place, enforced by the server" principle behind Meridian Trust, applied here too.</li>
-      <li><strong>Known weaknesses are documented, not hidden.</strong> Pantry's open Firestore rules are called out in plain language on its own write-up page, in this repo's README, and on the live app itself. A portfolio that names its own project's rough edges reads as more credible than one that hides them.</li>
-      <li><strong>There's a little fun in here too.</strong> Somewhere on the homepage is a hidden, fully interactive easter egg. No spoilers — if you're the type to click around, you'll find it.</li>
-    </ul>
-  </section>
-
-  <footer class="site-footer">
-    <span>© 2026 Caden James</span>
-    <a href="/">← Back to portfolio</a>
-    <a href="https://github.com/cadenjames667-ls/cadenjames667-ls.github.io" target="_blank" rel="noopener">github.com/cadenjames667-ls/cadenjames667-ls.github.io</a>
-  </footer>
-
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script>
-  mermaid.initialize({ startOnLoad: true, theme: "neutral", themeVariables: { fontFamily: "Inter, sans-serif" } });
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "dark",
+    themeVariables: {
+      fontFamily: "JetBrains Mono, monospace",
+      background: "#262637",
+      primaryColor: "#262637",
+      primaryTextColor: "#CDD6F4",
+      primaryBorderColor: "#89B4FA",
+      lineColor: "#7B7F9E",
+      secondaryColor: "#262637",
+      tertiaryColor: "#1E1E2E"
+    }
+  });
 </script>
 </body>
 </html>

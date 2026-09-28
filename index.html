@@ -6,26 +6,27 @@
 <title>Caden James — Enterprise IT Systems Student</title>
 <meta name="description" content="Portfolio of Caden James, an Enterprise IT Systems student — web applications built with JavaScript, Firebase, and real-time data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f8fa;
-    --surface: #ffffff;
-    --ink: #101828;
-    --ink-light: #475467;
-    --ink-muted: #98a2b3;
-    --accent: #2952cc;
-    --accent-light: #eef2fd;
-    --border: #e4e7ec;
-    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10);
+    --paper: #F7F8F3;
+    --paper-band: #E9EFE2;
+    --surface: #FFFFFF;
+    --ink: #1C2B24;
+    --ink-light: #4B5D53;
+    --ink-muted: #8B9A8F;
+    --stamp: #1F6E43;
+    --stamp-light: #E3EEE4;
+    --brass: #A9822E;
+    --rule: #CBD6C3;
+    --rule-soft: #DEE6D8;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
     color: var(--ink);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -33,19 +34,19 @@
 
   a { color: inherit; }
 
-  .mono {
-    font-family: "JetBrains Mono", monospace;
+  .figure {
+    font-family: "IBM Plex Mono", monospace;
   }
 
-  .page {
+  .sheet {
     position: relative;
     z-index: 1;
-    max-width: 1040px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 0 32px 96px;
+    padding: 0 28px 100px;
   }
 
-  /* ── Easter egg background ── */
+  /* ── Easter egg background (unchanged mechanics) ── */
   #bad-apple-bg {
     position: fixed;
     inset: 0;
@@ -70,412 +71,437 @@
     object-fit: cover;
   }
 
-  .trigger-a {
-    cursor: pointer;
-  }
+  .trigger-a { cursor: pointer; }
 
   #nav-name-text {
     display: inline-block;
     transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease;
   }
 
-  #nav-name-text.morph-out {
-    transform: translateY(-14px);
-    opacity: 0;
-  }
-
-  #nav-name-text.morph-in {
-    animation: navNameMorphIn 0.38s cubic-bezier(0.2, 0, 0.2, 1);
-  }
+  #nav-name-text.morph-out { transform: translateY(-14px); opacity: 0; }
+  #nav-name-text.morph-in { animation: navNameMorphIn 0.38s cubic-bezier(0.2, 0, 0.2, 1); }
 
   @keyframes navNameMorphIn {
     from { transform: translateY(14px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
 
-  /* ── Nav ── */
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 28px 0;
+  /* ── Letterhead ── */
+  .letterhead {
+    padding: 36px 0 20px;
   }
 
-  .nav-name {
-    font-weight: 700;
-    font-size: 16px;
+  .letterhead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    letter-spacing: 0.01em;
+    margin-bottom: 18px;
+  }
+
+  .letterhead-name {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 22px;
     letter-spacing: -0.01em;
   }
 
-  .nav-links {
+  .letterhead-nav {
+    margin-top: 18px;
     display: flex;
-    gap: 28px;
+    gap: 22px;
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
   }
 
-  .nav-links a {
+  .letterhead-nav a {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--ink-light);
     text-decoration: none;
   }
 
-  .nav-links a:hover { color: var(--accent); }
+  .letterhead-nav a:hover { color: var(--stamp); }
 
-  /* ── Hero ── */
-  .hero {
-    padding: 56px 0 72px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 64px;
+  /* ── Intro / statement ── */
+  .intro {
+    padding: 30px 0 44px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 44px;
   }
 
-  .hero-eyebrow {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 16px;
+  .intro-role {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--stamp);
+    margin-bottom: 18px;
   }
 
-  .hero-name {
-    font-size: clamp(36px, 5vw, 52px);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 16px;
+  .intro-statement {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: clamp(28px, 4.4vw, 40px);
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    max-width: 30ch;
+    margin-bottom: 20px;
   }
 
-  .hero-bio {
-    max-width: 620px;
+  .intro-sub {
+    max-width: 52ch;
     color: var(--ink-light);
-    font-size: 17px;
+    font-size: 16px;
     line-height: 1.7;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
 
-  .hero-links {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .intro-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  .btn {
+  .action {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     padding: 10px 18px;
-    border-radius: 8px;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    border-radius: 3px;
+    border: 1px solid var(--ink);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
 
-  .btn-primary {
+  .action-primary {
     background: var(--ink);
-    color: #fff;
+    color: var(--paper);
   }
 
-  .btn-primary:hover { background: var(--accent); }
+  .action-primary:hover { background: var(--stamp); border-color: var(--stamp); }
 
-  .btn-outline {
-    background: var(--surface);
+  .action:not(.action-primary) {
+    background: transparent;
     color: var(--ink);
-    border: 1px solid var(--border);
+    border-color: var(--rule);
   }
 
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .action:not(.action-primary):hover { border-color: var(--stamp); color: var(--stamp); }
 
-  /* ── Section header ── */
-  .section-eyebrow {
-    font-family: "JetBrains Mono", monospace;
+  /* ── Block heading (shared by Skills / Ledger / How I Build) ── */
+  .block { margin-bottom: 48px; }
+
+  .block-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+  }
+
+  .block-title {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 19px;
+  }
+
+  .block-note {
+    font-family: "IBM Plex Mono", monospace;
     font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
     color: var(--ink-muted);
-    margin-bottom: 20px;
   }
 
-  section { margin-bottom: 64px; }
-
-  /* ── Skills ── */
-  .skills-grid {
+  /* ── Skills, rendered as a filed list, not pill badges ── */
+  .skills-wrap {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    column-gap: 22px;
+    row-gap: 9px;
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
   }
 
-  .skill-pill {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 13px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 8px 16px;
+  .skill-item {
+    font-size: 14.5px;
     color: var(--ink-light);
+    position: relative;
+    padding-left: 14px;
   }
 
-  /* ── Project grid ── */
-  .projects-grid {
+  .skill-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    background: var(--stamp);
+    border-radius: 1px;
+  }
+
+  /* ── Project ledger ── */
+  .ledger { border-top: 1px solid var(--rule); }
+
+  .entry {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
-  }
-
-  .project-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    grid-template-columns: 44px 1fr auto;
+    align-items: start;
+    gap: 6px 18px;
+    padding: 20px 10px;
     text-decoration: none;
     color: inherit;
+    border-bottom: 1px solid var(--rule-soft);
+    transition: background 0.15s;
   }
 
-  .project-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-    border-color: var(--accent);
+  .entry:nth-child(even) { background: var(--paper-band); }
+  .entry:hover { background: var(--stamp-light); }
+
+  .entry-no {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    padding-top: 3px;
   }
 
-  .project-card-tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-    margin-bottom: 12px;
+  .entry-name {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 5px;
+    display: block;
   }
 
-  .project-card-title {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    margin-bottom: 10px;
-  }
-
-  .project-card-desc {
+  .entry-desc {
+    display: block;
     font-size: 14px;
     color: var(--ink-light);
-    line-height: 1.65;
-    flex: 1;
-    margin-bottom: 24px;
+    line-height: 1.6;
+    max-width: 52ch;
+    margin-bottom: 8px;
   }
 
-  .project-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+  .entry-tags {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--stamp);
   }
 
-  .project-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+  .entry-status {
+    text-align: right;
+    white-space: nowrap;
   }
 
-  .tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--accent-light);
-    border-radius: 6px;
-    padding: 4px 8px;
-    color: var(--accent);
-  }
-
-  .project-card-arrow {
-    font-size: 18px;
+  .entry-status-label {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
     color: var(--ink-muted);
-    flex-shrink: 0;
-    transition: transform 0.15s, color 0.15s;
+    margin-bottom: 4px;
   }
 
-  .project-card:hover .project-card-arrow {
-    transform: translateX(4px);
-    color: var(--accent);
+  .entry-status-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .entry:hover .entry-status-value { color: var(--stamp); }
+
+  @media (max-width: 560px) {
+    .entry { grid-template-columns: 30px 1fr; }
+    .entry-status { grid-column: 1 / -1; text-align: left; padding-top: 6px; }
+    .entry-status-label { display: inline; margin-right: 6px; }
+  }
+
+  /* ── How I build ── */
+  .how-text {
+    max-width: 62ch;
+    color: var(--ink-light);
+    font-size: 15px;
+    line-height: 1.75;
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
   }
 
   /* ── Footer ── */
-  .site-footer {
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
+  .letterfoot {
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", monospace;
     font-size: 12px;
     color: var(--ink-muted);
   }
 
-  .site-footer a { text-decoration: none; }
-  .site-footer a:hover { color: var(--accent); }
+  .letterfoot a { text-decoration: none; }
+  .letterfoot a:hover { color: var(--stamp); }
+  .letterfoot-links { display: flex; gap: 18px; }
 
-  @media (max-width: 640px) {
-    .nav-links { gap: 18px; }
-    .hero { padding: 40px 0 56px; }
-    .site-footer { flex-direction: column; align-items: flex-start; }
+  @media (max-width: 560px) {
+    .letterhead-top { flex-direction: column; gap: 4px; }
+    .letterfoot { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
 <div id="bad-apple-bg"></div>
-<div class="page">
+<div class="sheet">
 
-  <nav class="nav">
-    <div class="nav-name"><span id="nav-name-text">C<span id="trigger-a" class="trigger-a" onclick="toggleBadApple()">a</span>den James</span></div>
-    <div class="nav-links">
-      <a href="#projects">Projects</a>
+  <header class="letterhead">
+    <div class="letterhead-top">
+      <span>Personal record — statement of work</span>
+      <span>Folio 2026‑09</span>
+    </div>
+    <div class="letterhead-name"><span id="nav-name-text">C<span id="trigger-a" class="trigger-a" onclick="toggleBadApple()">a</span>den James</span></div>
+    <nav class="letterhead-nav">
+      <a href="#ledger">Projects</a>
       <a href="#skills">Skills</a>
       <a href="mailto:cadenjbannon@gmail.com">Contact</a>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="hero-eyebrow">Enterprise IT Systems Student</div>
-    <h1 class="hero-name">Caden James</h1>
-    <p class="hero-bio">I build full-stack web applications — real-time data sync, live databases, and responsive interfaces from scratch. Below are a few live projects, each built and deployed independently.</p>
-    <div class="hero-links">
-      <a class="btn btn-primary" href="mailto:cadenjbannon@gmail.com">Email Me</a>
-      <a class="btn btn-outline" href="/resume.pdf" target="_blank" rel="noopener">Resume</a>
-      <a class="btn btn-outline" href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
-    </div>
+    </nav>
   </header>
 
-  <section id="skills">
-    <div class="section-eyebrow">Technical Skills</div>
-    <div class="skills-grid">
-      <span class="skill-pill">JavaScript</span>
-      <span class="skill-pill">HTML / CSS</span>
-      <span class="skill-pill">Firebase / Firestore</span>
-      <span class="skill-pill">Real-time Data Sync</span>
-      <span class="skill-pill">REST APIs</span>
-      <span class="skill-pill">Responsive Design</span>
-      <span class="skill-pill">Git / GitHub</span>
-      <span class="skill-pill">C++ / Arduino</span>
-      <span class="skill-pill">Embedded Systems</span>
-      <span class="skill-pill">Python / Flask</span>
-      <span class="skill-pill">PostgreSQL</span>
-      <span class="skill-pill">Docker</span>
-      <span class="skill-pill">IAM / RBAC</span>
-      <span class="skill-pill">Linux Command-Line</span>
-      <span class="skill-pill">Network Security</span>
-      <span class="skill-pill">Tailscale / VPN</span>
-      <span class="skill-pill">Static Site Architecture</span>
+  <section class="intro">
+    <div class="intro-role">Enterprise IT Systems student — Remittance Processing, JPMorgan Chase</div>
+    <h1 class="intro-statement">I build full-stack web applications from scratch: real-time data sync, live databases, responsive interfaces.</h1>
+    <p class="intro-sub">What follows is an itemized record of what I've shipped — each entry built and deployed independently, most of it working alongside Claude as a pair-programming partner.</p>
+    <div class="intro-actions">
+      <a class="action action-primary" href="mailto:cadenjbannon@gmail.com">Email me</a>
+      <a class="action" href="/resume.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="action" href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">GitHub</a>
     </div>
   </section>
 
-  <main id="projects">
-    <div class="section-eyebrow">Featured Projects</div>
+  <section id="skills" class="block">
+    <div class="block-head">
+      <span class="block-title">Skills on file</span>
+    </div>
+    <div class="skills-wrap">
+      <span class="skill-item">JavaScript</span>
+      <span class="skill-item">HTML / CSS</span>
+      <span class="skill-item">Firebase / Firestore</span>
+      <span class="skill-item">Real-time data sync</span>
+      <span class="skill-item">REST APIs</span>
+      <span class="skill-item">Responsive design</span>
+      <span class="skill-item">Git / GitHub</span>
+      <span class="skill-item">C++ / Arduino</span>
+      <span class="skill-item">Embedded systems</span>
+      <span class="skill-item">Python / Flask</span>
+      <span class="skill-item">PostgreSQL</span>
+      <span class="skill-item">Docker</span>
+      <span class="skill-item">IAM / RBAC</span>
+      <span class="skill-item">Linux command-line</span>
+      <span class="skill-item">Network security</span>
+      <span class="skill-item">Tailscale / VPN</span>
+      <span class="skill-item">Static site architecture</span>
+    </div>
+  </section>
 
-    <div class="projects-grid">
+  <main id="ledger" class="block">
+    <div class="block-head">
+      <span class="block-title">Project ledger</span>
+      <span class="block-note figure">6 entries</span>
+    </div>
 
-      <a class="project-card" href="/pantry/about/">
-        <div class="project-card-tag">Web App · Live</div>
-        <h2 class="project-card-title">The Pantry</h2>
-        <p class="project-card-desc">A real-time kitchen inventory manager. Syncs pantry items and queued recipe links live across devices with Firebase Firestore, behind a lightweight account-based access gate.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">Real-time Firestore Sync</span>
-            <span class="tag">Firebase Auth</span>
-            <span class="tag">Share-by-Link</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+    <div class="ledger">
+
+      <a class="entry" href="/pantry/about/">
+        <span class="entry-no figure">001</span>
+        <span>
+          <span class="entry-name">The Pantry</span>
+          <span class="entry-desc">A real-time kitchen inventory manager. Syncs pantry items and queued recipe links live across devices, behind a lightweight account-based access gate.</span>
+          <span class="entry-tags">real-time firestore sync, firebase auth, share-by-link</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">Live app</span>
+        </span>
       </a>
 
-      <a class="project-card" href="/furnder/about/">
-        <div class="project-card-tag">Web App · Live</div>
-        <h2 class="project-card-title">Furnder</h2>
-        <p class="project-card-desc">A swipe-based furniture discovery app. Pulls product data and images from any retailer link, and stores liked items in a live Firestore-backed collection with a custom gesture-driven card UI.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">Firestore</span>
-            <span class="tag">Gesture UI</span>
-            <span class="tag">Metadata Fetch</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+      <a class="entry" href="/furnder/about/">
+        <span class="entry-no figure">002</span>
+        <span>
+          <span class="entry-name">Furnder</span>
+          <span class="entry-desc">A swipe-based furniture discovery app. Pulls product data and images from any retailer link into a Firestore-backed collection with a gesture-driven card UI.</span>
+          <span class="entry-tags">firestore, gesture ui, metadata fetch</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">Live app</span>
+        </span>
       </a>
 
-      <a class="project-card" href="/mycarremote/">
-        <div class="project-card-tag">Embedded · Firmware</div>
-        <h2 class="project-card-title">MyCarRemote</h2>
-        <p class="project-card-desc">A custom web-based remote control for an ESP32-powered mecanum-wheel smart car. The ESP32 hosts its own WiFi access point and web server — drive, sensor radar, and autonomous modes, no app required.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">ESP32</span>
-            <span class="tag">C++</span>
-            <span class="tag">Embedded Web Server</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+      <a class="entry" href="/mycarremote/">
+        <span class="entry-no figure">003</span>
+        <span>
+          <span class="entry-name">MyCarRemote</span>
+          <span class="entry-desc">A custom web-based remote control for an ESP32 mecanum-wheel smart car. The car hosts its own WiFi and web server — drive, radar, autonomous modes, no app required.</span>
+          <span class="entry-tags">esp32, c++, embedded web server</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">Firmware</span>
+        </span>
       </a>
 
-      <a class="project-card" href="/iam-rbac-demo/">
-        <div class="project-card-tag">Backend · Security</div>
-        <h2 class="project-card-title">Meridian Trust</h2>
-        <p class="project-card-desc">A role-based access control system with compliance-grade audit logging, modeled on enterprise and banking identity patterns. Separates authentication, authorization, and audit into three enforced layers, containerized with Docker.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">Flask</span>
-            <span class="tag">PostgreSQL</span>
-            <span class="tag">RBAC</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+      <a class="entry" href="/iam-rbac-demo/">
+        <span class="entry-no figure">004</span>
+        <span>
+          <span class="entry-name">Meridian Trust</span>
+          <span class="entry-desc">A role-based access control system with compliance-grade audit logging, modeled on enterprise and banking identity patterns. Authentication, authorization, and audit as three enforced layers.</span>
+          <span class="entry-tags">flask, postgresql, rbac</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">External repo</span>
+        </span>
       </a>
 
-      <a class="project-card" href="/homelab/">
-        <div class="project-card-tag">Systems · Infrastructure</div>
-        <h2 class="project-card-title">Homelab</h2>
-        <p class="project-card-desc">A self-hosted Linux server provisioned and administered entirely over SSH, hosting private Minecraft servers for concurrent multiplayer use. Secured with UFW/iptables and Tailscale private networking instead of public exposure.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">Linux</span>
-            <span class="tag">Tailscale</span>
-            <span class="tag">UFW / iptables</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+      <a class="entry" href="/homelab/">
+        <span class="entry-no figure">005</span>
+        <span>
+          <span class="entry-name">Homelab</span>
+          <span class="entry-desc">A self-hosted Linux server, provisioned and administered entirely over SSH, hosting private Minecraft servers behind UFW/iptables and a Tailscale mesh instead of public exposure.</span>
+          <span class="entry-tags">linux, tailscale, ufw / iptables</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">Infrastructure</span>
+        </span>
       </a>
 
-      <a class="project-card" href="/this-site/">
-        <div class="project-card-tag">Meta · Static Site</div>
-        <h2 class="project-card-title">This Site</h2>
-        <p class="project-card-desc">A look at how this portfolio itself is built — a hand-written, framework-free multi-page static site fronting three separate Firebase backends, with its own design system and a hidden easter egg.</p>
-        <div class="project-card-footer">
-          <div class="project-tags">
-            <span class="tag">No Framework</span>
-            <span class="tag">Firebase</span>
-            <span class="tag">GitHub Pages</span>
-          </div>
-          <span class="project-card-arrow">→</span>
-        </div>
+      <a class="entry" href="/this-site/">
+        <span class="entry-no figure">006</span>
+        <span>
+          <span class="entry-name">This site</span>
+          <span class="entry-desc">A look at how this portfolio itself is built — a hand-written, framework-free static site fronting three separate Firebase backends, with a hidden easter egg somewhere on this page.</span>
+          <span class="entry-tags">no framework, firebase, github pages</span>
+        </span>
+        <span class="entry-status">
+          <span class="entry-status-label">status</span>
+          <span class="entry-status-value">Meta</span>
+        </span>
       </a>
 
     </div>
   </main>
 
-  <section id="how-i-build">
-    <div class="section-eyebrow">How I Build</div>
-    <p class="hero-bio" style="max-width: 680px;">I build these projects working alongside Claude, Anthropic's AI coding assistant, as a pair-programming partner — it helps draft code, debug, and iterate on design, while I direct the architecture, review every change, and decide what actually ships. Treat it like any other tool in the stack: a way to move faster, not a replacement for understanding the system I'm building.</p>
+  <section class="block">
+    <div class="block-head">
+      <span class="block-title">How I build</span>
+    </div>
+    <p class="how-text">I build these projects working alongside Claude, Anthropic's AI coding assistant, as a pair-programming partner — it helps draft code, debug, and iterate on design, while I direct the architecture, review every change, and decide what actually ships. Treat it like any other tool in the stack: a way to move faster, not a replacement for understanding the system I'm building.</p>
   </section>
 
-  <footer class="site-footer">
+  <footer class="letterfoot">
     <span>© 2026 Caden James</span>
-    <a href="mailto:cadenjbannon@gmail.com">cadenjbannon@gmail.com</a>
-    <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
+    <span class="letterfoot-links">
+      <a href="mailto:cadenjbannon@gmail.com">cadenjbannon@gmail.com</a>
+      <a href="https://github.com/cadenjames667-ls" target="_blank" rel="noopener">github.com/cadenjames667-ls</a>
+    </span>
   </footer>
 
 </div>
